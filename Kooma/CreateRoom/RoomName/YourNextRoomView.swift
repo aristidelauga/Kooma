@@ -1,7 +1,7 @@
 
 import SwiftUI
 
-struct CreateRoomView: View {
+struct YourNextRoomView: View {
 	@State private var roomName = ""
 	@State private var roomCode = ""
 	@State private var createRoomSheet = false
@@ -9,7 +9,10 @@ struct CreateRoomView: View {
     var body: some View {
 		NavigationStack(path: $path) {
 			VStack(alignment: .leading, spacing: 0) {
-				TextHeading600(text: "Room details")
+
+				// MARK: - Create a Room
+				TextHeading600(text: "Create a Room")
+					.padding(.top, 25)
 				KMTextfield(text: $roomName, placeholder: "Name your room")
 					.padding(.vertical, 16)
 
@@ -20,31 +23,23 @@ struct CreateRoomView: View {
 					.frame(maxWidth: .infinity, alignment: .trailing)
 				}
 
+				// MARK: - Join a Room
 				TextHeading600(text: "Join a Room")
-					.padding(.top, 60)
+					.padding(.top, 92)
 
 				KMTextfield(text: $roomCode, placeholder: "Enter Room Code")
 					.padding(.vertical, 16)
 
-				NavigationLink(destination: ResearchRoomView(navigationPath: $path)) {
 					Button {
 						path.append("ResearchRoomView")
 					} label: {
-						TextHeading200(text: "Continue")
-							.padding(.vertical, 20)
-							.padding(.horizontal, 12)
-							.frame(maxWidth: 112, maxHeight: 48)
-							.background(
-								RoundedRectangle(cornerRadius: 48)
-									.foregroundStyle(.kmYellow)
-							)
+						NavigationButton(text: "Join Room")
 					}
-				}
 				.frame(maxWidth: .infinity, alignment: .trailing)
 				Spacer()
 			}
 			.padding(.horizontal, 16)
-			.navigationTitle("Create a room")
+			.navigationTitle("Your Next Room")
 			.navigationBarTitleDisplayMode(.inline)
 			.fullScreenCover(isPresented: $createRoomSheet, content: {
 				SearchAddressView()
@@ -62,6 +57,6 @@ struct CreateRoomView: View {
 
 #Preview {
     NavigationStack {
-    	CreateRoomView()
+    	YourNextRoomView()
     }
 }

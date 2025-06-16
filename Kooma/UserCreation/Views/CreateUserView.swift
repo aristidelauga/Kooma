@@ -14,7 +14,7 @@ struct CreateUserView: View {
 			.padding(.top, 18)
 			.frame(maxWidth: .infinity, alignment: .trailing)
 			.navigationDestination(isPresented: $hasSeenOnboarding, destination: {
-				CreateRoomView()
+				YourNextRoomView()
 			})
         }
 		.padding(.horizontal, 16)

@@ -25,6 +25,10 @@ import MapKit
 		guard !searchableText.isEmpty else { return }
 		localSearchCompleter.queryFragment = searchableText
 	}
+
+	func fillSearchText(result: String) {
+		searchableText = result
+	}
 }
 
 

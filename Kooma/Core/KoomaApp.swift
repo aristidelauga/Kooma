@@ -14,7 +14,7 @@ struct KoomaApp: App {
         WindowGroup {
 			NavigationStack {
 				if hasSeenOnboarding {
-					CreateRoomView()
+					YourNextRoomView()
 				} else {
 					OnboardingStepOneView()
 				}
