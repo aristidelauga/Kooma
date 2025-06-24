@@ -2,8 +2,15 @@
 import SwiftUI
 
 struct SearchAddressView: View {
-	@State private var searchAddressViewModel = SearchAddressViewModel()
+	@State private var searchAddressViewModel: SearchAddressViewModel
+	@State private var path = NavigationPath()
+	@State private var shouldNavigate = false
 	@FocusState private var isFocusedTexField: Bool
+
+	init(room: RoomUI) {
+		_searchAddressViewModel = State(wrappedValue: SearchAddressViewModel(room: room))
+	}
+
     var body: some View {
 		NavigationView {
 			VStack(alignment: .leading) {
@@ -36,17 +43,29 @@ struct SearchAddressView: View {
 					AddressListView(searchAddressViewModel: searchAddressViewModel)
 				} else {
 					Spacer()
-					NavigationLink(destination: RadiusSettingView(address: searchAddressViewModel.searchableText)) {
-						NavigationButton(text: "Continue")
+					MainButton(text: "Continue") {
+						Task {
+							try await self.searchAddressViewModel.assignAddressToRoom()
+							self.shouldNavigate = true
+						}
 					}
 					.frame(maxWidth: .infinity, alignment: .center)
+
+					if let room = self.searchAddressViewModel.room {
+						NavigationLink(
+							destination: RadiusSettingView(room: room),
+							isActive: $shouldNavigate
+						) {
+							EmptyView()
+						}
+					}
 				}
 			}
+			.background(Color.kmBeige.edgesIgnoringSafeArea(.bottom))
 		}
-		.background(Color.kmBeige.edgesIgnoringSafeArea(.bottom))
     }
 }
 
 #Preview {
-    SearchAddressView()
+	SearchAddressView(room: RoomUI(id: UUID(), name: "Kowabunga"))
 }

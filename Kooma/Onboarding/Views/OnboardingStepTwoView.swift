@@ -2,6 +2,7 @@
 import SwiftUI
 
 struct OnboardingStepTwoView: View {
+//	var coordinator: NavigationCoordinator
 	var body: some View {
 		VStack(spacing: 0) {
 			Image(.onboarding2)

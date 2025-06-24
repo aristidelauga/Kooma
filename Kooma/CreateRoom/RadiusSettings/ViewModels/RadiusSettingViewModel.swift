@@ -3,26 +3,28 @@ import MapKit
 import Foundation
 
 @MainActor
-@Observable final class RadiusSettingViewModel: Sendable {
-	var address: String
+@Observable final class RadiusSettingViewModel {
 	var region = MKCoordinateRegion()
-	var items: [MKMapItem] = []
+	var room: RoomUI
+	var isLoading = false
+
 	private let restaurantAPI: any GetRestaurantInterface
 
-	init(restaurantAPI: any GetRestaurantInterface = GetRestaurantService(), address: String) {
+	init(restaurantAPI: any GetRestaurantInterface = GetRestaurantService(), room: RoomUI) {
 		self.restaurantAPI = restaurantAPI
-		self.address = address
+		self.room = room
 	}
 
 	func searchRestaurants(within radius: Double) async {
+		guard let address = self.room.address else { return }
+		self.isLoading = true
+		defer { self.isLoading = false }
 		do {
 			let coordinate = try await self.restaurantAPI.getCoordinate(from: address)
 			region.center = coordinate
-			let items = try await self.restaurantAPI.searchNearbyRestaurants(at: coordinate, radiusInMeters: radius * 1000)
-			self.items = items
-			for item in self.items {
-				print("\(item) \n")
-			}
+			guard let items = try await self.restaurantAPI.searchNearbyRestaurants(at: coordinate, radiusInMeters: radius * 1000) else { return }
+			let itemsUI = try items.map { try $0.toUI() }
+			self.room.restaurants = itemsUI
 		} catch {
 			print("error during catching coordinate: \(error)")
 		}

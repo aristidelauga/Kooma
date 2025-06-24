@@ -1,9 +1,3 @@
-//
-//  AddressListView.swift
-//  Kooma
-//
-//  Created by Aristide LAUGA on 14/06/2025.
-//
 
 import SwiftUI
 

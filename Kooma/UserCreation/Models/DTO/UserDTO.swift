@@ -7,7 +7,7 @@ struct UserDTO: Identifiable, Codable, Sendable {
 }
 
 extension UserDTO: UIModelConvertible {
-	func toUI() throws -> User {
-		User(id: self.id, name: self.name)
+	func toUI() throws -> UserUI {
+		UserUI(id: self.id, name: self.name)
 	}
 }

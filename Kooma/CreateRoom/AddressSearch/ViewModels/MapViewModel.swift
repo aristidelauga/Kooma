@@ -14,26 +14,10 @@ import MapKit
 		
 		request.naturalLanguageQuery = subtitle.contains(title) ? subtitle : title + ", " + subtitle
 		
-		//		Task {
-		//			let response = try await MKLocalSearch(request: request).start()
-		//			let items = response.mapItems.map {
-		//				AnnotationItem(
-		//					latitude: $0.placemark.coordinate.latitude,
-		//					longitude: $0.placemark.coordinate.longitude
-		//				)
-		//			}
-		//			let region = response.boundingRegion
-		//
-		//			await MainActor.run {
-		//					self.annotationItems = items
-		//					self.region = region
-		//				}
-		////				self.region = response.boundingRegion
-		//			}
 		let search = MKLocalSearch(request: request)
 		search.start { [weak self] response, error in
 			guard let self, let response else { return }
-			let items = response.mapItems.map {
+			let items = response.mapItems.compactMap {
 				AnnotationItem(
 					latitude: $0.placemark.coordinate.latitude,
 					longitude: $0.placemark.coordinate.longitude
@@ -43,5 +27,4 @@ import MapKit
 			self.region = response.boundingRegion
 		}
 	}
-	//	}
 }

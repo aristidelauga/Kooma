@@ -6,20 +6,23 @@ import MapKit
 @Observable final class SearchAddressViewModel: NSObject {
 	private(set) var results: Array<AddressResult> = []
 	var searchableText = ""
+	var room: RoomUI?
 
 	private var localSearchCompleter: MKLocalSearchCompleter
 
 	override init() {
 		self.localSearchCompleter = MKLocalSearchCompleter()
+//		self.room = RoomUI()
 		super.init()
 		self.localSearchCompleter.delegate = self
 	}
 
-//	private var localSearchCompleter: MKLocalSearchCompleter = {
-//		let completer = MKLocalSearchCompleter()
-//		completer.delegate = self
-//		return completer
-//	}()
+	init(room: RoomUI) {
+		self.room = room
+		self.localSearchCompleter = MKLocalSearchCompleter()
+		super.init()
+		self.localSearchCompleter.delegate = self
+	}
 
 	func searchAddress(_ searchableText: String) {
 		guard !searchableText.isEmpty else { return }
@@ -28,6 +31,18 @@ import MapKit
 
 	func fillSearchText(result: String) {
 		searchableText = result
+	}
+
+	func assignAddressToRoom() async throws {
+		Task {
+			do {
+				try await self.room?.address = self.searchableText
+				print("self.searchableText in SearchAddressViewModel: \(self.searchableText)")
+				print("self.room?.address in SearchAddressViewModel: \(self.room?.address)")
+			} catch {
+				//TODO: create a proper catch error phase here
+			}
+		}
 	}
 }
 

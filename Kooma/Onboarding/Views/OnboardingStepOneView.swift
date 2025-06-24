@@ -16,14 +16,6 @@ struct OnboardingStepOneView: View {
 			Spacer()
 
 			NavigationLink(destination: OnboardingStepTwoView(), label: {
-//				TextHeading200(text: "Continue")
-//					.padding(.vertical, 20)
-//					.padding(.horizontal, 12)
-//					.frame(maxWidth: 112, maxHeight: 48)
-//					.background(
-//						RoundedRectangle(cornerRadius: 48)
-//							.foregroundStyle(.kmYellow)
-//					)
 				NavigationButton(text: "Continue")
 			})
         }

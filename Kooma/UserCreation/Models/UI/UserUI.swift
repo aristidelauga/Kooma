@@ -1,7 +1,7 @@
 
 import Foundation
 
-struct User: Identifiable, Codable, Sendable {
+struct UserUI: Identifiable, Codable, Sendable {
 	var id: UUID
 	var name: String
 }
