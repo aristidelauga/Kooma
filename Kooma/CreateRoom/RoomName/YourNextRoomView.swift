@@ -2,13 +2,17 @@
 import SwiftUI
 
 struct YourNextRoomView: View {
-	@State private var roomCode = ""
-	@State private var createRoomSheet = false
 	@State private var path = NavigationPath()
+	@State private var roomCode = ""
+	@State private var presentSheet = false
+	@State private var showRoomsList = false
 
 	// MARK: ViewModels
-	@State private var roomCreationVM = RoomCreationViewModel()
+	@State private var roomCreationVM: RoomCreationViewModel
 
+	init(user: UserUI) {
+		_roomCreationVM = State(wrappedValue: RoomCreationViewModel(user: user))
+	}
 
     var body: some View {
 		NavigationStack(path: $path) {
@@ -22,10 +26,8 @@ struct YourNextRoomView: View {
 
 				VStack {
 					MainButton(text: "Create Room", maxWidth: 140) {
-						createRoomSheet = true
-						Task {
-							try await self.roomCreationVM.createRoomWithName()
-						}
+						presentSheet = true
+						self.roomCreationVM.createRoomWithName(with: self.roomCreationVM.user)
 					}
 					.frame(maxWidth: .infinity, alignment: .trailing)
 					.disabled(roomCreationVM.name.isEmpty)
@@ -49,13 +51,19 @@ struct YourNextRoomView: View {
 			.padding(.horizontal, 16)
 			.navigationTitle("Your Next Room")
 			.navigationBarTitleDisplayMode(.inline)
-			.fullScreenCover(isPresented: $createRoomSheet, content: {
+			.fullScreenCover(isPresented: $presentSheet, content: {
 				if let room = self.roomCreationVM.room {
-					SearchAddressView(room: room)
+					SearchAddressView(room: room, presentSheet: $showRoomsList)
 				}
 			})
 			.navigationDestination(for: String.self) { name in
 				ResearchRoomView(navigationPath: $path)
+			}
+			.navigationDestination(isPresented: $showRoomsList, destination: {
+				RoomsListView()
+			})
+			.onAppear {
+				print("Current user: \(self.roomCreationVM.user.name)")
 			}
 			.navigationBarBackButtonHidden()
 		}
@@ -64,6 +72,6 @@ struct YourNextRoomView: View {
 
 #Preview {
     NavigationStack {
-		YourNextRoomView()
+		YourNextRoomView(user: UserUI(id: UUID(), name: ""))
     }
 }

@@ -5,13 +5,13 @@ import Foundation
 @Observable final class RoomCreationViewModel {
 	var room: RoomUI?
 	var name: String = ""
+	var user: UserUI
+	
+	init(user: UserUI) {
+		self.user = user
+	}
 
-	func createRoomWithName() async throws {
-//		let room = try await CreateRoomUseCase().execute(name: name)
-		do {
-			try await self.room = RoomUI(id: UUID(), name: self.name)
-		} catch {
-			// TODO: create a real catch error condition
-		}
+	func createRoomWithName(with owner: UserUI)  {
+		self.room = RoomUI(id: UUID(), name: self.name, administrator: owner)
 	}
 }

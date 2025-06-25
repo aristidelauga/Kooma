@@ -3,12 +3,13 @@ import SwiftUI
 
 struct SearchAddressView: View {
 	@State private var searchAddressViewModel: SearchAddressViewModel
-	@State private var path = NavigationPath()
 	@State private var shouldNavigate = false
 	@FocusState private var isFocusedTexField: Bool
+	@Binding var showRoomsList: Bool
 
-	init(room: RoomUI) {
+	init(room: RoomUI, presentSheet: Binding<Bool>) {
 		_searchAddressViewModel = State(wrappedValue: SearchAddressViewModel(room: room))
+		_showRoomsList = presentSheet
 	}
 
     var body: some View {
@@ -44,16 +45,14 @@ struct SearchAddressView: View {
 				} else {
 					Spacer()
 					MainButton(text: "Continue") {
-						Task {
-							try await self.searchAddressViewModel.assignAddressToRoom()
-							self.shouldNavigate = true
-						}
+						self.searchAddressViewModel.assignAddressToRoom()
+						self.shouldNavigate = true
 					}
 					.frame(maxWidth: .infinity, alignment: .center)
 
 					if let room = self.searchAddressViewModel.room {
 						NavigationLink(
-							destination: RadiusSettingView(room: room),
+							destination: RadiusSettingView(room: room, presentSheet: $showRoomsList),
 							isActive: $shouldNavigate
 						) {
 							EmptyView()
@@ -67,5 +66,5 @@ struct SearchAddressView: View {
 }
 
 #Preview {
-	SearchAddressView(room: RoomUI(id: UUID(), name: "Kowabunga"))
+	SearchAddressView(room: RoomUI(id: UUID(), name: "Kowabunga", administrator: UserUI(id: UUID(), name: "Lead")), presentSheet: .constant(true))
 }

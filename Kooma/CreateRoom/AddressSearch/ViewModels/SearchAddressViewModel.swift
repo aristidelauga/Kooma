@@ -33,16 +33,10 @@ import MapKit
 		searchableText = result
 	}
 
-	func assignAddressToRoom() async throws {
-		Task {
-			do {
-				try await self.room?.address = self.searchableText
+	func assignAddressToRoom() {
+				self.room?.address = self.searchableText
 				print("self.searchableText in SearchAddressViewModel: \(self.searchableText)")
 				print("self.room?.address in SearchAddressViewModel: \(self.room?.address)")
-			} catch {
-				//TODO: create a proper catch error phase here
-			}
-		}
 	}
 }
 
