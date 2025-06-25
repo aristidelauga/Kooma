@@ -2,7 +2,7 @@
 import Foundation
 
 struct RoomUI: Identifiable, Codable, Sendable {
-	let id: UUID
+	let id: String
 	var name: String?
 	var administrator: UserUI
 	var address: String?
@@ -10,8 +10,8 @@ struct RoomUI: Identifiable, Codable, Sendable {
 	var restaurants: [RestaurantUI]?
 	var image: String
 
-	init(id: UUID = UUID(), name: String? = nil, administrator: UserUI) {
-		self.id = UUID()
+	init(id: String = RoomUI.generateCode(), name: String? = nil, administrator: UserUI) {
+		self.id = id
 		self.name = name
 		self.administrator = administrator
 		self.members = [self.administrator]
@@ -21,5 +21,10 @@ struct RoomUI: Identifiable, Codable, Sendable {
 			"RoomIcon-3"
 		].randomElement()!
 
+	}
+
+	static func generateCode(length: Int = 6) -> String {
+		let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+		return String((0..<length).compactMap { _ in characters.randomElement() })
 	}
 }

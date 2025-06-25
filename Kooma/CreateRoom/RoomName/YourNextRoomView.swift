@@ -51,9 +51,16 @@ struct YourNextRoomView: View {
 			.padding(.horizontal, 16)
 			.navigationTitle("Your Next Room")
 			.navigationBarTitleDisplayMode(.inline)
-			.fullScreenCover(isPresented: $presentSheet, content: {
+//			.fullScreenCover(isPresented: $presentSheet, content: {
+//				if let room = self.roomCreationVM.room {
+//					SearchAddressView(room: room, presentSheet: $showRoomsList)
+//				}
+//			})
+			.fullScreenCover(isPresented: $presentSheet, onDismiss: {
+				self.showRoomsList = true
+			}, content: {
 				if let room = self.roomCreationVM.room {
-					SearchAddressView(room: room, presentSheet: $showRoomsList)
+					SearchAddressView(room: room, presentSheet: $presentSheet)
 				}
 			})
 			.navigationDestination(for: String.self) { name in

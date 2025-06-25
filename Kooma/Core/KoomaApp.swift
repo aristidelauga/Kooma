@@ -1,11 +1,17 @@
 
 import SwiftUI
+import FirebaseCore
 
 @main
 struct KoomaApp: App {
 	@AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
 	@State private var userManager = UserManager()
 	@State private var roomsListVM = RoomsListViewModel()
+
+	init() {
+		FirebaseApp.configure()
+	}
+
     var body: some Scene {
         WindowGroup {
 			NavigationStack {

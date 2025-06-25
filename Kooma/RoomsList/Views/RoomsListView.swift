@@ -9,6 +9,9 @@ struct RoomsListView: View {
 				ForEach(self.roomsListVM.rooms) { room in
 					RoomCell(room: room)
 						.padding(.leading, 12)
+						.onTapGesture {
+							print("Room' id: \(room.id)")
+						}
 				}
 				Spacer()
 			}

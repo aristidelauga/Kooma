@@ -34,7 +34,7 @@ struct RoomCell: View {
 #Preview {
 	RoomCell(
 		room: RoomUI(
-			id: UUID(),
+			id: "12b489",
 			name: "Mobile Tech Squad",
 			administrator: UserUI(id: UUID(), name: "Lead")
 		)

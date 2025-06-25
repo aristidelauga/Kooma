@@ -12,6 +12,6 @@ import Foundation
 	}
 
 	func createRoomWithName(with owner: UserUI)  {
-		self.room = RoomUI(id: UUID(), name: self.name, administrator: owner)
+		self.room = RoomUI(name: self.name, administrator: owner)
 	}
 }

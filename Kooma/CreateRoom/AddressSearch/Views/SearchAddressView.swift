@@ -5,15 +5,15 @@ struct SearchAddressView: View {
 	@State private var searchAddressViewModel: SearchAddressViewModel
 	@State private var shouldNavigate = false
 	@FocusState private var isFocusedTexField: Bool
-	@Binding var showRoomsList: Bool
+	@Binding var presentSheet: Bool
 
 	init(room: RoomUI, presentSheet: Binding<Bool>) {
 		_searchAddressViewModel = State(wrappedValue: SearchAddressViewModel(room: room))
-		_showRoomsList = presentSheet
+		_presentSheet = presentSheet
 	}
 
     var body: some View {
-		NavigationView {
+		NavigationStack {
 			VStack(alignment: .leading) {
 
 				TextHeading600(text: "Where are you starting from?")
@@ -50,21 +50,26 @@ struct SearchAddressView: View {
 					}
 					.frame(maxWidth: .infinity, alignment: .center)
 
-					if let room = self.searchAddressViewModel.room {
-						NavigationLink(
-							destination: RadiusSettingView(room: room, presentSheet: $showRoomsList),
-							isActive: $shouldNavigate
-						) {
-							EmptyView()
-						}
-					}
+//					if let room = self.searchAddressViewModel.room {
+//						NavigationLink(
+//							destination: RadiusSettingView(room: room, presentSheet: $presentSheet),
+//							isActive: $shouldNavigate
+//						) {
+//							EmptyView()
+//						}
+//					}
 				}
 			}
+			.navigationDestination(isPresented: $shouldNavigate, destination: {
+				if let room = self.searchAddressViewModel.room {
+					RadiusSettingView(room: room, presentSheet: $presentSheet)
+				}
+			})
 			.background(Color.kmBeige.edgesIgnoringSafeArea(.bottom))
 		}
     }
 }
 
 #Preview {
-	SearchAddressView(room: RoomUI(id: UUID(), name: "Kowabunga", administrator: UserUI(id: UUID(), name: "Lead")), presentSheet: .constant(true))
+	SearchAddressView(room: RoomUI(id: "12b489", name: "Kowabunga", administrator: UserUI(id: UUID(), name: "Lead")), presentSheet: .constant(true))
 }
