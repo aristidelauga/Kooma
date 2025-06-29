@@ -3,7 +3,8 @@ import SwiftUI
 
 struct ResearchRoomView: View {
 	@State private var isLoading: Bool = false
-	@Binding var navigationPath: NavigationPath
+//	@Binding var navigationPath: NavigationPath
+	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     var body: some View {
 		VStack {
 			Spacer()
@@ -15,14 +16,20 @@ struct ResearchRoomView: View {
 			Spacer()
 
 			MainButton(text: "Cancel") {
-				navigationPath = NavigationPath()
+				self.presentationMode.wrappedValue.dismiss()
 			}
 		}
+		.frame(maxWidth: .infinity, maxHeight: .infinity)
+		.background(
+			Color.kmBeige
+				.edgesIgnoringSafeArea(.all)
+		)
 		.navigationBarBackButtonHidden()
     }
 }
 
 #Preview {
-	ResearchRoomView(navigationPath: .constant(NavigationPath()))
+	ResearchRoomView()
 }
+
 

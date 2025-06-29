@@ -1,9 +1,3 @@
-//
-//  LoadingView.swift
-//  Kooma
-//
-//  Created by Aristide LAUGA on 24/06/2025.
-//
 
 import SwiftUI
 

@@ -5,8 +5,9 @@ import FirebaseCore
 @main
 struct KoomaApp: App {
 	@AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
-	@State private var userManager = UserManager()
 	@State private var roomsListVM = RoomsListViewModel()
+	@State private var userManager = UserManager()
+	@State private var navigationVM = NavigationViewModel()
 
 	init() {
 		FirebaseApp.configure()
@@ -14,9 +15,13 @@ struct KoomaApp: App {
 
     var body: some Scene {
         WindowGroup {
-			NavigationStack {
+			NavigationStack(path: $navigationVM.path) {
 				if self.hasCompletedOnboarding, let user = self.userManager.currentUser {
-					YourNextRoomView(user: user)
+					if self.roomsListVM.rooms.isEmpty {
+						YourNextRoomView(user: user)
+					} else {
+						RoomsListView()
+					}
 				} else {
 					OnboardingStepOneView()
 				}
@@ -24,5 +29,6 @@ struct KoomaApp: App {
         }
 		.environment(self.userManager)
 		.environment(self.roomsListVM)
+		.environment(self.navigationVM)
     }
 }

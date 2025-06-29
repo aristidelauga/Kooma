@@ -2,7 +2,6 @@
 import SwiftUI
 
 struct YourNextRoomView: View {
-	@State private var path = NavigationPath()
 	@State private var roomCode = ""
 	@State private var presentSheet = false
 	@State private var showRoomsList = false
@@ -15,7 +14,6 @@ struct YourNextRoomView: View {
 	}
 
     var body: some View {
-		NavigationStack(path: $path) {
 			VStack(alignment: .leading, spacing: 0) {
 
 				// MARK: - Create a Room
@@ -40,12 +38,10 @@ struct YourNextRoomView: View {
 				KMTextfield(text: $roomCode, placeholder: "Enter Room Code")
 					.padding(.vertical, 16)
 
-					Button {
-						path.append("ResearchRoomView")
-					} label: {
-						NavigationButton(text: "Join Room")
-					}
-				.frame(maxWidth: .infinity, alignment: .trailing)
+				NavigationLink(destination: ResearchRoomView(), label: {
+					NavigationButton(text: "Join Room")
+						.frame(maxWidth: .infinity, alignment: .trailing)
+				})
 				Spacer()
 			}
 			.padding(.horizontal, 16)
@@ -58,9 +54,6 @@ struct YourNextRoomView: View {
 					SearchAddressView(room: room, presentSheet: $presentSheet)
 				}
 			})
-			.navigationDestination(for: String.self) { name in
-				ResearchRoomView(navigationPath: $path)
-			}
 			.navigationDestination(isPresented: $showRoomsList, destination: {
 				RoomsListView()
 			})
@@ -68,7 +61,6 @@ struct YourNextRoomView: View {
 				print("Current user: \(self.roomCreationVM.user.name)")
 			}
 			.navigationBarBackButtonHidden()
-		}
     }
 }
 
@@ -77,3 +69,4 @@ struct YourNextRoomView: View {
 		YourNextRoomView(user: UserUI(id: UUID(), name: ""))
     }
 }
+
