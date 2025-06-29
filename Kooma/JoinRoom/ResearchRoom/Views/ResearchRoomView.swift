@@ -3,7 +3,6 @@ import SwiftUI
 
 struct ResearchRoomView: View {
 	@State private var isLoading: Bool = false
-//	@Binding var navigationPath: NavigationPath
 	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     var body: some View {
 		VStack {

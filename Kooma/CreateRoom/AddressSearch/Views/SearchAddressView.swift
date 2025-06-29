@@ -49,15 +49,6 @@ struct SearchAddressView: View {
 						self.shouldNavigate = true
 					}
 					.frame(maxWidth: .infinity, alignment: .center)
-
-//					if let room = self.searchAddressViewModel.room {
-//						NavigationLink(
-//							destination: RadiusSettingView(room: room, presentSheet: $presentSheet),
-//							isActive: $shouldNavigate
-//						) {
-//							EmptyView()
-//						}
-//					}
 				}
 			}
 			.navigationDestination(isPresented: $shouldNavigate, destination: {

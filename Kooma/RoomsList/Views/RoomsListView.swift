@@ -7,7 +7,6 @@ struct RoomsListView: View {
 	@Environment(UserManager.self) private var userManager
 	@State private var showYourNextRoom = false
 	var body: some View {
-//		NavigationStack(path: $navigationVM.path) {
 			VStack {
 				TextHeading600(text: "Your Rooms")
 					.frame(maxWidth: .infinity, alignment: .leading)
@@ -32,8 +31,6 @@ struct RoomsListView: View {
 				Spacer()
 
 				MainButton(text: "New Room", maxWidth: 142) {
-					//						self.showYourNextRoom = true
-//					if let user = userManager.currentUser {
 					if let user = userManager.currentUser {
 						print("👤 Going to YourNextRoomView with user: \(user.name)")
 						self.navigationVM.goToYourNextRoomView()
@@ -44,7 +41,6 @@ struct RoomsListView: View {
 				.frame(maxWidth: .infinity, alignment: .trailing)
 				.padding(.trailing, 38)
 			}
-//		}
 		.onAppear {
 			print("Rooms' count in RoomListView: \(roomsListVM.rooms.count)")
 		}
@@ -61,22 +57,6 @@ struct RoomsListView: View {
 				YourNextRoomView(user: user)
 			}
 		}
-		//		.navigationDestination(isPresented: $showYourNextRoom) {
-		//			if let user = userManager.currentUser {
-		//				YourNextRoomView(user: user)
-		//			}
-//		.navigationDestination(for: AppRoute.self) { route in
-//			switch route {
-//				case .yourNextRoom(user: self.userManager.currentUser):
-//					if let user = self.userManager.currentUser {
-//						YourNextRoomView(user: user)
-//					}
-//					default
-//			}
-//			if route == AppRoute.yourNextRoom, let user = self.userManager.currentUser {
-//				YourNextRoomView(user: user)
-//			}
-//		}
 	}
 }
 

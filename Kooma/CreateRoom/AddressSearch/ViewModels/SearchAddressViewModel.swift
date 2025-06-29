@@ -12,7 +12,6 @@ import MapKit
 
 	override init() {
 		self.localSearchCompleter = MKLocalSearchCompleter()
-//		self.room = RoomUI()
 		super.init()
 		self.localSearchCompleter.delegate = self
 	}
