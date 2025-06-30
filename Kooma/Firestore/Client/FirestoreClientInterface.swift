@@ -7,5 +7,5 @@ import Firebase
 @MainActor
 protocol FirestoreClientInterface {
 	var database: Firestore { get set }
+    func saveRoom(_ room: RoomDTO) async throws -> String
 }
-

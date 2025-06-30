@@ -37,7 +37,7 @@ final class GetRestaurantService: GetRestaurantInterface {
 	}
 }
 
-extension GetRestaurantService: DTOModelConvertible {
+extension GetRestaurantService: DTORestaurantServiceConvertible {
 	func toDTO(from item: MKMapItem?) throws -> RestaurantDTO? {
 		guard
 			let item,

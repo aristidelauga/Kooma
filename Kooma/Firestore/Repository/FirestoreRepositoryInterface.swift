@@ -10,4 +10,3 @@ protocol FirestoreRepositoryInterface {
 //	func getRoom(byId id: String) async throws -> RoomDTO
 //	func listenToRoom(id: String, onChange: @escaping (RoomDTO?) -> Void) -> ListenerRegistration
 }
-

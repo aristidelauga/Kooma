@@ -11,14 +11,21 @@ struct RestaurantDTO: Sendable, Identifiable, Codable {
 }
 
 extension RestaurantDTO: UIModelConvertible {
-	static let emptyElement = RestaurantDTO(id: "", name: "", phoneNumber: "", placemark: CodablePlacemark(from: MKPlacemark(coordinate: CLLocationCoordinate2D())), url: "")
-
-	// TODO: Check if Apple Maps' displays the "\" when I open the address in Apple Maps
+    static let emptyElement = RestaurantDTO(
+        id: "",
+        name: "",
+        phoneNumber: "",
+        placemark: CodablePlacemark(
+            from: MKPlacemark(coordinate: CLLocationCoordinate2D())
+        ),
+        url: ""
+    )
+    
 	private func createAddress() -> String {
 		if let subThoroughfare = self.placemark.subThoroughfare, let thoroughfare = self.placemark.thoroughfare {
 			let addressParts = [
-				self.placemark.name/*?.replacingOccurrences(of: "\\", with: "")*/,
-				"\(subThoroughfare) \(thoroughfare/*.replacingOccurrences(of: "\\", with: "")*/)",
+				self.placemark.name,
+				"\(subThoroughfare) \(thoroughfare)",
 				self.placemark.postalCode,
 				self.placemark.locality,
 				self.placemark.country
@@ -38,7 +45,4 @@ extension RestaurantDTO: UIModelConvertible {
 			url: self.url
 		)
 	}
-
 }
-
-//extension MKPlacemark: Codable { }

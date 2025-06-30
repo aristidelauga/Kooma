@@ -14,11 +14,10 @@ struct RoomsListView: View {
 				ScrollView(.horizontal, showsIndicators: false) {
 					HStack {
 						ForEach(self.roomsListVM.rooms) { room in
-							RoomCell(room: room)
-								.padding(.horizontal, 12)
-								.onTapGesture {
-									print("Room' id: \(room.id)")
-								}
+                            NavigationLink(destination: RoomDetailsView(room: room), label: {
+                                RoomCell(room: room)
+                                    .padding(.horizontal, 12)
+                            })
 						}
 					}
 				}
@@ -64,4 +63,5 @@ struct RoomsListView: View {
 	RoomsListView()
 		.environment(RoomsListViewModel())
 		.environment(UserManager())
+        .environment(NavigationViewModel())
 }
