@@ -1,13 +1,15 @@
 
 import Foundation
+@preconcurrency import FirebaseFirestore
 
 struct UserDTO: Identifiable, Codable, Sendable {
-	var id: UUID
+	@DocumentID var id: String?
 	var name: String
 }
 
 extension UserDTO: UIModelConvertible {
 	func toUI() throws -> UserUI {
-		UserUI(id: self.id, name: self.name)
+		guard let id = self.id else { return .init(id: "", name: "")}
+		return UserUI(id: id, name: self.name)
 	}
 }

@@ -42,7 +42,7 @@ struct RoomCell: View {
                 room: RoomUI(
                     id: "12b489",
                     name: "Mobile Tech and Product and Design Squads",
-                    administrator: UserUI(id: UUID(), name: "KawabungaDelToro")
+					administrator: UserUI(id: UUID().uuidString, name: "KawabungaDelToro")
                 )
             )
             .padding(.trailing)

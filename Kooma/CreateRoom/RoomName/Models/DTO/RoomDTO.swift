@@ -1,9 +1,10 @@
 import Foundation
+@preconcurrency import FirebaseFirestore
 
 struct RoomDTO: Identifiable, Codable, Sendable {
-	let id: String
-	var hostID: UUID {
-		administrator.id
+	@DocumentID var id: String?
+	var hostID: String {
+		administrator.id ?? ""
 	}
 	var name: String
 	var administrator: UserDTO

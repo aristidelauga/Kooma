@@ -62,5 +62,5 @@ struct SearchAddressView: View {
 }
 
 #Preview {
-	SearchAddressView(room: RoomUI(id: "12b489", name: "Kowabunga", administrator: UserUI(id: UUID(), name: "Lead")), presentSheet: .constant(true))
+	SearchAddressView(room: RoomUI(id: "12b489", name: "Kowabunga", administrator: UserUI(id: UUID().uuidString, name: "Lead")), presentSheet: .constant(true))
 }

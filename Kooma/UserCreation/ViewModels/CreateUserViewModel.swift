@@ -8,6 +8,6 @@ import Foundation
 	var name: String = ""
 
 	func createUser()  {
-		self.user = UserUI(id: UUID(), name: name)
+		self.user = UserUI(id: UUID().uuidString, name: name)
 	}
 }

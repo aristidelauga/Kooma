@@ -66,7 +66,7 @@ struct YourNextRoomView: View {
 
 #Preview {
     NavigationStack {
-		YourNextRoomView(user: UserUI(id: UUID(), name: ""))
+		YourNextRoomView(user: UserUI(id: UUID().uuidString, name: ""))
     }
 }
 
