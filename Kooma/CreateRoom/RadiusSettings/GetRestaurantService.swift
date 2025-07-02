@@ -53,7 +53,8 @@ extension GetRestaurantService: DTORestaurantServiceConvertible {
 			name: name,
 			phoneNumber: phoneNumber,
 			placemark: .init(from: item.placemark),
-			url: url
+            url: url,
+            vote: 0
 		)
 	}
 }

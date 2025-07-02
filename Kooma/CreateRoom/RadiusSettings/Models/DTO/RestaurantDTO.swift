@@ -8,6 +8,7 @@ struct RestaurantDTO: Sendable, Identifiable, Codable {
 	let phoneNumber: String
 	let placemark: CodablePlacemark
 	let url: String
+    var vote: Int
 }
 
 extension RestaurantDTO: UIModelConvertible {
@@ -18,7 +19,8 @@ extension RestaurantDTO: UIModelConvertible {
         placemark: CodablePlacemark(
             from: MKPlacemark(coordinate: CLLocationCoordinate2D())
         ),
-        url: ""
+        url: "",
+        vote: 0
     )
     
 	private func createAddress() -> String {
@@ -42,7 +44,8 @@ extension RestaurantDTO: UIModelConvertible {
 			name: self.name,
 			phoneNumber: self.phoneNumber,
 			address: self.createAddress(),
-			url: self.url
+			url: self.url,
+            vote: self.vote
 		)
 	}
 }

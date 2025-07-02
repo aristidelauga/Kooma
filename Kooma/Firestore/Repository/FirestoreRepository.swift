@@ -12,9 +12,8 @@ final class FirestoreRepository: FirestoreRepositoryInterface {
 		self.client = client
 	}
 
-    func createRoom(_ room: RoomDTO) async throws {
-        
-        try await self.client.saveRoom(room)
+    func createRoom(_ room: RoomDTO) async throws -> String {
+        return try await self.client.saveRoom(room)
     }
     
 
