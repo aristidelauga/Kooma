@@ -13,49 +13,50 @@ struct SearchAddressView: View {
 	}
 
     var body: some View {
-		NavigationStack {
-			VStack(alignment: .leading) {
-
-				TextHeading600(text: "Where are you starting from?")
-					.padding(.leading, 16)
-					.padding(.vertical, 20)
-
-				TextField("Type an address", text: $searchAddressViewModel.searchableText)
-					.foregroundStyle(.kmKaki)
-					.padding(.leading, 8)
-					.padding(.vertical, 12)
-					.background(Color.kmBeigeSecondary)
-					.cornerRadius(12)
-					.padding(.horizontal, 16)
-					.textInputAutocapitalization(.words)
-					.autocorrectionDisabled()
-					.focused($isFocusedTexField)
-					.onSubmit({
-						isFocusedTexField = false
-					})
-					.onChange(of: searchAddressViewModel.searchableText, { oldValue, newValue in
-						searchAddressViewModel.searchAddress(newValue)
-					})
-					.onAppear {
-						isFocusedTexField = true
-					}
-
-				if isFocusedTexField {
-					AddressListView(searchAddressViewModel: searchAddressViewModel)
-				} else {
-					Spacer()
-					MainButton(text: "Continue") {
-						self.searchAddressViewModel.assignAddressToRoom()
-						self.shouldNavigate = true
-					}
-					.frame(maxWidth: .infinity, alignment: .center)
-				}
-			}
-			.navigationDestination(isPresented: $shouldNavigate, destination: {
-				if let room = self.searchAddressViewModel.room {
-					RadiusSettingView(room: room, presentSheet: $presentSheet)
-				}
-			})
+		NavigationView {
+            VStack(alignment: .leading) {
+                
+                if let room = self.searchAddressViewModel.room {
+                    NavigationLink(destination: RadiusSettingView(room: room, presentSheet: $presentSheet), isActive: $shouldNavigate) {
+                        EmptyView()
+                    }
+                }
+                
+                TextHeading600(text: "Where are you starting from?")
+                    .padding(.leading, 16)
+                    .padding(.vertical, 20)
+                
+                TextField("Type an address", text: $searchAddressViewModel.searchableText)
+                    .foregroundStyle(.kmKaki)
+                    .padding(.leading, 8)
+                    .padding(.vertical, 12)
+                    .background(Color.kmBeigeSecondary)
+                    .cornerRadius(12)
+                    .padding(.horizontal, 16)
+                    .textInputAutocapitalization(.words)
+                    .autocorrectionDisabled()
+                    .focused($isFocusedTexField)
+                    .onSubmit({
+                        isFocusedTexField = false
+                    })
+                    .onChange(of: searchAddressViewModel.searchableText, { oldValue, newValue in
+                        searchAddressViewModel.searchAddress(newValue)
+                    })
+                    .onAppear {
+                        isFocusedTexField = true
+                    }
+                
+                if isFocusedTexField {
+                    AddressListView(searchAddressViewModel: searchAddressViewModel)
+                } else {
+                    Spacer()
+                    MainButton(text: "Continue") {
+                        self.searchAddressViewModel.assignAddressToRoom()
+                        self.shouldNavigate = true
+                    }
+                    .frame(maxWidth: .infinity, alignment: .center)
+                }
+            }
 			.background(Color.kmBeige.edgesIgnoringSafeArea(.bottom))
 		}
     }

@@ -12,14 +12,14 @@ struct RoomsListView: View {
 					.frame(maxWidth: .infinity, alignment: .leading)
 					.padding(.leading, 12)
 				ScrollView(.horizontal, showsIndicators: false) {
-					HStack {
+                    HStack(spacing: 16) {
 						ForEach(self.roomsListVM.rooms) { room in
                             NavigationLink(destination: RoomDetailsView(room: room), label: {
                                 RoomCell(room: room)
-                                    .padding(.horizontal, 12)
                             })
-						}
-					}
+                        }
+                    }
+                    .padding(.bottom, 12)
 				}
 				.padding(12)
 
@@ -30,12 +30,8 @@ struct RoomsListView: View {
 				Spacer()
 
 				MainButton(text: "New Room", maxWidth: 142) {
-					if let user = userManager.currentUser {
-						print("👤 Going to YourNextRoomView with user: \(user.name)")
-						self.navigationVM.goToYourNextRoomView()
-					} else {
-						print("No user")
-					}
+                    self.navigationVM.goToYourNextRoomView()
+                    print("navigationVM.currentView: \(self.navigationVM.path)")
 				}
 				.frame(maxWidth: .infinity, alignment: .trailing)
 				.padding(.trailing, 38)
@@ -51,11 +47,6 @@ struct RoomsListView: View {
 		.navigationTitle("Your Rooms")
 		.navigationBarTitleDisplayMode(.inline)
 		.navigationBarBackButtonHidden()
-		.navigationDestination(for: AppRoute.self) { route in
-			if route == AppRoute.yourNextRoom, let user = self.userManager.currentUser {
-				YourNextRoomView(user: user)
-			}
-		}
 	}
 }
 

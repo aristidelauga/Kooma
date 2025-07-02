@@ -4,7 +4,6 @@ import SwiftUI
 struct YourNextRoomView: View {
 	@State private var roomCode = ""
 	@State private var presentSheet = false
-	@State private var showRoomsList = false
 
 	// MARK: ViewModels
 	@State private var roomCreationVM: RoomCreationViewModel
@@ -47,16 +46,11 @@ struct YourNextRoomView: View {
 			.padding(.horizontal, 16)
 			.navigationTitle("Your Next Room")
 			.navigationBarTitleDisplayMode(.inline)
-			.fullScreenCover(isPresented: $presentSheet, onDismiss: {
-				self.showRoomsList = true
-			}, content: {
-				if let room = self.roomCreationVM.room {
-					SearchAddressView(room: room, presentSheet: $presentSheet)
-				}
-			})
-			.navigationDestination(isPresented: $showRoomsList, destination: {
-				RoomsListView()
-			})
+            .fullScreenCover(isPresented: $presentSheet, content: {
+                if let room = self.roomCreationVM.room {
+                    SearchAddressView(room: room, presentSheet: $presentSheet)
+                }
+            })
 			.onAppear {
 				print("Current user: \(self.roomCreationVM.user.name)")
 			}
