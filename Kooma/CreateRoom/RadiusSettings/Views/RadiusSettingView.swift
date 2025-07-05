@@ -34,7 +34,7 @@ struct RadiusSettingView: View {
 						navigationVM.showRoomsListView()
 						self.presentSheet = false
 						await radiusSettingViewModel.searchRestaurants(within: slider)
-						self.roomsListVM.addNewRoom(self.radiusSettingViewModel.room)
+						try await self.roomsListVM.addNewRoom(self.radiusSettingViewModel.room)
 						print("roomsListVM.rooms.count: \(self.roomsListVM.rooms.count)")
 					}
 				}

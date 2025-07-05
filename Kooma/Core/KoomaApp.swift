@@ -1,6 +1,9 @@
 
 import SwiftUI
 import FirebaseCore
+import Firebase
+import FirebaseFirestore
+
 
 @main
 struct KoomaApp: App {
