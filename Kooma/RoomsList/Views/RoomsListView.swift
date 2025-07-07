@@ -2,7 +2,7 @@
 import SwiftUI
 
 struct RoomsListView: View {
-	@Environment(RoomsListViewModel.self) private var roomsListVM
+    @State private var roomsListVM = RoomsListViewModel(firestoreService: FirestoreService())
 	@Environment(NavigationViewModel.self) private var navigationVM
 	@Environment(UserManager.self) private var userManager
 	@State private var showYourNextRoom = false
@@ -37,7 +37,14 @@ struct RoomsListView: View {
 				.padding(.trailing, 38)
 			}
 		.onAppear {
-			print("Rooms' count in RoomListView: \(roomsListVM.rooms.count)")
+            Task {
+                do {
+                    try await self.roomsListVM.fetchRooms()
+                } catch {
+                    print("No rooms to be loaded: \(error)")
+                    throw error
+                }
+            }
 		}
 		.background(
 			Color.kmBeige
@@ -52,7 +59,7 @@ struct RoomsListView: View {
 
 #Preview {
 	RoomsListView()
-		.environment(RoomsListViewModel())
+        .environment(RoomsListViewModel(firestoreService: FirestoreService()))
 		.environment(UserManager())
         .environment(NavigationViewModel())
 }

@@ -2,7 +2,7 @@ import Foundation
 @preconcurrency import FirebaseFirestore
 
 struct RoomDTO: Identifiable, Codable, Sendable {
-	@DocumentID var id: String?
+	@DocumentID var id: String? = nil
 	var hostID: String {
 		administrator.id ?? ""
 	}
@@ -11,4 +11,17 @@ struct RoomDTO: Identifiable, Codable, Sendable {
 	var address: String
 	var members: [UserDTO]
 	var restaurants: [RestaurantDTO]
+}
+
+extension RoomDTO: UIModelConvertible {
+    func toUI() throws -> RoomUI {
+        RoomUI(
+            id: self.id ?? "",
+            name: self.name,
+            administrator: try self.administrator.toUI(),
+            address: self.address,
+            members: try self.members.map { try $0.toUI() },
+            restaurants: try self.restaurants.map { try $0.toUI() },
+        )
+    }
 }

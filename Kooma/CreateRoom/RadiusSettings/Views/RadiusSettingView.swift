@@ -4,7 +4,6 @@ import MapKit
 
 struct RadiusSettingView: View {
 	@State private var radiusSettingViewModel: RadiusSettingViewModel
-	@Environment(RoomsListViewModel.self) private var roomsListVM
 	@Environment(NavigationViewModel.self) private var navigationVM
 	@State private var slider: Double = 0.0
 	@Binding var presentSheet: Bool
@@ -32,10 +31,9 @@ struct RadiusSettingView: View {
 				MainButton(text: "Submit") {
 					Task {
 						navigationVM.showRoomsListView()
-						self.presentSheet = false
-						await radiusSettingViewModel.searchRestaurants(within: slider)
-						try await self.roomsListVM.addNewRoom(self.radiusSettingViewModel.room)
-						print("roomsListVM.rooms.count: \(self.roomsListVM.rooms.count)")
+                        try await radiusSettingViewModel.searchRestaurants(within: slider)
+                        self.presentSheet = false
+						try await self.radiusSettingViewModel.addNewRoom(self.radiusSettingViewModel.room)
 					}
 				}
 				.frame(maxWidth: .infinity, alignment: .center)

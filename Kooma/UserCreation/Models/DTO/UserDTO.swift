@@ -9,7 +9,9 @@ struct UserDTO: Identifiable, Codable, Sendable {
 
 extension UserDTO: UIModelConvertible {
 	func toUI() throws -> UserUI {
-		guard let id = self.id else { return .init(id: "", name: "")}
+        guard let id = self.id else {
+            return .init(id: "", name: "")
+        }
 		return UserUI(id: id, name: self.name)
 	}
 }

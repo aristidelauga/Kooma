@@ -19,7 +19,7 @@ struct RoomCell: View {
                     .foregroundStyle(.kmBlack)
                     .fixedSize(horizontal: false, vertical: true)
                 
-				Text("^[\(String(describing: self.room.members.count)) member](inflect: true)")
+                Text("^[\(String(describing: self.room.members?.count)) member](inflect: true)")
                     .font(.bodyMedium)
 					.foregroundStyle(.kmKaki)
                     .padding(.bottom, 12)

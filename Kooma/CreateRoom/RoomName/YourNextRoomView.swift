@@ -51,9 +51,7 @@ struct YourNextRoomView: View {
                     SearchAddressView(room: room, presentSheet: $presentSheet)
                 }
             })
-			.onAppear {
-				print("Current user: \(self.roomCreationVM.user.name)")
-			}
+
 			.navigationBarBackButtonHidden()
     }
 }

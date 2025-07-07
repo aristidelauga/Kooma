@@ -8,9 +8,10 @@ import FirebaseFirestore
 @main
 struct KoomaApp: App {
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
-    @State private var roomsListVM = RoomsListViewModel()
+//    @State private var roomsListVM = RoomsListViewModel(firestoreService: FirestoreService())
     @State private var userManager = UserManager()
     @State private var navigationVM = NavigationViewModel()
+    @State private var service = FirestoreService()
     
     init() {
         FirebaseApp.configure()
@@ -21,7 +22,7 @@ struct KoomaApp: App {
             NavigationStack(path: $navigationVM.path) {
                 Group {
                     if self.hasCompletedOnboarding, let user = self.userManager.currentUser {
-                        if self.roomsListVM.rooms.isEmpty || !self.navigationVM.showRoomsList {
+                        if self.service.rooms.isEmpty || !self.navigationVM.showRoomsList {
                             YourNextRoomView(user: user)
                         } else {
                             RoomsListView()
@@ -46,14 +47,12 @@ struct KoomaApp: App {
 //                .navigationDestination(isPresented: $navigationVM.showRoomsList, destination: {
 //                    RoomsListView()
 //                })
-                .onAppear {
-                    print("current state of hasCompletedOnboarding: \(self.hasCompletedOnboarding)")
-                }
+
             }
             .navigationBarBackButtonHidden()
         }
         .environment(self.userManager)
-        .environment(self.roomsListVM)
+//        .environment(self.roomsListVM)
         .environment(self.navigationVM)
     }
 }

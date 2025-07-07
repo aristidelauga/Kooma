@@ -2,11 +2,14 @@
 import Foundation
 
 struct RoomUI: Identifiable, Codable, Sendable {
-	var id: String
+	var id: String?
+    var hostID: String {
+        administrator.id
+    }
 	var name: String?
 	var administrator: UserUI
 	var address: String?
-	var members: [UserUI] = []
+	var members: [UserUI]? = []
 	var restaurants: [RestaurantUI]?
 	var image: String
 
@@ -22,6 +25,27 @@ struct RoomUI: Identifiable, Codable, Sendable {
 		].randomElement()!
 
 	}
+    
+    init(
+        id: String,
+        name: String?,
+        administrator: UserUI,
+        address: String?,
+        members: [UserUI],
+        restaurants: [RestaurantUI]
+    ) {
+        self.id = id
+        self.name = name
+        self.administrator = administrator
+        self.address = address
+        self.members = members
+        self.restaurants = restaurants
+        self.image = [
+            "RoomIcon-1",
+            "RoomIcon-2",
+            "RoomIcon-3"
+        ].randomElement()!
+    }
 
 	static func generateCode(length: Int = 6) -> String {
 		let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -32,16 +56,20 @@ struct RoomUI: Identifiable, Codable, Sendable {
 extension RoomUI {
     private func gatherRestaurantsDTO() async throws -> [RestaurantDTO] {
         var restaurantsDTO = [RestaurantDTO]()
+//        guard let restaurants = self.restaurants else {
+//            print("No restaurants.")
+//            return []
+//        }
         if let restaurants = self.restaurants {
-            restaurantsDTO = try await withThrowingTaskGroup(of: RestaurantDTO.self) { group in
+            let restaurantsDTO = try await withThrowingTaskGroup(of: RestaurantDTO.self) { group in
                 for restaurant in restaurants {
                     group.addTask {
                         try await restaurant.toDTO()
                     }
                 }
-                
                 var results: [RestaurantDTO] = []
                 for try await DTO in group {
+                    print("Converted RestaurantDTO: \(DTO.name)")
                     results.append(DTO)
                 }
                 return results
@@ -49,24 +77,41 @@ extension RoomUI {
         } else {
             restaurantsDTO = []
         }
+        print("Output restaurantsDTO count: \(restaurantsDTO.count)")
         return restaurantsDTO
     }
     
     func toDTO() async throws -> RoomDTO {
-        guard let address = self.address else { throw NSError(domain: "RoomUI", code: 1, userInfo: [NSLocalizedDescriptionKey: "Address is nil"]) }
-        
+        guard let address = self.address else {
+            throw NSError(domain: "RoomUI", code: 1, userInfo: [NSLocalizedDescriptionKey: "Address is nil"])
+        }
         let administratorDTO = try self.administrator.toDTO()
+                
+        guard let members = self.members else {
+            throw NSError(domain: "RoomUI", code: 7, userInfo: [NSLocalizedDescriptionKey: "Members is nil"])
+        }
+        let membersDTO = try members.compactMap { try $0.toDTO() }
         
-        let membersDTO = try self.members.map { try $0.toDTO() }
+        for member in membersDTO {
+            print("toDTO membersDTO: \(member)")
+        }
         
-        let restaurantsDTO = try await gatherRestaurantsDTO()
+        guard let restaurants = self.restaurants else {
+            throw NSError(domain: "RoomUI", code: 8, userInfo: [NSLocalizedDescriptionKey: "restaurants is nil"])
+        }
+        let restaurantsDTO = try await self.gatherRestaurantsDTO()
+        for restaurant in restaurants {
+            print("Restaurant's name: \(restaurant.name)")
+        }
         
-        return RoomDTO(
-            name: self.id,
+        let RoomDTO = RoomDTO(
+            id: nil,
+            name: self.name ?? "",
             administrator: administratorDTO,
             address: address,
             members: membersDTO,
             restaurants: restaurantsDTO
         )
+        return RoomDTO
     }
 }

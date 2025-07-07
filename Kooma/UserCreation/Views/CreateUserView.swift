@@ -15,7 +15,6 @@ struct CreateUserView: View {
 					self.userManager.setUser(user)
 				}
 				self.hasCompletedOnboarding = true
-                print("haCompletedOnboarding: \(self.hasCompletedOnboarding)")
 			}
 			.padding(.top, 18)
 			.frame(maxWidth: .infinity, alignment: .trailing)
