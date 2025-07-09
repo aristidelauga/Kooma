@@ -42,6 +42,7 @@ final class FirestoreClient: FirestoreClientInterface {
             let rooms = snapshot.documents.compactMap { document in
                 try? document.data(as: RoomDTO.self)
             }
+            print("rooms.count: \(rooms.count)")
             return rooms
         } catch {
             throw error

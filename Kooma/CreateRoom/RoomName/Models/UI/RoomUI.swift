@@ -56,28 +56,35 @@ struct RoomUI: Identifiable, Codable, Sendable {
 extension RoomUI {
     private func gatherRestaurantsDTO() async throws -> [RestaurantDTO] {
         var restaurantsDTO = [RestaurantDTO]()
-//        guard let restaurants = self.restaurants else {
-//            print("No restaurants.")
-//            return []
-//        }
-        if let restaurants = self.restaurants {
-            let restaurantsDTO = try await withThrowingTaskGroup(of: RestaurantDTO.self) { group in
-                for restaurant in restaurants {
-                    group.addTask {
-                        try await restaurant.toDTO()
+       do {
+           if let restaurants = self.restaurants {
+                restaurantsDTO = try await withThrowingTaskGroup(of: RestaurantDTO.self) { group in
+                    for restaurant in restaurants {
+                        group.addTask {
+                            do {
+                                let dto = try await restaurant.toDTO()
+                                print("Successfully converted restaurant \(restaurant.name ?? "Unnamed")")
+                                return dto
+                            } catch {
+                                print("Failed to convert restaurant \(restaurant.name ?? "Unnamed"): \(error.localizedDescription)")
+                                throw error
+                            }
+                        }
                     }
+                    var results: [RestaurantDTO] = []
+                    for try await DTO in group {
+                        print("Converted RestaurantDTO: \(DTO.name)")
+                        results.append(DTO)
+                    }
+                    print("Final results count inside task group: \(results.count)")
+                    return results
                 }
-                var results: [RestaurantDTO] = []
-                for try await DTO in group {
-                    print("Converted RestaurantDTO: \(DTO.name)")
-                    results.append(DTO)
-                }
-                return results
             }
-        } else {
+        } catch {
             restaurantsDTO = []
+            throw NSError(domain: "RoomUI", code: 112, userInfo: [NSLocalizedDescriptionKey: "restaurants is nil"])
         }
-        print("Output restaurantsDTO count: \(restaurantsDTO.count)")
+        print("restaurants' count: \(restaurantsDTO.count)")
         return restaurantsDTO
     }
     

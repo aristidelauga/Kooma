@@ -15,21 +15,27 @@ struct RestaurantUI: Identifiable, Sendable, Codable {
 
 extension RestaurantUI {
     func toDTO() async throws -> RestaurantDTO {
-        let geocoder = CLGeocoder()
-        
-        guard let placemark = try await geocoder.geocodeAddressString(self.address).first, let mkPlacemark = placemark as? MKPlacemark else {
-            throw URLError(.badServerResponse)
+        print("Attempting to convert RestaurantUI to DTO: \(self.name ?? "Unknown")")
+        do {
+            let geocoder = CLGeocoder()
+            
+            guard let placemark = try await geocoder.geocodeAddressString(self.address).first, let mkPlacemark = placemark as? MKPlacemark else {
+                print("ERROR: Required property missing for \(self.name ?? "Unknown")")
+                throw URLError(.badServerResponse)
+            }
+            
+            let codablePlacemark = CodablePlacemark(from: mkPlacemark)
+            
+            return RestaurantDTO(
+                id: self.id,
+                name: self.name,
+                phoneNumber: self.phoneNumber,
+                placemark: codablePlacemark,
+                url: self.url,
+                vote: self.vote
+            )
+        } catch {
+            throw NSError(domain: "RestaurantUI", code: 14, userInfo: [NSLocalizedDescriptionKey: "Instance of RestaurantUI is nil"])
         }
-        
-        let codablePlacemark = CodablePlacemark(from: mkPlacemark)
-        
-        return RestaurantDTO(
-            id: self.id,
-            name: self.name,
-            phoneNumber: self.phoneNumber,
-            placemark: codablePlacemark,
-            url: self.url,
-            vote: self.vote
-        )
     }
 }

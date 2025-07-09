@@ -20,7 +20,7 @@ struct CreateUserView: View {
 			.frame(maxWidth: .infinity, alignment: .trailing)
 			.navigationDestination(isPresented: $hasCompletedOnboarding, destination: {
 				if let user = self.createUserVM.user {
-					YourNextRoomView(user: user)
+                    YourNextRoomView(user: user, userManager: self.userManager)
 				}
 			})
         }

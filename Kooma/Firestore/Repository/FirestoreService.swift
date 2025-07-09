@@ -25,8 +25,6 @@ final class FirestoreService: FirestoreServiceInterface {
 
     
     func createRoom(_ room: RoomDTO) async throws {
-        print("createRoom being called.")
-//        return try await self.client.saveRoom(room)
         let newRoomDTO = RoomDTO(
             id: nil,
             name: room.name,
@@ -36,23 +34,17 @@ final class FirestoreService: FirestoreServiceInterface {
             restaurants: room.restaurants
         )
         
-//        do {
+        do {
             _ = try await client.saveRoom(newRoomDTO)
             try await fetchRooms()
-//        } catch {
-//            throw NSError(domain: "RoomUI", code: 3, userInfo: [NSLocalizedDescriptionKey: "Failure in the Service during an attempt of saving a room"])
-//        }
+        } catch {
+            throw NSError(domain: "RoomUI", code: 3, userInfo: [NSLocalizedDescriptionKey: "Failure in the Service during an attempt of saving a room"])
+        }
     }
     
     func fetchRooms() async throws {
-//        return try await self.client.fetchRooms()
-//        do {
-            let roomDTOs = try await client.getRooms()
-            self.rooms = try roomDTOs.map { try $0.toUI() }
-//        } catch {
-            self.rooms = []
-//            throw NSError(domain: "RoomUI", code: 2, userInfo: [NSLocalizedDescriptionKey: "No room to load"])
-//        }
+        let roomDTOs = try await client.getRooms()
+        self.rooms = try roomDTOs.compactMap { try $0.toUI() }
     }
 
 }

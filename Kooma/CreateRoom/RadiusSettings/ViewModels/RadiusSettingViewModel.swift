@@ -11,7 +11,6 @@ import Foundation
         self.service.rooms
     }
     var restaurantsDTO: [RestaurantDTO] = []
-//    var errorMessage: String?
 
 	private let restaurantAPI: any GetRestaurantInterface
     private let service: FirestoreServiceInterface
@@ -29,35 +28,33 @@ import Foundation
 
 	func searchRestaurants(within radius: Double) async throws {
 		guard let address = self.room.address, !address.isEmpty else {
-//            self.errorMessage = "Address is missing. Please enter a valid address"
             throw NSError(domain: "RoomUI", code: 4, userInfo: [NSLocalizedDescriptionKey: "Address is missing. Please enter a valid address"])
         }
 		self.isLoading = true
-//        self.errorMessage = nil
 		defer { self.isLoading = false }
-//		do {
+		do {
 			let coordinate = try await self.restaurantAPI.getCoordinate(from: address)
 			region.center = coordinate
 			guard let items = try await self.restaurantAPI.searchNearbyRestaurants(at: coordinate, radiusInMeters: radius * 1000) else { return }
-        self.restaurantsDTO = items
-			let itemsUI = try items.map { try $0.toUI() }
+//        self.restaurantsDTO = items
+			let itemsUI = try items.compactMap { try $0.toUI() }
 			self.room.restaurants = itemsUI
-//		} catch {
-//            self.errorMessage = "Could not find the address. Please check it and try again."
-//			print("error during catching coordinate: \(error)")
-//		}
+		} catch {
+            throw NSError(domain: "RoomUI", code: 14, userInfo: [NSLocalizedDescriptionKey: "Restaurants fetching attempt failed."])
+		}
 	}
     
     func addNewRoom(_ room: RoomUI) async throws {
-        //        do {
-        var roomDTO = try await room.toDTO()
-        roomDTO.restaurants = restaurantsDTO
-        print("RoomDTO: \(roomDTO)")
-        try await self.service.createRoom(roomDTO)
-        print("rooms's count: \(rooms.count)")
-        //        } catch {
-        //            self.errorMessage = "Could not find the address. Please check it and try again."
-        //            throw NSError(domain: "RoomUI", code: 3, userInfo: [NSLocalizedDescriptionKey: "Failure in the Service during an attempt of saving a room"])
-        //        }
+        let admin = UserDTO(id: room.administrator.id, name: room.administrator.name)
+        if let  roomId = room.id, let roomName = room.name  {
+            let room = RoomDTO(id: roomId, name: roomName, administrator: admin, address: roomName, members: [admin], restaurants: self.restaurantsDTO)
+            try await self.service.createRoom(room)
+        }
+//        do {
+//            let roomDTO = try await room.toDTO()
+//            try await self.service.createRoom(roomDTO)
+//        } catch {
+//            throw NSError(domain: "RoomUI", code: 3, userInfo: [NSLocalizedDescriptionKey: "Failure in the Service during an attempt of saving a room"])
+//        }
     }
 }

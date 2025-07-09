@@ -21,7 +21,7 @@ extension RoomDTO: UIModelConvertible {
             administrator: try self.administrator.toUI(),
             address: self.address,
             members: try self.members.map { try $0.toUI() },
-            restaurants: try self.restaurants.map { try $0.toUI() },
+            restaurants: try self.restaurants.compactMap { try $0.toUI() },
         )
     }
 }

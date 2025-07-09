@@ -8,7 +8,6 @@ import FirebaseFirestore
 @main
 struct KoomaApp: App {
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
-//    @State private var roomsListVM = RoomsListViewModel(firestoreService: FirestoreService())
     @State private var userManager = UserManager()
     @State private var navigationVM = NavigationViewModel()
     @State private var service = FirestoreService()
@@ -23,7 +22,7 @@ struct KoomaApp: App {
                 Group {
                     if self.hasCompletedOnboarding, let user = self.userManager.currentUser {
                         if self.service.rooms.isEmpty || !self.navigationVM.showRoomsList {
-                            YourNextRoomView(user: user)
+                            YourNextRoomView(user: user, userManager: UserManager())
                         } else {
                             RoomsListView()
                         }
@@ -32,27 +31,19 @@ struct KoomaApp: App {
                     }
                 }
                 .navigationDestination(for: AppRoute.self) { route in
-//                    if route == AppRoute.yourNextRoom, let user = self.userManager.currentUser {
-//                        YourNextRoomView(user: user)
-//                    }
                     switch route {
                     case AppRoute.yourNextRoom:
                         if let user = self.userManager.currentUser {
-                            YourNextRoomView(user: user)
+                            YourNextRoomView(user: user, userManager: UserManager())
                         }
                     case AppRoute.roomsList:
                         RoomsListView()
                     }
                 }
-//                .navigationDestination(isPresented: $navigationVM.showRoomsList, destination: {
-//                    RoomsListView()
-//                })
-
             }
             .navigationBarBackButtonHidden()
         }
         .environment(self.userManager)
-//        .environment(self.roomsListVM)
         .environment(self.navigationVM)
     }
 }

@@ -7,9 +7,11 @@ struct YourNextRoomView: View {
 
 	// MARK: ViewModels
 	@State private var roomCreationVM: RoomCreationViewModel
+    var userManager: UserManager
 
-	init(user: UserUI) {
-		_roomCreationVM = State(wrappedValue: RoomCreationViewModel(user: user))
+    init(user: UserUI, userManager: UserManager) {
+        self.userManager = userManager
+        _roomCreationVM = State(wrappedValue: RoomCreationViewModel(user: self.userManager.currentUser ?? UserUI(id: UUID().uuidString, name: "ErrorName")))
 	}
 
     var body: some View {
@@ -51,14 +53,17 @@ struct YourNextRoomView: View {
                     SearchAddressView(room: room, presentSheet: $presentSheet)
                 }
             })
-
+            .onAppear(perform: {
+                print("user's id: \(self.roomCreationVM.user.id)")
+                print("user's name: \(self.roomCreationVM.user.name)")
+            })
 			.navigationBarBackButtonHidden()
     }
 }
 
 #Preview {
     NavigationStack {
-		YourNextRoomView(user: UserUI(id: UUID().uuidString, name: ""))
+        YourNextRoomView(user: UserUI(id: UUID().uuidString, name: ""), userManager: UserManager())
     }
 }
 
