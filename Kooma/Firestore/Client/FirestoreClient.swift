@@ -11,8 +11,8 @@ private enum FirestoreConstants {
 @MainActor
 protocol FirestoreClientInterface {
      var database: Firestore { get }
-    func saveRoom(_ room: RoomDTO) async throws -> String
-    func getRooms() async throws -> [RoomDTO]
+    func saveRoom(_ room: RoomUI) async throws -> String
+    func getRooms() async throws -> [RoomUI]
 }
 
 final class FirestoreClient: FirestoreClientInterface {
@@ -21,7 +21,7 @@ final class FirestoreClient: FirestoreClientInterface {
         database.collection(FirestoreConstants.roomsCollectionName)
     }
     
-    func saveRoom(_ room: RoomDTO) async throws -> String {
+    func saveRoom(_ room: RoomUI) async throws -> String {
         do {
             let documentRef = try self.roomsCollection.addDocument(from: room)
             return documentRef.documentID
@@ -31,7 +31,7 @@ final class FirestoreClient: FirestoreClientInterface {
         }
     }
     
-    func getRooms() async throws -> [RoomDTO] {
+    func getRooms() async throws -> [RoomUI] {
         //        let snapshot = try await roomsCollection.getDocuments()
         //        return snapshot.documents.compactMap { doc in
         //            print("fetchRooms from FirestoreClient: \(doc.data().values)")
@@ -40,7 +40,7 @@ final class FirestoreClient: FirestoreClientInterface {
         do {
             let snapshot = try await roomsCollection.getDocuments()
             let rooms = snapshot.documents.compactMap { document in
-                try? document.data(as: RoomDTO.self)
+                try? document.data(as: RoomUI.self)
             }
             print("rooms.count: \(rooms.count)")
             return rooms

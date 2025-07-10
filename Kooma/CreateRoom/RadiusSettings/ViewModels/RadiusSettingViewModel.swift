@@ -45,16 +45,6 @@ import Foundation
 	}
     
     func addNewRoom(_ room: RoomUI) async throws {
-        let admin = UserDTO(id: room.administrator.id, name: room.administrator.name)
-        if let  roomId = room.id, let roomName = room.name  {
-            let room = RoomDTO(id: roomId, name: roomName, administrator: admin, address: roomName, members: [admin], restaurants: self.restaurantsDTO)
-            try await self.service.createRoom(room)
-        }
-//        do {
-//            let roomDTO = try await room.toDTO()
-//            try await self.service.createRoom(roomDTO)
-//        } catch {
-//            throw NSError(domain: "RoomUI", code: 3, userInfo: [NSLocalizedDescriptionKey: "Failure in the Service during an attempt of saving a room"])
-//        }
+                try await self.service.createRoom(room)
     }
 }

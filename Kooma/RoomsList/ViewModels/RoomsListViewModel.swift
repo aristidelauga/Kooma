@@ -66,8 +66,7 @@ final class RoomsListViewModel {
     
     func addNewRoom(_ room: RoomUI) async {
         do {
-            let roomDTO = try await room.toDTO()
-            try await firestoreService.createRoom(roomDTO)
+            try await firestoreService.createRoom(room)
         } catch {
             print("Error preparing room for saving: \(error.localizedDescription)")
         }

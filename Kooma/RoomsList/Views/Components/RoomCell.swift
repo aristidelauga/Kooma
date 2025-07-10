@@ -19,10 +19,12 @@ struct RoomCell: View {
                     .foregroundStyle(.kmBlack)
                     .fixedSize(horizontal: false, vertical: true)
                 
-                Text("^[\(String(describing: self.room.members?.count)) member](inflect: true)")
-                    .font(.bodyMedium)
-					.foregroundStyle(.kmKaki)
-                    .padding(.bottom, 12)
+                if let members = self.room.members?.count, members > 0 {
+                    Text("^[\(String(describing: members)) member](inflect: true)")
+                        .font(.bodyMedium)
+                        .foregroundStyle(.kmKaki)
+                        .padding(.bottom, 12)
+                }
 			}
             .padding(.horizontal, 8)
 		}

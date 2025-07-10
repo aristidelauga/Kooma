@@ -7,7 +7,7 @@ import FirebaseFirestore
 @MainActor
 protocol FirestoreServiceInterface {
     var rooms: [RoomUI] { get }
-    func createRoom(_ room: RoomDTO) async throws
+    func createRoom(_ room: RoomUI) async throws
     func fetchRooms() async throws
 //    func listenToRoom(id: String, onChange: @escaping (RoomDTO?) -> Void) -> ListenerRegistration
 }
@@ -24,18 +24,18 @@ final class FirestoreService: FirestoreServiceInterface {
 	}
 
     
-    func createRoom(_ room: RoomDTO) async throws {
-        let newRoomDTO = RoomDTO(
+    func createRoom(_ room: RoomUI) async throws {
+        let newRoom = RoomUI(
             id: nil,
             name: room.name,
             administrator: room.administrator,
             address: room.address,
-            members: room.members,
-            restaurants: room.restaurants
+            members: room.members ?? [room.administrator],
+            restaurants: room.restaurants ?? []
         )
         
         do {
-            _ = try await client.saveRoom(newRoomDTO)
+            _ = try await client.saveRoom(newRoom)
             try await fetchRooms()
         } catch {
             throw NSError(domain: "RoomUI", code: 3, userInfo: [NSLocalizedDescriptionKey: "Failure in the Service during an attempt of saving a room"])
@@ -43,8 +43,7 @@ final class FirestoreService: FirestoreServiceInterface {
     }
     
     func fetchRooms() async throws {
-        let roomDTOs = try await client.getRooms()
-        self.rooms = try roomDTOs.compactMap { try $0.toUI() }
+        self.rooms = try await client.getRooms()
     }
 
 }

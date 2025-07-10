@@ -12,7 +12,7 @@ struct KoomaApp: App {
     @State private var navigationVM = NavigationViewModel()
     @State private var service = FirestoreService()
     
-    init() {
+    init()  {
         FirebaseApp.configure()
     }
     
@@ -21,7 +21,7 @@ struct KoomaApp: App {
             NavigationStack(path: $navigationVM.path) {
                 Group {
                     if self.hasCompletedOnboarding, let user = self.userManager.currentUser {
-                        if self.service.rooms.isEmpty || !self.navigationVM.showRoomsList {
+                        if self.service.rooms.isEmpty {
                             YourNextRoomView(user: user, userManager: UserManager())
                         } else {
                             RoomsListView()
@@ -42,6 +42,12 @@ struct KoomaApp: App {
                 }
             }
             .navigationBarBackButtonHidden()
+            .onAppear {
+                Task {
+                    try await service.fetchRooms()
+                }
+                print("self.service.rooms.isEmpty ? : \(self.service.rooms.isEmpty)")
+            }
         }
         .environment(self.userManager)
         .environment(self.navigationVM)
