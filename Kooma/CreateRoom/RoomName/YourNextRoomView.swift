@@ -8,8 +8,9 @@ struct YourNextRoomView: View {
 	// MARK: ViewModels
 	@State private var roomCreationVM: RoomCreationViewModel
     var userManager: UserManager
+    @Environment(FirestoreService.self) private var service
 
-    init(user: UserUI, userManager: UserManager) {
+    init(userManager: UserManager) {
         self.userManager = userManager
         _roomCreationVM = State(wrappedValue: RoomCreationViewModel(user: self.userManager.currentUser ?? UserUI(id: UUID().uuidString, name: "ErrorName")))
 	}
@@ -50,7 +51,7 @@ struct YourNextRoomView: View {
 			.navigationBarTitleDisplayMode(.inline)
             .fullScreenCover(isPresented: $presentSheet, content: {
                 if let room = self.roomCreationVM.room {
-                    SearchAddressView(room: room, presentSheet: $presentSheet)
+                    SearchAddressView(room: room, presentSheet: $presentSheet, service: self.service)
                 }
             })
             .onAppear(perform: {
@@ -63,7 +64,7 @@ struct YourNextRoomView: View {
 
 #Preview {
     NavigationStack {
-        YourNextRoomView(user: UserUI(id: UUID().uuidString, name: ""), userManager: UserManager())
+        YourNextRoomView(userManager: UserManager())
     }
 }
 

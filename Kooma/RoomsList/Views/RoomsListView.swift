@@ -3,9 +3,13 @@ import SwiftUI
 
 struct RoomsListView: View {
     @State private var roomsListVM = RoomsListViewModel(firestoreService: FirestoreService())
-	@Environment(NavigationViewModel.self) private var navigationVM
-	@Environment(UserManager.self) private var userManager
-	@State private var showYourNextRoom = false
+    @Environment(NavigationViewModel.self) private var navigationVM
+    @Environment(UserManager.self) private var userManager
+    @State private var showYourNextRoom = false
+    
+    init(service: FirestoreService) {
+        _roomsListVM = State(wrappedValue: RoomsListViewModel(firestoreService: service))
+    }
 	var body: some View {
 			VStack {
 				TextHeading600(text: "Your Rooms")
@@ -13,7 +17,7 @@ struct RoomsListView: View {
 					.padding(.leading, 12)
 				ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 16) {
-						ForEach(self.roomsListVM.rooms) { room in
+                        ForEach(self.roomsListVM.rooms) { room in
                             NavigationLink(destination: RoomDetailsView(room: room), label: {
                                 RoomCell(room: room)
                             })
@@ -58,7 +62,7 @@ struct RoomsListView: View {
 }
 
 #Preview {
-	RoomsListView()
+    RoomsListView(service: FirestoreService())
         .environment(RoomsListViewModel(firestoreService: FirestoreService()))
 		.environment(UserManager())
         .environment(NavigationViewModel())

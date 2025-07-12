@@ -13,12 +13,12 @@ import Foundation
     var restaurantsDTO: [RestaurantDTO] = []
 
 	private let restaurantAPI: any GetRestaurantInterface
-    private let service: FirestoreServiceInterface
+    private let service: any FirestoreServiceInterface
 
 
     init(
         restaurantAPI: any GetRestaurantInterface = GetRestaurantService(),
-        service: FirestoreServiceInterface = FirestoreService(),
+        service: any FirestoreServiceInterface = FirestoreService(),
         room: RoomUI
     ) {
 		self.restaurantAPI = restaurantAPI

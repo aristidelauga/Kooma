@@ -6,10 +6,12 @@ struct SearchAddressView: View {
 	@State private var shouldNavigate = false
 	@FocusState private var isFocusedTexField: Bool
 	@Binding var presentSheet: Bool
+    var service: FirestoreService
 
-	init(room: RoomUI, presentSheet: Binding<Bool>) {
+    init(room: RoomUI, presentSheet: Binding<Bool>, service: FirestoreService) {
 		_searchAddressViewModel = State(wrappedValue: SearchAddressViewModel(room: room))
 		_presentSheet = presentSheet
+        self.service = service
 	}
 
     var body: some View {
@@ -17,7 +19,7 @@ struct SearchAddressView: View {
             VStack(alignment: .leading) {
                 
                 if let room = self.searchAddressViewModel.room {
-                    NavigationLink(destination: RadiusSettingView(room: room, presentSheet: $presentSheet), isActive: $shouldNavigate) {
+                    NavigationLink(destination: RadiusSettingView(room: room, service: self.service, presentSheet: $presentSheet), isActive: $shouldNavigate) {
                         EmptyView()
                     }
                 }
@@ -63,5 +65,5 @@ struct SearchAddressView: View {
 }
 
 #Preview {
-	SearchAddressView(room: RoomUI(id: "12b489", name: "Kowabunga", administrator: UserUI(id: UUID().uuidString, name: "Lead")), presentSheet: .constant(true))
+    SearchAddressView(room: RoomUI(id: "12b489", name: "Kowabunga", administrator: UserUI(id: UUID().uuidString, name: "Lead")), presentSheet: .constant(true), service: FirestoreService())
 }

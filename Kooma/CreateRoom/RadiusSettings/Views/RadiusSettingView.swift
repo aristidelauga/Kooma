@@ -4,12 +4,12 @@ import MapKit
 
 struct RadiusSettingView: View {
 	@State private var radiusSettingViewModel: RadiusSettingViewModel
-	@Environment(NavigationViewModel.self) private var navigationVM
+    @Environment(NavigationViewModel.self) private var navigationVM
 	@State private var slider: Double = 0.0
 	@Binding var presentSheet: Bool
 
-	init(room: RoomUI, presentSheet: Binding<Bool>) {
-		_radiusSettingViewModel = State(wrappedValue: RadiusSettingViewModel(room: room))
+    init(room: RoomUI, service: FirestoreService, presentSheet: Binding<Bool>) {
+        _radiusSettingViewModel = State(wrappedValue: RadiusSettingViewModel(service: service, room: room))
 		_presentSheet = presentSheet
 	}
 
@@ -57,6 +57,6 @@ struct RadiusSettingView: View {
 
 #Preview {
     NavigationView {
-		RadiusSettingView(room: RoomUI(id: "12b489", name: "Eeastquadron", administrator: UserUI(id: UUID().uuidString, name: "Lead")), presentSheet: .constant(true))
+        RadiusSettingView(room: RoomUI(id: "12b489", name: "Eeastquadron", administrator: UserUI(id: UUID().uuidString, name: "Lead")), service: FirestoreService(), presentSheet: .constant(true))
     }
 }

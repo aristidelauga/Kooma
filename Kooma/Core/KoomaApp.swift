@@ -11,7 +11,8 @@ struct KoomaApp: App {
     @State private var userManager = UserManager()
     @State private var navigationVM = NavigationViewModel()
     @State private var service = FirestoreService()
-    
+    @State private var isLoading = true
+    @State private var displayYourNextRoomView: Bool = false
     init() {
         FirebaseApp.configure()
     }
@@ -19,38 +20,56 @@ struct KoomaApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack(path: $navigationVM.path) {
-                Group {
-                    if self.hasCompletedOnboarding, let user = self.userManager.currentUser {
-                        if self.service.rooms.isEmpty {
-                            YourNextRoomView(user: user, userManager: UserManager())
+                VStack {
+                    if self.isLoading {
+                       LaunchScreenView()
+                            .onAppear {
+                                print("self.service.rooms.isEmpty: \(self.service.rooms.isEmpty)")
+                            }
+                    } else if self.hasCompletedOnboarding {
+//                        if self.hasCompletedOnboarding {
+//                            if self.service.rooms.isEmpty {
+//                                YourNextRoomView(userManager: UserManager())
+//                            } else {
+//                                RoomsListView()
+//                            }
+                            switch self.service.rooms.isEmpty {
+                            case true:
+                                YourNextRoomView(userManager: userManager)
+                            case false:
+                                RoomsListView(service: self.service)
+                            }
                         } else {
-                            RoomsListView()
-                        }
-                    } else {
-                        OnboardingStepOneView(hasCompletedOnboarding: $hasCompletedOnboarding)
+                            OnboardingStepOneView(hasCompletedOnboarding: $hasCompletedOnboarding)
+//                        }
                     }
                 }
                 .navigationDestination(for: AppRoute.self) { route in
                     switch route {
                     case AppRoute.yourNextRoom:
-                        if let user = self.userManager.currentUser {
-                            YourNextRoomView(user: user, userManager: UserManager())
-                        }
+                            YourNextRoomView(userManager: UserManager())
                     case AppRoute.roomsList:
-                        RoomsListView()
+                        RoomsListView(service: self.service)
                     }
                 }
             }
             .navigationBarBackButtonHidden()
             .onAppear {
-                print("hasCompletedOnboarding: \(self.hasCompletedOnboarding)")
+//                print("hasCompletedOnboarding: \(self.hasCompletedOnboarding)")
+                Task { @MainActor in
+                    try await self.service.fetchRooms()
+                    try await Task.sleep(for: .seconds(3))
+                    displayYourNextRoomView = self.service.rooms.isEmpty
+                    self.isLoading = false
+                }
             }
             
-            .onChange(of: self.hasCompletedOnboarding) { oldValue, newValue in
-                print("hasCompletedOnboarding before: \(oldValue)")
-                print("hasCompletedOnboarding after: \(newValue)")
-            }
+//            .onChange(of: self.service.rooms.isEmpty, initial: true) {
+//                print("self.service.roomsIsEmpty: \(self.service.rooms.isEmpty)")
+//                self.isLoading = false
+//            }
         }
+        .environment(self.service)
         .environment(self.userManager)
         .environment(self.navigationVM)
     }

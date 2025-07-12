@@ -21,9 +21,11 @@ final class FirestoreService: FirestoreServiceInterface {
 
 	init(client: FirestoreClientInterface = FirestoreClient()) {
 		self.client = client
-        Task { @MainActor in
-            try await self.fetchRooms()
-        }
+//        Task { @MainActor in
+//            try await self.fetchRooms()
+//            print("self.service.rooms.isEmpty' in FirestoreService: \(self.rooms.isEmpty)")
+//            try await Task.sleep(for: .seconds(3)) 
+//        }
 	}
 
     
