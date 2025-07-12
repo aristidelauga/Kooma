@@ -21,6 +21,9 @@ final class FirestoreService: FirestoreServiceInterface {
 
 	init(client: FirestoreClientInterface = FirestoreClient()) {
 		self.client = client
+        Task { @MainActor in
+            try await self.fetchRooms()
+        }
 	}
 
     

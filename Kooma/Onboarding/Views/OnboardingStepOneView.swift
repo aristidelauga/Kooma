@@ -2,6 +2,7 @@
 import SwiftUI
 
 struct OnboardingStepOneView: View {
+    @Binding var hasCompletedOnboarding: Bool
     var body: some View {
 		VStack(spacing: 0) {
 			Image(.onboarding1)
@@ -15,7 +16,7 @@ struct OnboardingStepOneView: View {
 			TextBodyLarge(text: "Quickly and easily decide where to have lunch")
 			Spacer()
 
-			NavigationLink(destination: OnboardingStepTwoView(), label: {
+			NavigationLink(destination: OnboardingStepTwoView(hasCompletedOnboarding: $hasCompletedOnboarding), label: {
 				NavigationButton(text: "Continue")
 			})
         }
@@ -28,5 +29,5 @@ struct OnboardingStepOneView: View {
 }
 
 #Preview {
-	OnboardingStepOneView()
+    OnboardingStepOneView(hasCompletedOnboarding: .constant(false))
 }

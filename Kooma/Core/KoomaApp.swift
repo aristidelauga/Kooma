@@ -7,12 +7,12 @@ import FirebaseFirestore
 
 @main
 struct KoomaApp: App {
-    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+    @MainActor @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
     @State private var userManager = UserManager()
     @State private var navigationVM = NavigationViewModel()
     @State private var service = FirestoreService()
     
-    init()  {
+    init() {
         FirebaseApp.configure()
     }
     
@@ -27,7 +27,7 @@ struct KoomaApp: App {
                             RoomsListView()
                         }
                     } else {
-                        OnboardingStepOneView()
+                        OnboardingStepOneView(hasCompletedOnboarding: $hasCompletedOnboarding)
                     }
                 }
                 .navigationDestination(for: AppRoute.self) { route in
@@ -43,10 +43,12 @@ struct KoomaApp: App {
             }
             .navigationBarBackButtonHidden()
             .onAppear {
-                Task {
-                    try await service.fetchRooms()
-                }
-                print("self.service.rooms.isEmpty ? : \(self.service.rooms.isEmpty)")
+                print("hasCompletedOnboarding: \(self.hasCompletedOnboarding)")
+            }
+            
+            .onChange(of: self.hasCompletedOnboarding) { oldValue, newValue in
+                print("hasCompletedOnboarding before: \(oldValue)")
+                print("hasCompletedOnboarding after: \(newValue)")
             }
         }
         .environment(self.userManager)

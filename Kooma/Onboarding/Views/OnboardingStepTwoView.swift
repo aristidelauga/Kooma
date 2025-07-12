@@ -2,6 +2,7 @@
 import SwiftUI
 
 struct OnboardingStepTwoView: View {
+    @Binding var hasCompletedOnboarding: Bool
 	var body: some View {
 		VStack(spacing: 0) {
 			Image(.onboarding2)
@@ -19,7 +20,7 @@ struct OnboardingStepTwoView: View {
 			.padding(.horizontal, 16)
 			Spacer()
 
-			NavigationLink(destination: CreateUserView(), label: {
+            NavigationLink(destination: CreateUserView(hasCompletedOnboarding: $hasCompletedOnboarding), label: {
 				TextHeading200(text: "Get Started")
 					.padding(.vertical, 20)
 					.padding(.horizontal, 12)
@@ -40,5 +41,5 @@ struct OnboardingStepTwoView: View {
 }
 
 #Preview {
-	OnboardingStepTwoView()
+    OnboardingStepTwoView(hasCompletedOnboarding: .constant(false))
 }

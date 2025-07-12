@@ -3,13 +3,13 @@ import SwiftUI
 
 struct CreateUserView: View {
 	@State private var createUserVM = CreateUserViewModel()
-	@AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+    @MainActor @Binding var hasCompletedOnboarding: Bool
 	@Environment(UserManager.self) private var userManager
     var body: some View {
 		VStack(alignment: .leading) {
         	TextHeading600(text: "Your name")
 			KMTextfield(text: $createUserVM.name)
-			MainButton(text: "Submit") {
+			MainButton(text: "Submit") { @MainActor in
 				self.createUserVM.createUser()
 				if let user = self.createUserVM.user {
 					self.userManager.setUser(user)
@@ -30,5 +30,5 @@ struct CreateUserView: View {
 }
 
 #Preview {
-	CreateUserView()
+    CreateUserView(hasCompletedOnboarding: .constant(false))
 }
