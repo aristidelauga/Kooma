@@ -21,10 +21,14 @@ struct RoomUI: Identifiable, Codable, Sendable {
 		self.administrator = administrator
 		self.members = [self.administrator]
 		self.image = [
-			"RoomIcon-1",
-			"RoomIcon-2",
-			"RoomIcon-3"
-		].randomElement()!
+            "RoomOne",
+            "RoomTwo",
+            "RoomThree",
+            "RoomFour",
+            "RoomFive",
+            "RoomSix",
+            "RoomSeven"
+        ].randomElement()!
 
 	}
     
@@ -44,9 +48,13 @@ struct RoomUI: Identifiable, Codable, Sendable {
         self.members = members
         self.restaurants = restaurants
         self.image = [
-            "RoomIcon-1",
-            "RoomIcon-2",
-            "RoomIcon-3"
+            "RoomOne",
+            "RoomTwo",
+            "RoomThree",
+            "RoomFour",
+            "RoomFive",
+            "RoomSix",
+            "RoomSeven"
         ].randomElement()!
     }
 
