@@ -8,7 +8,7 @@ import FirebaseFirestore
 protocol FirestoreServiceInterface {
     var rooms: [RoomUI] { get }
     func createRoom(_ room: RoomUI) async throws
-    func fetchRooms() async throws
+    func fetchRooms(withUserID userID: String) async throws
 //    func listenToRoom(id: String, onChange: @escaping (RoomDTO?) -> Void) -> ListenerRegistration
 }
 
@@ -21,11 +21,6 @@ final class FirestoreService: FirestoreServiceInterface {
 
 	init(client: FirestoreClientInterface = FirestoreClient()) {
 		self.client = client
-//        Task { @MainActor in
-//            try await self.fetchRooms()
-//            print("self.service.rooms.isEmpty' in FirestoreService: \(self.rooms.isEmpty)")
-//            try await Task.sleep(for: .seconds(3)) 
-//        }
 	}
 
     
@@ -41,14 +36,16 @@ final class FirestoreService: FirestoreServiceInterface {
         
         do {
             _ = try await client.saveRoom(newRoom)
-            try await fetchRooms()
+            // TODO: To be changed to Fetch**MY**Rooms as this would fetch only the rooms of the administrator
+            try await fetchRooms(withUserID: room.administrator.id)
+            // TODO: Add a second method to fetch the other rooms: fetchJoinedRooms()
         } catch {
             throw NSError(domain: "RoomUI", code: 3, userInfo: [NSLocalizedDescriptionKey: "Failure in the Service during an attempt of saving a room"])
         }
     }
     
-    func fetchRooms() async throws {
-        self.rooms = try await client.getRooms()
+    func fetchRooms(withUserID userID: String) async throws {
+        self.rooms = try await client.getRooms(forUserID: userID)
     }
 
 }

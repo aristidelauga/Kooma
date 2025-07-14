@@ -7,12 +7,10 @@ import FirebaseFirestore
 
 @main
 struct KoomaApp: App {
-    @MainActor @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
     @State private var userManager = UserManager()
     @State private var navigationVM = NavigationViewModel()
     @State private var service = FirestoreService()
     @State private var isLoading = true
-    @State private var displayYourNextRoomView: Bool = false
     init() {
         FirebaseApp.configure()
     }
@@ -26,22 +24,15 @@ struct KoomaApp: App {
                             .onAppear {
                                 print("self.service.rooms.isEmpty: \(self.service.rooms.isEmpty)")
                             }
-                    } else if self.hasCompletedOnboarding {
-//                        if self.hasCompletedOnboarding {
-//                            if self.service.rooms.isEmpty {
-//                                YourNextRoomView(userManager: UserManager())
-//                            } else {
-//                                RoomsListView()
-//                            }
+                    } else if self.userManager.currentUser != nil {
                             switch self.service.rooms.isEmpty {
                             case true:
-                                YourNextRoomView(userManager: userManager)
+                                YourNextRoomView(userManager: self.userManager)
                             case false:
                                 RoomsListView(service: self.service)
                             }
                         } else {
-                            OnboardingStepOneView(hasCompletedOnboarding: $hasCompletedOnboarding)
-//                        }
+                            OnboardingStepOneView()
                     }
                 }
                 .navigationDestination(for: AppRoute.self) { route in
@@ -55,19 +46,16 @@ struct KoomaApp: App {
             }
             .navigationBarBackButtonHidden()
             .onAppear {
-//                print("hasCompletedOnboarding: \(self.hasCompletedOnboarding)")
                 Task { @MainActor in
-                    try await self.service.fetchRooms()
+                    print("self.userManager.currentUser.?id in KoomaApp: \(self.userManager.currentUser?.id)")
+                    print("self.userManager.currentUser.?id in KoomaApp: \(self.userManager.currentUser?.name)")
+                    if let currentUserID = self.userManager.currentUser?.id {
+                        try await self.service.fetchRooms(withUserID: currentUserID)
+                    }
                     try await Task.sleep(for: .seconds(3))
-                    displayYourNextRoomView = self.service.rooms.isEmpty
                     self.isLoading = false
                 }
             }
-            
-//            .onChange(of: self.service.rooms.isEmpty, initial: true) {
-//                print("self.service.roomsIsEmpty: \(self.service.rooms.isEmpty)")
-//                self.isLoading = false
-//            }
         }
         .environment(self.service)
         .environment(self.userManager)

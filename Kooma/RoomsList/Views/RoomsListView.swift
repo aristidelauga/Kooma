@@ -40,16 +40,6 @@ struct RoomsListView: View {
 				.frame(maxWidth: .infinity, alignment: .trailing)
 				.padding(.trailing, 38)
 			}
-		.onAppear {
-            Task {
-                do {
-                    try await self.roomsListVM.fetchRooms()
-                } catch {
-                    print("No rooms to be loaded: \(error)")
-                    throw error
-                }
-            }
-		}
 		.background(
 			Color.kmBeige
 				.frame(maxWidth: .infinity, maxHeight: .infinity)

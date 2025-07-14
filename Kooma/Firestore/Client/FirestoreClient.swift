@@ -12,7 +12,7 @@ private enum FirestoreConstants {
 protocol FirestoreClientInterface {
      var database: Firestore { get }
     func saveRoom(_ room: RoomUI) async throws -> String
-    func getRooms() async throws -> [RoomUI]
+    func getRooms(forUserID userID: String) async throws -> [RoomUI]
 }
 
 final class FirestoreClient: FirestoreClientInterface {
@@ -31,18 +31,12 @@ final class FirestoreClient: FirestoreClientInterface {
         }
     }
     
-    func getRooms() async throws -> [RoomUI] {
-        //        let snapshot = try await roomsCollection.getDocuments()
-        //        return snapshot.documents.compactMap { doc in
-        //            print("fetchRooms from FirestoreClient: \(doc.data().values)")
-        //            return try? RoomDTO(from: doc.data() as! Decoder)
-        //        }
+    func getRooms(forUserID userID: String) async throws -> [RoomUI] {
         do {
-            let snapshot = try await roomsCollection.getDocuments()
+            let snapshot = try await roomsCollection.whereField("administrator.id", isEqualTo: userID).getDocuments()
             let rooms = snapshot.documents.compactMap { document in
                 try? document.data(as: RoomUI.self)
             }
-//            print("rooms.count: \(rooms.count)")
             return rooms
         } catch {
             throw error
