@@ -7,16 +7,18 @@ struct RoomUI: Identifiable, Codable, Sendable {
     var hostID: String {
         administrator.id
     }
-    var code: String?
+    var code: String
 	var name: String?
 	var administrator: UserUI
 	var address: String?
 	var members: [UserUI]? = []
+    var membersID: [String] = []
 	var restaurants: [RestaurantUI]?
 	var image: String
 
-	init(id: String = RoomUI.generateCode(), name: String? = nil, administrator: UserUI) {
+    init(id: String? = nil, name: String? = nil, administrator: UserUI) {
 		self.id = id
+        self.code = RoomUI.generateCode()
 		self.name = name
 		self.administrator = administrator
 		self.members = [self.administrator]

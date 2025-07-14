@@ -17,7 +17,7 @@ struct RoomsListView: View {
 					.padding(.leading, 12)
 				ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 16) {
-                        ForEach(self.roomsListVM.rooms) { room in
+                        ForEach(self.roomsListVM.myRooms) { room in
                             NavigationLink(destination: RoomDetailsView(room: room), label: {
                                 RoomCell(room: room)
                             })
@@ -30,7 +30,18 @@ struct RoomsListView: View {
 				TextHeading600(text: "Rooms you are invited")
 					.frame(maxWidth: .infinity, alignment: .leading)
 					.padding(.leading, 12)
-
+                
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 16) {
+                        ForEach(self.roomsListVM.joinedRooms) { room in
+                            NavigationLink(destination: RoomDetailsView(room: room), label: {
+                                RoomCell(room: room)
+                            })
+                        }
+                    }
+                    .padding(.bottom, 12)
+                }
+                .padding(12)
 				Spacer()
 
 				MainButton(text: "New Room", maxWidth: 142) {

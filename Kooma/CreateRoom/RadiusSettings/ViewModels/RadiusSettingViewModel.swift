@@ -8,7 +8,7 @@ import Foundation
 	var room: RoomUI
 	var isLoading = false
     var rooms: [RoomUI] {
-        self.service.rooms
+        self.service.myRooms
     }
     var restaurantsDTO: [RestaurantDTO] = []
 

@@ -5,8 +5,12 @@ struct RoomDetailsView: View {
     var room: RoomUI
     var body: some View {
         VStack {
-            ForEach(room.restaurants ?? []) { restaurant in
-                Text(restaurant.address)
+//            ForEach(room.restaurants ?? []) { restaurant in
+//                Text(restaurant.address)
+//            }
+            Text(room.code)
+            ForEach(room.members ?? []) { member in
+                Text(member.name)
             }
         }
     }

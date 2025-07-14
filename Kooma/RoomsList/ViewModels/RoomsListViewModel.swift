@@ -5,7 +5,8 @@ import Foundation
 final class RoomsListViewModel {
     private let firestoreService: any FirestoreServiceInterface
     
-    var rooms: [RoomUI] { firestoreService.rooms }
+    var myRooms: [RoomUI] { firestoreService.myRooms }
+    var joinedRooms: [RoomUI] { firestoreService.joinedRooms }
     
     init(firestoreService: any FirestoreServiceInterface = FirestoreService()) {
         self.firestoreService = firestoreService
@@ -13,7 +14,7 @@ final class RoomsListViewModel {
     
     func fetchRooms(userID: String) async throws {
         do {
-            try await firestoreService.fetchRooms(withUserID: userID)
+            try await firestoreService.fetchMyRooms(withUserID: userID)
         } catch {
             print("Failed to fetch rooms: \(error.localizedDescription)")
         }

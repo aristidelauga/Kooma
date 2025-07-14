@@ -6,16 +6,20 @@ import FirebaseFirestore
 
 @MainActor
 protocol FirestoreServiceInterface {
-    var rooms: [RoomUI] { get }
+    var myRooms: [RoomUI] { get }
+    var joinedRooms: [RoomUI] { get }
+    
     func createRoom(_ room: RoomUI) async throws
-    func fetchRooms(withUserID userID: String) async throws
-//    func listenToRoom(id: String, onChange: @escaping (RoomDTO?) -> Void) -> ListenerRegistration
+    func joinRoom(withCode code: String, user: UserUI) async throws
+    func fetchMyRooms(withUserID userID: String) async throws
+    func fetchJoinedRooms(withUserID userID: String) async throws
 }
 
 @Observable
 final class FirestoreService: FirestoreServiceInterface {
     
-    private(set) var rooms: [RoomUI] = []
+    private(set) var myRooms: [RoomUI] = []
+    private(set) var joinedRooms: [RoomUI] = []
     
 	private let client: any FirestoreClientInterface
 
@@ -30,23 +34,40 @@ final class FirestoreService: FirestoreServiceInterface {
             name: room.name,
             administrator: room.administrator,
             address: room.address,
-            members: room.members ?? [room.administrator],
+            members: [room.administrator],
             restaurants: room.restaurants ?? []
         )
         
         do {
             _ = try await client.saveRoom(newRoom)
-            // TODO: To be changed to Fetch**MY**Rooms as this would fetch only the rooms of the administrator
-            try await fetchRooms(withUserID: room.administrator.id)
-            // TODO: Add a second method to fetch the other rooms: fetchJoinedRooms()
+            try await fetchMyRooms(withUserID: room.administrator.id)
         } catch {
             throw NSError(domain: "RoomUI", code: 3, userInfo: [NSLocalizedDescriptionKey: "Failure in the Service during an attempt of saving a room"])
         }
     }
     
-    func fetchRooms(withUserID userID: String) async throws {
-        self.rooms = try await client.getRooms(forUserID: userID)
+    func joinRoom(withCode code: String, user: UserUI) async throws {
+//        Task {
+            do {
+                try await self.client.joinRoom(withCode: code, user: user)
+            } catch {
+                throw NSError(domain: "RoomUI", code: 141, userInfo: [NSLocalizedDescriptionKey: "Failure in the Service during an attempt of joining a room"])
+            }
+            do {
+                try await self.fetchJoinedRooms(withUserID: user.id)
+            } catch {
+                throw NSError(domain: "RoomUI", code: 121, userInfo: [NSLocalizedDescriptionKey: "Failure in the Service during an attempt of fetching joined rooms"])
+            }
+//        }
     }
-
+    
+    func fetchMyRooms(withUserID userID: String) async throws {
+        self.myRooms = try await client.getMyRooms(forUserID: userID)
+    }
+    
+    func fetchJoinedRooms(withUserID userID: String) async throws {
+        self.joinedRooms = try await client.getJoinedRooms(forUserID: userID)
+        print("self.joinedRooms.count: \(self.joinedRooms.count)")
+    }
 }
 

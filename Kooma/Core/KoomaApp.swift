@@ -22,14 +22,14 @@ struct KoomaApp: App {
                     if self.isLoading {
                        LaunchScreenView()
                             .onAppear {
-                                print("self.service.rooms.isEmpty: \(self.service.rooms.isEmpty)")
+                                print("self.service.rooms.isEmpty: \(self.service.myRooms.isEmpty)")
                             }
                     } else if self.userManager.currentUser != nil {
-                            switch self.service.rooms.isEmpty {
+                        switch !self.service.myRooms.isEmpty || !self.service.joinedRooms.isEmpty {
                             case true:
-                                YourNextRoomView(userManager: self.userManager)
+                            RoomsListView(service: self.service)
                             case false:
-                                RoomsListView(service: self.service)
+                            YourNextRoomView(userManager: self.userManager)
                             }
                         } else {
                             OnboardingStepOneView()
@@ -50,7 +50,8 @@ struct KoomaApp: App {
                     print("self.userManager.currentUser.?id in KoomaApp: \(self.userManager.currentUser?.id)")
                     print("self.userManager.currentUser.?id in KoomaApp: \(self.userManager.currentUser?.name)")
                     if let currentUserID = self.userManager.currentUser?.id {
-                        try await self.service.fetchRooms(withUserID: currentUserID)
+                        try await self.service.fetchMyRooms(withUserID: currentUserID)
+                        try await self.service.fetchJoinedRooms(withUserID: currentUserID)
                     }
                     try await Task.sleep(for: .seconds(3))
                     self.isLoading = false

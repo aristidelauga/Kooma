@@ -8,6 +8,7 @@ struct YourNextRoomView: View {
 	// MARK: ViewModels
 	@State private var roomCreationVM: RoomCreationViewModel
     var userManager: UserManager
+    @Environment(NavigationViewModel.self) private var navigationVM
     @Environment(FirestoreService.self) private var service
 
     init(userManager: UserManager) {
@@ -40,10 +41,15 @@ struct YourNextRoomView: View {
 				KMTextfield(text: $roomCode, placeholder: "Enter Room Code")
 					.padding(.vertical, 16)
 
-				NavigationLink(destination: ResearchRoomView(), label: {
+                NavigationLink(destination: ResearchRoomView(
+                    service: self.service,
+                    code: roomCode,
+                    userManager: self.userManager,
+                    navigationVM: navigationVM), label: {
 					NavigationButton(text: "Join Room")
 						.frame(maxWidth: .infinity, alignment: .trailing)
 				})
+                .disabled(self.roomCode.isEmpty)
 				Spacer()
 			}
 			.padding(.horizontal, 16)
