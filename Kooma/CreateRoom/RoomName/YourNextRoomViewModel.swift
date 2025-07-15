@@ -2,7 +2,7 @@
 import Foundation
 
 @MainActor
-@Observable final class RoomCreationViewModel {
+@Observable final class YourNextRoomViewModel {
 	var room: RoomUI?
 	var name: String = ""
 	var user: UserUI

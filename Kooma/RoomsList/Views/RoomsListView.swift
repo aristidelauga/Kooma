@@ -10,6 +10,7 @@ struct RoomsListView: View {
     init(service: FirestoreService) {
         _roomsListVM = State(wrappedValue: RoomsListViewModel(firestoreService: service))
     }
+    
 	var body: some View {
 			VStack {
 				TextHeading600(text: "Your Rooms")

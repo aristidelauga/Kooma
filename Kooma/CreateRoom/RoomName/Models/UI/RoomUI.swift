@@ -11,9 +11,10 @@ struct RoomUI: Identifiable, Codable, Sendable {
 	var name: String?
 	var administrator: UserUI
 	var address: String?
-	var members: [UserUI]? = []
+	var members: [UserUI] = []
     var membersID: [String] = []
-	var restaurants: [RestaurantUI]?
+	var restaurants: [RestaurantUI] = []
+    var votes: [String: [String]] = [:]
 	var image: String
 
     init(id: String? = nil, name: String? = nil, administrator: UserUI) {

@@ -47,7 +47,6 @@ final class FirestoreService: FirestoreServiceInterface {
     }
     
     func joinRoom(withCode code: String, user: UserUI) async throws {
-//        Task {
             do {
                 try await self.client.joinRoom(withCode: code, user: user)
             } catch {
@@ -58,7 +57,6 @@ final class FirestoreService: FirestoreServiceInterface {
             } catch {
                 throw NSError(domain: "RoomUI", code: 121, userInfo: [NSLocalizedDescriptionKey: "Failure in the Service during an attempt of fetching joined rooms"])
             }
-//        }
     }
     
     func fetchMyRooms(withUserID userID: String) async throws {

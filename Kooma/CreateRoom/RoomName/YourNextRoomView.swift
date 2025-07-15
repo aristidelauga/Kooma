@@ -6,14 +6,14 @@ struct YourNextRoomView: View {
 	@State private var presentSheet = false
 
 	// MARK: ViewModels
-	@State private var roomCreationVM: RoomCreationViewModel
+	@State private var yourNextRoomVM: YourNextRoomViewModel
     var userManager: UserManager
     @Environment(NavigationViewModel.self) private var navigationVM
     @Environment(FirestoreService.self) private var service
 
     init(userManager: UserManager) {
         self.userManager = userManager
-        _roomCreationVM = State(wrappedValue: RoomCreationViewModel(user: self.userManager.currentUser ?? UserUI(id: UUID().uuidString, name: "ErrorName")))
+        _yourNextRoomVM = State(wrappedValue: YourNextRoomViewModel(user: self.userManager.currentUser ?? UserUI(id: UUID().uuidString, name: "ErrorName")))
 	}
 
     var body: some View {
@@ -22,16 +22,16 @@ struct YourNextRoomView: View {
 				// MARK: - Create a Room
 				TextHeading600(text: "Create a Room")
 					.padding(.top, 25)
-				KMTextfield(text: $roomCreationVM.name, placeholder: "Name your room")
+				KMTextfield(text: $yourNextRoomVM.name, placeholder: "Name your room")
 					.padding(.vertical, 16)
 
 				VStack {
 					MainButton(text: "Create Room", maxWidth: 140) {
 						presentSheet = true
-						self.roomCreationVM.createRoomWithName(with: self.roomCreationVM.user)
+						self.yourNextRoomVM.createRoomWithName(with: self.yourNextRoomVM.user)
 					}
 					.frame(maxWidth: .infinity, alignment: .trailing)
-					.disabled(roomCreationVM.name.isEmpty)
+					.disabled(yourNextRoomVM.name.isEmpty)
 				}
 
 				// MARK: - Join a Room
@@ -55,15 +55,17 @@ struct YourNextRoomView: View {
 			.padding(.horizontal, 16)
 			.navigationTitle("Your Next Room")
 			.navigationBarTitleDisplayMode(.inline)
-            .fullScreenCover(isPresented: $presentSheet, content: {
-                if let room = self.roomCreationVM.room {
-                    SearchAddressView(room: room, presentSheet: $presentSheet, service: self.service)
-                }
-            })
-            .onAppear(perform: {
-                print("user's id: \(self.roomCreationVM.user.id)")
-                print("user's name: \(self.roomCreationVM.user.name)")
-            })
+            .fullScreenCover(
+                isPresented: $presentSheet,
+                content: {
+                    if let room = self.yourNextRoomVM.room {
+                        SearchAddressView(
+                            room: room,
+                            presentSheet: $presentSheet,
+                            service: self.service
+                        )
+                    }
+                })
 			.navigationBarBackButtonHidden()
     }
 }
