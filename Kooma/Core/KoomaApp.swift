@@ -38,17 +38,24 @@ struct KoomaApp: App {
                 .navigationDestination(for: AppRoute.self) { route in
                     switch route {
                     case AppRoute.yourNextRoom:
-                            YourNextRoomView(userManager: UserManager())
+                            YourNextRoomView(userManager: userManager)
                     case AppRoute.roomsList:
                         RoomsListView(service: self.service)
+                    case AppRoute.roomDetails(let room):
+                        if let user = self.userManager.currentUser {
+                            RoomDetailsView(
+                                room: room,
+                                user: user,
+                                service: service,
+                                navigation: navigationVM
+                            )
+                        }
                     }
                 }
             }
             .navigationBarBackButtonHidden()
             .onAppear {
                 Task { @MainActor in
-                    print("self.userManager.currentUser.?id in KoomaApp: \(self.userManager.currentUser?.id)")
-                    print("self.userManager.currentUser.?id in KoomaApp: \(self.userManager.currentUser?.name)")
                     if let currentUserID = self.userManager.currentUser?.id {
                         try await self.service.fetchMyRooms(withUserID: currentUserID)
                         try await self.service.fetchJoinedRooms(withUserID: currentUserID)

@@ -15,6 +15,7 @@ protocol FirestoreClientInterface {
     func getMyRooms(forUserID userID: String) async throws -> [RoomUI]
     func joinRoom(withCode code: String, user: UserUI) async throws
     func getJoinedRooms(forUserID userID: String) async throws -> [RoomUI]
+    func updateVotes(forRoomID roomID: String, votes: [String: [String]]) async throws
 }
 
 final class FirestoreClient: FirestoreClientInterface {
@@ -50,7 +51,7 @@ final class FirestoreClient: FirestoreClientInterface {
             let userMap = try Firestore.Encoder().encode(user)
             try await document.reference.updateData([
                 "members": FieldValue.arrayUnion([userMap]),
-                "membersID": FieldValue.arrayUnion([user.id])
+                "regularMembersID": FieldValue.arrayUnion([user.id])
             ])
         } catch {
             throw NSError(domain: "AppError", code: 310, userInfo: [NSLocalizedDescriptionKey: "Error joining the room: \(error)"])
@@ -71,7 +72,7 @@ final class FirestoreClient: FirestoreClientInterface {
     
     func getJoinedRooms(forUserID userID: String) async throws -> [RoomUI] {
         do {
-            let snapshot = try await roomsCollection.whereField("membersID", arrayContains: userID).getDocuments()
+            let snapshot = try await roomsCollection.whereField("regularMembersID", arrayContains: userID).getDocuments()
             let rooms = snapshot.documents.compactMap { document in
                 try? document.data(as: RoomUI.self)
             }
@@ -81,4 +82,9 @@ final class FirestoreClient: FirestoreClientInterface {
         }
     }
     
+    func updateVotes(forRoomID roomID: String, votes: [String : [String]]) async throws {
+        let ref = roomsCollection.document(roomID)
+        try await ref.updateData(["votes": votes])
+    }
+
 }

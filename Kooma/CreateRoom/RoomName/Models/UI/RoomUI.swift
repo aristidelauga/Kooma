@@ -2,7 +2,7 @@
 import Foundation
 @preconcurrency import FirebaseFirestore
 
-struct RoomUI: Identifiable, Codable, Sendable {
+struct RoomUI: Identifiable, Codable, Sendable, Equatable, Hashable {
 	@DocumentID var id: String?
     var hostID: String {
         administrator.id
@@ -12,7 +12,7 @@ struct RoomUI: Identifiable, Codable, Sendable {
 	var administrator: UserUI
 	var address: String?
 	var members: [UserUI] = []
-    var membersID: [String] = []
+    var regularMembersID: [String] = []
 	var restaurants: [RestaurantUI] = []
     var votes: [String: [String]] = [:]
 	var image: String
@@ -61,6 +61,10 @@ struct RoomUI: Identifiable, Codable, Sendable {
         ].randomElement()!
     }
 
+    static func == (lhs: RoomUI, rhs: RoomUI) -> Bool {
+            lhs.id == rhs.id
+        }
+    
 	static func generateCode(length: Int = 6) -> String {
 		let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 		return String((0..<length).compactMap { _ in characters.randomElement() })

@@ -57,6 +57,6 @@ struct RadiusSettingView: View {
 
 #Preview {
     NavigationView {
-        RadiusSettingView(room: RoomUI(id: "12b489", name: "Eeastquadron", administrator: UserUI(id: UUID().uuidString, name: "Lead")), service: FirestoreService(), presentSheet: .constant(true))
+        RadiusSettingView(room: RoomUI(id: "12b489", name: "Expédition 33", administrator: UserUI(id: UUID().uuidString, name: "Gustave")), service: FirestoreService(), presentSheet: .constant(true))
     }
 }

@@ -12,14 +12,6 @@ final class RoomsListViewModel {
         self.firestoreService = firestoreService
     }
     
-    func fetchRooms(userID: String) async throws {
-        do {
-            try await firestoreService.fetchMyRooms(withUserID: userID)
-        } catch {
-            print("Failed to fetch rooms: \(error.localizedDescription)")
-        }
-    }
-    
     func addNewRoom(_ room: RoomUI) async {
         do {
             try await firestoreService.createRoom(room)

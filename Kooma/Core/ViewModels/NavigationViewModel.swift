@@ -6,7 +6,7 @@ final class NavigationViewModel {
 	var path = NavigationPath()
     var showRoomsList = false
 
-    private func cleanPath() {
+    func cleanPath() {
         self.path = NavigationPath()
     }
     

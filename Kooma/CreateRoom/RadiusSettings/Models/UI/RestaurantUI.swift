@@ -4,7 +4,7 @@ import Foundation
 import CoreLocation
 import MapKit
 
-struct RestaurantUI: Identifiable, Sendable, Codable {
+struct RestaurantUI: Identifiable, Sendable, Codable, Equatable, Hashable {
 	let id: String
 	let name: String
 	let phoneNumber: String

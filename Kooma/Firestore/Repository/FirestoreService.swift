@@ -13,6 +13,7 @@ protocol FirestoreServiceInterface {
     func joinRoom(withCode code: String, user: UserUI) async throws
     func fetchMyRooms(withUserID userID: String) async throws
     func fetchJoinedRooms(withUserID userID: String) async throws
+    func updateVote(forRoomID roomID: String, votes: [String: [String]]) async throws
 }
 
 @Observable
@@ -35,7 +36,7 @@ final class FirestoreService: FirestoreServiceInterface {
             administrator: room.administrator,
             address: room.address,
             members: [room.administrator],
-            restaurants: room.restaurants ?? []
+            restaurants: room.restaurants
         )
         
         do {
@@ -66,6 +67,10 @@ final class FirestoreService: FirestoreServiceInterface {
     func fetchJoinedRooms(withUserID userID: String) async throws {
         self.joinedRooms = try await client.getJoinedRooms(forUserID: userID)
         print("self.joinedRooms.count: \(self.joinedRooms.count)")
+    }
+    
+    func updateVote(forRoomID roomID: String, votes: [String : [String]]) async throws {
+        try await self.client.updateVotes(forRoomID: roomID, votes: votes)
     }
 }
 
