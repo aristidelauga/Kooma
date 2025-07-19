@@ -5,6 +5,7 @@ struct CreateUserView: View {
 	@State private var createUserVM = CreateUserViewModel()
     @State private var hasCompletedOnboarding: Bool = false
 	@Environment(UserManager.self) private var userManager
+    @Environment(FirestoreService.self) private var service
     var body: some View {
 		VStack(alignment: .leading) {
         	TextHeading600(text: "Your name")
@@ -19,7 +20,7 @@ struct CreateUserView: View {
 			.padding(.top, 18)
 			.frame(maxWidth: .infinity, alignment: .trailing)
 			.navigationDestination(isPresented: $hasCompletedOnboarding, destination: {
-                    YourNextRoomView(userManager: self.userManager)
+                YourNextRoomView(userManager: self.userManager)
 			})
         }
 		.padding(.horizontal, 16)

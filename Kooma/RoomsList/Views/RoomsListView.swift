@@ -53,16 +53,14 @@ struct RoomsListView: View {
             Spacer()
             
             MainButton(text: "New Room", maxWidth: 142) {
-                self.navigationVM.goToYourNextRoomView()
-                print("navigationVM.currentView: \(self.navigationVM.path)")
+                let hasRooms = !self.roomsListVM.joinedRooms.isEmpty || !self.roomsListVM.myRooms.isEmpty
+                self.navigationVM.goToYourNextRoomView(hasRooms: hasRooms)
             }
             .frame(maxWidth: .infinity, alignment: .trailing)
             .padding(.trailing, 38)
         }
         .onAppear {
-            print("path from RoomsListView outside of the Task: \(self.navigationVM.path)")
             Task {
-                print("path from RoomsListView inside of the Task: \(self.navigationVM.path)")
                 if let userID = self.userManager.currentUser?.id {
                     try await self.roomsListVM.getMyRoomsConverted(userID: userID)
                     try await self.roomsListVM.getJoinedRoomsConverted(userID: userID)

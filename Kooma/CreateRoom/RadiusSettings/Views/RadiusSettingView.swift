@@ -4,13 +4,12 @@ import MapKit
 
 struct RadiusSettingView: View {
 	@State private var radiusSettingViewModel: RadiusSettingViewModel
-    @Environment(NavigationViewModel.self) private var navigationVM
-	@State private var slider: Double = 0.0
-	@Binding var presentSheet: Bool
+    @State private var slider: Double = 0.0
+    var navigationVM: NavigationViewModel
 
-    init(room: RoomUI, service: FirestoreService, presentSheet: Binding<Bool>) {
+    init(room: RoomUI, service: FirestoreService, navigationVM: NavigationViewModel) {
         _radiusSettingViewModel = State(wrappedValue: RadiusSettingViewModel(service: service, room: room))
-		_presentSheet = presentSheet
+        self.navigationVM = navigationVM
 	}
 
     var body: some View {
@@ -34,7 +33,6 @@ struct RadiusSettingView: View {
                         try await self.radiusSettingViewModel.addNewRoom(self.radiusSettingViewModel.room)
                         self.navigationVM.showRoomsListView()
                         print("path from RadiusSettingsView: \(self.navigationVM.path)")
-                        self.presentSheet = false
 					}
 				}
 				.frame(maxWidth: .infinity, alignment: .center)
@@ -53,11 +51,24 @@ struct RadiusSettingView: View {
 					.edgesIgnoringSafeArea(.all)
 			}
 		}
+        .toolbar {
+            ToolbarItem(placement: .destructiveAction) {
+                Button {
+                    self.navigationVM.goToYourNextRoomView()
+                } label: {
+                    Image(systemName: "xmark")
+                        .resizable()
+                        .foregroundStyle(.kmYellow)
+                        .frame(width: 14, height: 14)
+                        .padding(.trailing, 12)
+                }
+            }
+        }
     }
 }
 
 #Preview {
     NavigationView {
-        RadiusSettingView(room: RoomUI(id: "12b489", name: "Expédition 33", administrator: UserUI(id: UUID().uuidString, name: "Gustave")), service: FirestoreService(), presentSheet: .constant(true))
+        RadiusSettingView(room: RoomUI(id: "12b489", name: "Expédition 33", administrator: UserUI(id: UUID().uuidString, name: "Gustave")), service: FirestoreService(), navigationVM: NavigationViewModel())
     }
 }

@@ -37,19 +37,30 @@ struct KoomaApp: App {
                 }
                 .navigationDestination(for: AppRoute.self) { route in
                     switch route {
-                    case AppRoute.yourNextRoom:
-                            YourNextRoomView(userManager: userManager)
+                    case AppRoute.yourNextRoom(let hasRooms):
+                        YourNextRoomView(userManager: userManager, hasRooms: hasRooms)
                     case AppRoute.roomsList:
                         RoomsListView(service: self.service)
                     case AppRoute.roomDetails(let roomID):
                         if let user = self.userManager.currentUser, let room = self.service.getRoomByID(roomID, userID: user.id) {
                             RoomDetailsView(
-                                room: room,
+                                room: room.toUI(),
                                 user: user,
                                 service: service,
                                 navigation: navigationVM
                             )
                         }
+                    case .addressSearch(let room):
+                        SearchAddressView(room: room, service: service, navigationVM: self.navigationVM)
+                    case .radiusSettingView(let room):
+                        RadiusSettingView(room: room, service: self.service, navigationVM: self.navigationVM)
+                    case .RoomSearch(code: let code):
+                        ResearchRoomView(
+                            service: self.service,
+                            code: code,
+                            userManager: self.userManager,
+                            navigationVM: self.navigationVM
+                        )
                     }
                 }
             }

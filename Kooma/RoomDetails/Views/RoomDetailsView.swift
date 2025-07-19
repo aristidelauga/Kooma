@@ -3,7 +3,6 @@ import SwiftUI
 
 struct RoomDetailsView: View {
     @State private var roomDetailsVM = RoomDetailsViewModel()
-//    @State private var voteTracker = VoteTracker()
     var navigationVM: NavigationViewModel
     var room: RoomUI
     var user: UserUI
@@ -21,7 +20,6 @@ struct RoomDetailsView: View {
             ScrollView(.vertical, showsIndicators: false) {
                 ForEach(room.restaurants) { restaurant in
                     RoomDetailCell(
-//                        voteTracker: self.voteTracker,
                         restaurant: restaurant
                     ) {
                         Task {
@@ -30,7 +28,6 @@ struct RoomDetailsView: View {
                                     inRoom: self.room,
                                     user: self.user
                                 )
-//                            voteTracker.setVoted(restaurant)
                         }
                     }
                 }
@@ -113,26 +110,3 @@ struct RoomDetailsView: View {
         )
     }
 }
-
-//@Observable @MainActor
-//final class VoteTracker {
-//    var votedRestaurantIDs: Set<String> = []
-//    
-//    func hasVoted(_ restaurant: RestaurantUI) -> Bool {
-//        votedRestaurantIDs.contains(restaurant.id)
-//    }
-//    
-//    func setVoted(_ restaurant: RestaurantUI) {
-//        votedRestaurantIDs.insert(restaurant.id)
-//    }
-//    
-//    func preloadVotes(from room: RoomUI, user: UserUI) {
-//        var voted = Set<String>()
-//        for (restaurantID, userIDs) in room.votes {
-//            if userIDs.contains(user.id) {
-//                voted.insert(restaurantID)
-//            }
-//        }
-//        self.votedRestaurantIDs = voted
-//    }
-//}

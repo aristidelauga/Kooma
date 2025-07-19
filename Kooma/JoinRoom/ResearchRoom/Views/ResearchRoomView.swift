@@ -4,7 +4,6 @@ import SwiftUI
 struct ResearchRoomView: View {
 	@State private var isLoading: Bool = false
     @State private var viewModel: ResearchRoomViewModel
-	@Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     var service: FirestoreService
     var userManager: UserManager
     var navigatioNVM: NavigationViewModel
@@ -24,7 +23,7 @@ struct ResearchRoomView: View {
                     .edgesIgnoringSafeArea(.all)
                 PopupError(error: error as! JoinRoomError) {
                     popupError = nil
-                    self.presentationMode.wrappedValue.dismiss()
+                    self.navigatioNVM.showRoomsListView()
                 }
             }
             VStack {
@@ -37,7 +36,7 @@ struct ResearchRoomView: View {
                 Spacer()
 
                 MainButton(text: "Cancel") {
-                    self.presentationMode.wrappedValue.dismiss()
+                    self.navigatioNVM.showRoomsListView()
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

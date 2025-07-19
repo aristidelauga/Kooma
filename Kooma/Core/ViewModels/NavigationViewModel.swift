@@ -15,10 +15,21 @@ final class NavigationViewModel {
         self.path.append(AppRoute.roomsList)
     }
 
-	func goToYourNextRoomView() {
+    func goToYourNextRoomView(hasRooms: Bool? = false) {
         self.cleanPath()
-		self.path.append(AppRoute.yourNextRoom)
+		self.path.append(AppRoute.yourNextRoom(hasRooms: hasRooms))
 	}
     
+    func goToSearchAddressView(withRoom room: RoomUI) {
+        self.path.append(AppRoute.addressSearch(room: room))
+    }
+    
+    func goToRadiusSettingView(withRoom room: RoomUI) {
+        self.path.append(AppRoute.radiusSettingView(room: room))
+    }
+    
+    func goToResearchRoomView(withRoomCode code: String) {
+        self.path.append(AppRoute.RoomSearch(code: code))
+    }
 
 }
