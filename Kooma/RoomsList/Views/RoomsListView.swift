@@ -21,7 +21,7 @@ struct RoomsListView: View {
                 HStack(spacing: 16) {
                     ForEach(self.roomsListVM.myRooms) { room in
                             Button {
-                                self.navigationVM.path.append(AppRoute.roomDetails(room: room))
+                                self.navigationVM.path.append(AppRoute.roomDetails(roomID: room.id ?? ""))
                             } label: {
                                 RoomCell(room: room)
                             }
@@ -41,7 +41,7 @@ struct RoomsListView: View {
                     ForEach(self.roomsListVM.joinedRooms) { room in
                         Button {
                             //TODO: Add to NavigationVM
-                            self.navigationVM.path.append(AppRoute.roomDetails(room: room))
+                            self.navigationVM.path.append(AppRoute.roomDetails(roomID: room.id ?? ""))
                         } label: {
                             RoomCell(room: room)
                         }
@@ -60,7 +60,9 @@ struct RoomsListView: View {
             .padding(.trailing, 38)
         }
         .onAppear {
+            print("path from RoomsListView outside of the Task: \(self.navigationVM.path)")
             Task {
+                print("path from RoomsListView inside of the Task: \(self.navigationVM.path)")
                 if let userID = self.userManager.currentUser?.id {
                     try await self.roomsListVM.getMyRoomsConverted(userID: userID)
                     try await self.roomsListVM.getJoinedRoomsConverted(userID: userID)
@@ -72,7 +74,7 @@ struct RoomsListView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .edgesIgnoringSafeArea(.all)
         )
-        .navigationTitle("Your Rooms")
+        .navigationTitle("Rooms")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden()
     }

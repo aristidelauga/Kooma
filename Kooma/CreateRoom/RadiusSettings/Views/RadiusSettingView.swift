@@ -30,10 +30,11 @@ struct RadiusSettingView: View {
 
 				MainButton(text: "Submit") {
 					Task {
-						navigationVM.showRoomsListView()
                         try await radiusSettingViewModel.searchRestaurants(within: slider)
+                        try await self.radiusSettingViewModel.addNewRoom(self.radiusSettingViewModel.room)
+                        self.navigationVM.showRoomsListView()
+                        print("path from RadiusSettingsView: \(self.navigationVM.path)")
                         self.presentSheet = false
-						try await self.radiusSettingViewModel.addNewRoom(self.radiusSettingViewModel.room)
 					}
 				}
 				.frame(maxWidth: .infinity, alignment: .center)

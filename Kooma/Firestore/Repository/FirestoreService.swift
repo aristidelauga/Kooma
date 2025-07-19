@@ -80,5 +80,14 @@ final class FirestoreService: FirestoreServiceInterface {
     func updateVote(forRoomID roomID: String, votes: [String : [String]]) async throws {
         try await self.client.updateVotes(forRoomID: roomID, votes: votes)
     }
+    
+    func getRoomByID(_ roomID: String, userID: String) -> RoomUI? {
+        if let room = self.myRooms.first(where: { $0.id == roomID && $0.administrator.id == userID}) {
+            return room.toUI()
+        } else if let room = self.joinedRooms.first(where: { $0.id == roomID }) {
+            return room.toUI()
+        }
+        return nil
+    }
 }
 

@@ -50,12 +50,12 @@ struct ResearchRoomView: View {
                 Task {
                     if let user = self.userManager.currentUser {
                         try await self.viewModel.fetchJoinedRooms(userID: user.id)
-                        navigatioNVM.showRoomsListView()
                         do {
                             try await self.viewModel.joinRoom(code: self.code, user: user)
                         } catch {
                             self.popupError = error
                         }
+                        navigatioNVM.showRoomsListView()
                     }
                 }
             }

@@ -38,6 +38,8 @@ struct RoomDetailsView: View {
             }
             TextHeading600(text: "\(room.code)")
                 .padding(.leading, 12)
+            TextHeading400(text: "\(room.members.count)")
+                .padding(.vertical, 12)
         }
         .toolbar(content: {
             ToolbarItem(placement: .topBarLeading) {

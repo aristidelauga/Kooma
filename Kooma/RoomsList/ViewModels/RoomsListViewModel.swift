@@ -21,16 +21,12 @@ final class RoomsListViewModel {
     }
     
     func getMyRoomsConverted(userID: String) async throws {
-        Task {
-            try await self.service.fetchMyRooms(withUserID: userID)
-            self.myRooms = self.service.myRooms.map { $0.toUI() }
-        }
+        try await self.service.fetchMyRooms(withUserID: userID)
+        self.myRooms = self.service.myRooms.map { $0.toUI() }
     }
     
     func getJoinedRoomsConverted(userID: String) async throws {
-        Task {
-            try await self.service.fetchJoinedRooms(withUserID: userID)
-            self.joinedRooms = self.service.joinedRooms.map { $0.toUI() }
-        }
+        try await self.service.fetchJoinedRooms(withUserID: userID)
+        self.joinedRooms = self.service.joinedRooms.map { $0.toUI() }
     }
 }
