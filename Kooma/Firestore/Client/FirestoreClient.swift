@@ -6,15 +6,17 @@ import FirebaseFirestore
 
 private enum FirestoreConstants {
     static let roomsCollectionName = "rooms"
+    static let myRoomsKey = "administrator.id"
+    static let joinedRoomsKey = "regularMembersID"
 }
 
 @MainActor
 protocol FirestoreClientInterface {
     var database: Firestore { get }
-    func saveRoom(_ room: RoomUI) async throws -> String
-    func getMyRooms(forUserID userID: String) async throws -> [RoomUI]
-    func joinRoom(withCode code: String, user: UserUI) async throws
-    func getJoinedRooms(forUserID userID: String) async throws -> [RoomUI]
+    func saveRoom(_ room: RoomDomain) async throws
+    func getMyRooms(forUserID userID: String) async throws -> [RoomDomain]
+    func joinRoom(withCode code: String, user: UserDomain) async throws
+    func getJoinedRooms(forUserID userID: String) async throws -> [RoomDomain]
     func updateVotes(forRoomID roomID: String, votes: [String: [String]]) async throws
 }
 
@@ -24,17 +26,16 @@ final class FirestoreClient: FirestoreClientInterface {
         database.collection(FirestoreConstants.roomsCollectionName)
     }
     
-    func saveRoom(_ room: RoomUI) async throws -> String {
+    func saveRoom(_ room: RoomDomain) async throws {
         do {
-            let documentRef = try self.roomsCollection.addDocument(from: room)
-            return documentRef.documentID
+            try self.roomsCollection.addDocument(from: room)
         } catch {
             print("saveRoom: \(error)")
             throw error
         }
     }
     
-    func joinRoom(withCode code: String, user: UserUI) async throws {
+    func joinRoom(withCode code: String, user: UserDomain) async throws {
         let query = roomsCollection.whereField("code", isEqualTo: code).limit(to: 1)
         let snapshot: QuerySnapshot
         do {
@@ -58,11 +59,11 @@ final class FirestoreClient: FirestoreClientInterface {
         }
     }
     
-    func getMyRooms(forUserID userID: String) async throws -> [RoomUI] {
+    func getMyRooms(forUserID userID: String) async throws -> [RoomDomain] {
         do {
-            let snapshot = try await roomsCollection.whereField("administrator.id", isEqualTo: userID).getDocuments()
+            let snapshot = try await roomsCollection.whereField(FirestoreConstants.myRoomsKey, isEqualTo: userID).getDocuments()
             let rooms = snapshot.documents.compactMap { document in
-                try? document.data(as: RoomUI.self)
+                try? document.data(as: RoomDomain.self)
             }
             return rooms
         } catch {
@@ -70,11 +71,11 @@ final class FirestoreClient: FirestoreClientInterface {
         }
     }
     
-    func getJoinedRooms(forUserID userID: String) async throws -> [RoomUI] {
+    func getJoinedRooms(forUserID userID: String) async throws -> [RoomDomain] {
         do {
-            let snapshot = try await roomsCollection.whereField("regularMembersID", arrayContains: userID).getDocuments()
+            let snapshot = try await roomsCollection.whereField(FirestoreConstants.joinedRoomsKey, arrayContains: userID).getDocuments()
             let rooms = snapshot.documents.compactMap { document in
-                try? document.data(as: RoomUI.self)
+                try? document.data(as: RoomDomain.self)
             }
             return rooms
         } catch {

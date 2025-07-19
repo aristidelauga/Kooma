@@ -5,12 +5,14 @@ import Foundation
 final class RoomDetailsViewModel {
     private let service: any FirestoreServiceInterface
     
-    var myRooms: [RoomUI] { service.myRooms }
-    var joinedRooms: [RoomUI] { service.joinedRooms }
+    var myRooms: [RoomUI] = []
+    var joinedRooms: [RoomUI] = []
     
     init(service: any FirestoreServiceInterface = FirestoreService()) {
         self.service = service
+        
     }
+    
     
     func hasVoted(forRestaurant restaurant: RestaurantUI, in room: RoomUI, user: UserUI) -> Bool {
         room.votes[restaurant.id]?.contains(user.id) ?? false
@@ -69,5 +71,17 @@ final class RoomDetailsViewModel {
         
     }
     
+    func getMyRoomsConverted(userID: String) async throws {
+        Task {
+            try await self.service.fetchMyRooms(withUserID: userID)
+            self.myRooms = self.service.myRooms.map { $0.toUI() }
+        }
+    }
     
+    func getJoinedRoomsConverted(userID: String) async throws {
+        Task {
+            try await self.service.fetchJoinedRooms(withUserID: userID)
+            self.joinedRooms = self.service.joinedRooms.map { $0.toUI() }
+        }
+    }
 }

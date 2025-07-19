@@ -6,8 +6,8 @@ struct UserUI: Identifiable, Codable, Sendable, Equatable, Hashable {
 	var name: String
 }
 
-extension UserUI: DTOModelConvertible {
-    func toDTO() throws -> UserDTO {
-        UserDTO(id: self.id, name: self.name)
+extension UserUI: DomainModelConvertible {
+    func toDomain() throws -> UserDomain {
+        UserDomain(id: self.id, name: self.name)
     }
 }

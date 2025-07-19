@@ -71,6 +71,8 @@ struct RoomDetailsView: View {
         RoomDetailsView(
             room: RoomUI(
                 id: "1-43432jf49fgjjf",
+                hostID: "1-942hfd3410]fh8]",
+                code: "BBX8TR93",
                 name: "Friends",
                 administrator: UserUI(id: "1-942hfd3410]fh8]", name: "Ross Geller"),
                 address: "90 Bedford Street, New-York",

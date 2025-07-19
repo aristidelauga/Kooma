@@ -12,3 +12,16 @@ struct RestaurantUI: Identifiable, Sendable, Codable, Equatable, Hashable {
 	let url: String
     var vote: Int
 }
+
+extension RestaurantUI: DomainModelConvertible {
+    func toDomain() throws -> RestaurantDomain {
+        RestaurantDomain(
+            id: self.id,
+            name: self.name,
+            phoneNumber: self.phoneNumber,
+            address: self.address,
+            url: self.url,
+            vote: self.vote
+        )
+    }
+}

@@ -7,9 +7,7 @@ import Foundation
 	var region = MKCoordinateRegion()
 	var room: RoomUI
 	var isLoading = false
-    var rooms: [RoomUI] {
-        self.service.myRooms
-    }
+    
     var restaurantsDTO: [RestaurantDTO] = []
 
 	private let restaurantAPI: any GetRestaurantInterface
@@ -36,7 +34,6 @@ import Foundation
 			let coordinate = try await self.restaurantAPI.getCoordinate(from: address)
 			region.center = coordinate
 			guard let items = try await self.restaurantAPI.searchNearbyRestaurants(at: coordinate, radiusInMeters: radius * 1000) else { return }
-//        self.restaurantsDTO = items
 			let itemsUI = try items.compactMap { try $0.toUI() }
 			self.room.restaurants = itemsUI
 		} catch {
@@ -45,6 +42,7 @@ import Foundation
 	}
     
     func addNewRoom(_ room: RoomUI) async throws {
-                try await self.service.createRoom(room)
+        try await self.service.createRoom(room)
     }
+    
 }

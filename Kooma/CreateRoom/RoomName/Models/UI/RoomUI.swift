@@ -1,12 +1,9 @@
 
 import Foundation
-@preconcurrency import FirebaseFirestore
 
 struct RoomUI: Identifiable, Codable, Sendable, Equatable, Hashable {
-	@DocumentID var id: String?
-    var hostID: String {
-        administrator.id
-    }
+	var id: String?
+    var hostID: String
     var code: String
 	var name: String?
 	var administrator: UserUI
@@ -19,6 +16,7 @@ struct RoomUI: Identifiable, Codable, Sendable, Equatable, Hashable {
 
     init(id: String? = nil, name: String? = nil, administrator: UserUI) {
 		self.id = id
+        self.hostID = administrator.id
         self.code = RoomUI.generateCode()
 		self.name = name
 		self.administrator = administrator
@@ -37,6 +35,8 @@ struct RoomUI: Identifiable, Codable, Sendable, Equatable, Hashable {
     
     init(
         id: String?,
+        hostID: String,
+        code: String,
         name: String?,
         administrator: UserUI,
         address: String?,
@@ -44,7 +44,8 @@ struct RoomUI: Identifiable, Codable, Sendable, Equatable, Hashable {
         restaurants: [RestaurantUI]
     ) {
         self.id = id
-        self.code = RoomUI.generateCode()
+        self.hostID = hostID
+        self.code = code
         self.name = name
         self.administrator = administrator
         self.address = address

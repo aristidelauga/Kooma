@@ -6,8 +6,8 @@ import FirebaseFirestore
 
 @MainActor
 protocol FirestoreServiceInterface {
-    var myRooms: [RoomUI] { get }
-    var joinedRooms: [RoomUI] { get }
+    var myRooms: [RoomDomain] { get }
+    var joinedRooms: [RoomDomain] { get }
     
     func createRoom(_ room: RoomUI) async throws
     func joinRoom(withCode code: String, user: UserUI) async throws
@@ -19,8 +19,8 @@ protocol FirestoreServiceInterface {
 @Observable
 final class FirestoreService: FirestoreServiceInterface {
     
-    private(set) var myRooms: [RoomUI] = []
-    private(set) var joinedRooms: [RoomUI] = []
+    private(set) var myRooms: [RoomDomain] = []
+    private(set) var joinedRooms: [RoomDomain] = []
     
 	private let client: any FirestoreClientInterface
 
@@ -30,17 +30,25 @@ final class FirestoreService: FirestoreServiceInterface {
 
     
     func createRoom(_ room: RoomUI) async throws {
-        let newRoom = RoomUI(
-            id: nil,
-            name: room.name,
-            administrator: room.administrator,
-            address: room.address,
-            members: [room.administrator],
-            restaurants: room.restaurants
-        )
+        guard let address = room.address else {
+            return
+        }
         
+            let newRoom = RoomDomain(
+                id: room.id,
+                code: room.code,
+                name: room.name,
+                administrator: try room.administrator.toDomain(),
+                address: address,
+                members: try room.members.map { try $0.toDomain() },
+                regularMembersID: room.regularMembersID,
+                restaurants: try room.restaurants.map { try $0.toDomain() },
+                votes: room.votes,
+                image: room.image
+            )
+
         do {
-            _ = try await client.saveRoom(newRoom)
+            try await client.saveRoom(newRoom)
             try await fetchMyRooms(withUserID: room.administrator.id)
         } catch {
             throw NSError(domain: "RoomUI", code: 3, userInfo: [NSLocalizedDescriptionKey: "Failure in the Service during an attempt of saving a room"])
@@ -49,7 +57,7 @@ final class FirestoreService: FirestoreServiceInterface {
     
     func joinRoom(withCode code: String, user: UserUI) async throws {
             do {
-                try await self.client.joinRoom(withCode: code, user: user)
+                try await self.client.joinRoom(withCode: code, user: user.toDomain())
             } catch {
                 throw NSError(domain: "RoomUI", code: 141, userInfo: [NSLocalizedDescriptionKey: "Failure in the Service during an attempt of joining a room"])
             }

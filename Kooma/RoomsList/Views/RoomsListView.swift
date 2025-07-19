@@ -20,16 +20,11 @@ struct RoomsListView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
                     ForEach(self.roomsListVM.myRooms) { room in
-//                        if let user = userManager.currentUser {
-//                            NavigationLink(destination: RoomDetailsView(room: room, user: user, service: service, navigation: navigationVM), label: {
-//                                RoomCell(room: room)
-//                            })
                             Button {
                                 self.navigationVM.path.append(AppRoute.roomDetails(room: room))
                             } label: {
                                 RoomCell(room: room)
                             }
-//                        }
                     }
                     .padding(.bottom, 12)
                 }
@@ -44,11 +39,6 @@ struct RoomsListView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
                     ForEach(self.roomsListVM.joinedRooms) { room in
-//                        if let user = userManager.currentUser {
-//                            NavigationLink(destination: RoomDetailsView(room: room, user: user, service: service, navigation: navigationVM), label: {
-//                                RoomCell(room: room)
-//                            })
-//                        }
                         Button {
                             //TODO: Add to NavigationVM
                             self.navigationVM.path.append(AppRoute.roomDetails(room: room))
@@ -69,6 +59,14 @@ struct RoomsListView: View {
             .frame(maxWidth: .infinity, alignment: .trailing)
             .padding(.trailing, 38)
         }
+        .onAppear {
+            Task {
+                if let userID = self.userManager.currentUser?.id {
+                    try await self.roomsListVM.getMyRoomsConverted(userID: userID)
+                    try await self.roomsListVM.getJoinedRoomsConverted(userID: userID)
+                }
+            }
+        }
         .background(
             Color.kmBeige
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -77,11 +75,6 @@ struct RoomsListView: View {
         .navigationTitle("Your Rooms")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden()
-//        .navigationDestination(item: $room) { room in
-//            if let user = userManager.currentUser {
-//                RoomDetailsView(room: room, user: user, service: self.service, navigation: self.navigationVM)
-//            }
-//        }
     }
 }
 

@@ -1,8 +1,8 @@
 
 import Foundation
 
-protocol DTOModelConvertible {
-    associatedtype DTOType
-    func toDTO() throws -> DTOType
+protocol DomainModelConvertible {
+    associatedtype DomainType
+    func toDomain() throws -> DomainType
 
 }
