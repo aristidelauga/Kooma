@@ -8,7 +8,6 @@ final class RoomDetailsViewModel {
     var myRooms: [RoomUI] = []
     var joinedRooms: [RoomUI] = []
     var currentRoom: RoomUI
-
     
     init(service: any FirestoreServiceInterface = FirestoreService(), currentRoom: RoomUI) {
         self.service = service
@@ -22,8 +21,8 @@ final class RoomDetailsViewModel {
         }
     }
     
-    func hasVoted(forRestaurant restaurant: RestaurantUI, in room: RoomUI, user: UserUI) -> Bool {
-        room.votes[restaurant.id]?.contains(user.id) ?? false
+    func hasVoted(forRestaurant restaurant: RestaurantUI, user: UserUI) -> Bool {
+        self.currentRoom.votes[restaurant.id]?.contains(user.id) ?? false
     }
     
     func getVoteCount(withRestaurantID id: String) -> Int {
@@ -42,21 +41,11 @@ final class RoomDetailsViewModel {
     }
     
     func vote(forRestaurant restaurant: RestaurantUI, inRoom room: RoomUI, user: UserUI) async throws {
-        let isAdmin = user.id == room.administrator.id
-        
-        var roomtoVote = RoomUI(id: nil, name: "", administrator: UserUI(id: "", name: ""))
-        
-//        if isAdmin {
-//            roomtoVote = try await self.findRoom(room, from: self.myRooms, userID: user.id)
-//        } else {
-//            roomtoVote = try await self.findRoom(room, from: self.joinedRooms, userID: user.id)
-//        }
-        
-        guard !hasVoted(forRestaurant: restaurant, in: roomtoVote, user: user), let roomID = room.id else {
+        guard !hasVoted(forRestaurant: restaurant, user: user) else {
             return
         }
 
-        var votes = roomtoVote.votes
+        var votes = self.currentRoom.votes
         let userVotes = votes.values.flatMap { $0 }.filter { $0 == user.id }.count
         guard userVotes < 2 else {
             return
@@ -66,16 +55,11 @@ final class RoomDetailsViewModel {
         
         voters.append(user.id)
         votes[restaurant.id] = voters
-        try await service.vote(forRoomID: roomID, votes: votes)
-//        if let index = roomtoVote.restaurants.firstIndex(where: { $0.id == restaurant.id }) {
-//               roomtoVote.restaurants[index].vote += 1
-//           }
-        
-        if isAdmin {
-            try await self.service.fetchMyRooms(withUserID: user.id)
-        } else {
-            try await self.service.fetchJoinedRooms(withUserID: user.id)
+        self.currentRoom.votes = votes
+        guard let roomID = currentRoom.id else {
+            return
         }
+        try await service.vote(forRoomID: roomID, votes: votes)
     }
     
     func removeVote() {

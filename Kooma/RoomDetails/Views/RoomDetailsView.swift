@@ -36,7 +36,7 @@ struct RoomDetailsView: View {
                                 )
                             }
                         } label: {
-                            Image(.thumbFill)
+                            Image(self.roomDetailsVM.hasVoted(forRestaurant: restaurant, user: self.user) ? "thumbFill" : "thumbEmpty")
                                 .resizable()
                                 .frame(maxWidth: 24, maxHeight: 24)
                         }
