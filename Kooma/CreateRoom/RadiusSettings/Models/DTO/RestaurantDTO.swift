@@ -8,21 +8,9 @@ struct RestaurantDTO: Sendable, Identifiable, Codable {
 	let phoneNumber: String
 	let placemark: CodablePlacemark
 	let url: String
-    var vote: Int
 }
 
 extension RestaurantDTO: UIModelConvertible {
-    static let emptyElement = RestaurantDTO(
-        id: "",
-        name: "",
-        phoneNumber: "",
-        placemark: CodablePlacemark(
-            from: MKPlacemark(coordinate: CLLocationCoordinate2D())
-        ),
-        url: "",
-        vote: 0
-    )
-    
 	private func createAddress() -> String {
 		if let subThoroughfare = self.placemark.subThoroughfare, let thoroughfare = self.placemark.thoroughfare {
 			let addressParts = [
@@ -45,7 +33,6 @@ extension RestaurantDTO: UIModelConvertible {
 			phoneNumber: self.phoneNumber,
 			address: self.createAddress(),
 			url: self.url,
-            vote: self.vote
 		)
 	}
 }

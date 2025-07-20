@@ -1,7 +1,8 @@
 
 import Foundation
 
-struct RoomUI: Identifiable, Codable, Sendable, Equatable, Hashable {
+/// Hashable protocol implemented so AppRoute is Hashable
+struct RoomUI: Identifiable, Equatable, Hashable {
 	var id: String?
     var hostID: String
     var code: String
@@ -41,7 +42,8 @@ struct RoomUI: Identifiable, Codable, Sendable, Equatable, Hashable {
         administrator: UserUI,
         address: String?,
         members: [UserUI],
-        restaurants: [RestaurantUI]
+        restaurants: [RestaurantUI],
+        votes: [String: [String]]
     ) {
         self.id = id
         self.hostID = hostID
@@ -51,6 +53,7 @@ struct RoomUI: Identifiable, Codable, Sendable, Equatable, Hashable {
         self.address = address
         self.members = members
         self.restaurants = restaurants
+        self.votes = votes
         self.image = [
             "RoomOne",
             "RoomTwo",

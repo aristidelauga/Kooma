@@ -2,14 +2,16 @@
 import SwiftUI
 
 struct RoomDetailCell: View {
-//    var voteTracker: VoteTracker
-    var restaurant: RestaurantUI
+    //    var voteTracker: VoteTracker
+    @State var restaurant: RestaurantUI
+    @Binding var room: RoomUI
+//    @State var hasVoted: Bool = false
     var voteAction: () -> Void
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 8) {
                 TextHeading200(text: restaurant.name)
-                Text("^[\(restaurant.vote) vote](inflect: true)")
+                Text("^[\(String(describing: room.votes[restaurant.id]?.count)) vote](inflect: true)")
                     .font(.bodyMedium)
                     .foregroundStyle(.kmKaki)
             }
@@ -17,25 +19,23 @@ struct RoomDetailCell: View {
             Button {
                 voteAction()
             } label: {
-//                Image(voteTracker.hasVoted(restaurant) ? .thumbFill : .thumbEmpty)
-                Image(.thumbEmpty)
+                Image(.thumbFill)
                     .resizable()
                     .frame(maxWidth: 24, maxHeight: 24)
             }
-            
         }
     }
 }
 
 #Preview {
     RoomDetailCell(
-        /*voteTracker: VoteTracker(),*/ restaurant: RestaurantUI(
+        restaurant: RestaurantUI(
             id: "0df48hf134hf0",
             name: "Central Perk",
             phoneNumber: "+49 612-345-678",
             address: "90 Bedford Street, New-York",
-            url: "https://centralparktoursnyc.com/central-perk-coffee-shop/",
-            vote: 0),
+            url: "https://centralparktoursnyc.com/central-perk-coffee-shop/"),
+        room: .constant(RoomUI(administrator: UserUI(id: "", name: ""))),
         voteAction: {}
     )
 }

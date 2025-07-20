@@ -4,13 +4,32 @@ import Foundation
 import CoreLocation
 import MapKit
 
-struct RestaurantUI: Identifiable, Sendable, Codable, Equatable, Hashable {
+/// Hashable protocol implemented so RoomUI is Hashable
+struct RestaurantUI: Identifiable, Equatable, Hashable  {
+    
+    static func == (lhs: RestaurantUI, rhs: RestaurantUI) -> Bool {
+        lhs.id == rhs.id
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
 	let id: String
 	let name: String
 	let phoneNumber: String
 	let address: String
 	let url: String
-    var vote: Int
+    
+    init(id: String, name: String, phoneNumber: String, address: String, url: String) {
+        self.id = id
+        self.name = name
+        self.phoneNumber = phoneNumber
+        self.address = address
+        self.url = url
+    }
+    
+    
 }
 
 extension RestaurantUI: DomainModelConvertible {
@@ -21,7 +40,6 @@ extension RestaurantUI: DomainModelConvertible {
             phoneNumber: self.phoneNumber,
             address: self.address,
             url: self.url,
-            vote: self.vote
         )
     }
 }

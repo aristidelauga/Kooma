@@ -8,7 +8,7 @@ struct RestaurantDomain: Identifiable, Sendable, Codable {
     let address: String
     let url: String
     //TODO: Check if it wouldn't be better to create rather an array of String containing the ID's of the voters
-    let vote: Int
+//    let vote: Int
 }
 
 extension RestaurantDomain {
@@ -19,7 +19,7 @@ extension RestaurantDomain {
             phoneNumber: self.phoneNumber,
             address: self.address,
             url: self.url,
-            vote: self.vote
+//            vote: self.vote
         )
     }
 }

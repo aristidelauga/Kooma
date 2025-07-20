@@ -29,4 +29,13 @@ final class RoomsListViewModel {
         try await self.service.fetchJoinedRooms(withUserID: userID)
         self.joinedRooms = self.service.joinedRooms.map { $0.toUI() }
     }
+    
+    func beginListening(forUserID userID: String) {
+        service.startListening(forUserID: userID)
+    }
+    
+    func endListening() {
+        service.stopListening()
+    }
+
 }

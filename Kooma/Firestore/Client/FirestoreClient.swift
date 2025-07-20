@@ -17,7 +17,11 @@ protocol FirestoreClientInterface {
     func getMyRooms(forUserID userID: String) async throws -> [RoomDomain]
     func joinRoom(withCode code: String, user: UserDomain) async throws
     func getJoinedRooms(forUserID userID: String) async throws -> [RoomDomain]
-    func updateVotes(forRoomID roomID: String, votes: [String: [String]]) async throws
+    func vote(forRoomID roomID: String, votes: [String: [String]]) async throws
+    
+    //Listeners
+    func listenToMyRooms(forUserID userID: String) -> AsyncThrowingStream<[RoomDomain], Error>
+    func listenToJoinedRooms(forUserID userID: String) -> AsyncThrowingStream<[RoomDomain], Error>
 }
 
 final class FirestoreClient: FirestoreClientInterface {
@@ -83,9 +87,81 @@ final class FirestoreClient: FirestoreClientInterface {
         }
     }
     
-    func updateVotes(forRoomID roomID: String, votes: [String : [String]]) async throws {
+    func vote(forRoomID roomID: String, votes: [String: [String]]) async throws {
         let ref = roomsCollection.document(roomID)
-        try await ref.updateData(["votes": votes])
-    }
+        let snapshot = try await ref.getDocument()
+        var currentVotes = snapshot.data()?["votes"] as? [String: [String]] ?? [:]
 
+        for (restaurantID, newUserIDs) in votes {
+            var existingUserIDs = currentVotes[restaurantID] ?? []
+            for userID in newUserIDs {
+                if !existingUserIDs.contains(userID) {
+                    existingUserIDs.append(userID)
+                }
+            }
+            currentVotes[restaurantID] = existingUserIDs
+        }
+
+        try await ref.updateData(["votes": currentVotes])
+    }
+    
+    func listenToMyRooms(forUserID userID: String) -> AsyncThrowingStream<[RoomDomain], Error> {
+        return AsyncThrowingStream { @MainActor continuation in
+            let listener = roomsCollection.whereField(FirestoreConstants.myRoomsKey, isEqualTo: userID)
+                .addSnapshotListener { snapshot, error in
+                    if let error = error {
+                        continuation.finish(throwing: error)
+                        return
+                    }
+                    
+                    guard let snapshot = snapshot else {
+                        continuation.finish(throwing: NSError(domain: "AppError", code: 500, userInfo: [NSLocalizedDescriptionKey: "Snapshot was nil."]))
+                        return
+                    }
+                    
+                    let rooms = snapshot.documents.compactMap { try? $0.data(as: RoomDomain.self) }
+                    continuation.yield(rooms)
+                }
+            
+            let sendableListener = UnsafeSendableBox(listener)
+            
+            continuation.onTermination = { @Sendable _ in
+                sendableListener.value.remove()
+            }
+        }
+    }
+    
+    func listenToJoinedRooms(forUserID userID: String) -> AsyncThrowingStream<[RoomDomain], any Error> {
+        return AsyncThrowingStream { @MainActor continuation in
+            let listener = roomsCollection.whereField(FirestoreConstants.joinedRoomsKey, arrayContains: userID)
+                .addSnapshotListener { snapshot, error in
+                    if let error = error {
+                        continuation.finish(throwing: error)
+                        return
+                    }
+                    
+                    guard let snapshot = snapshot else {
+                        continuation.finish(throwing: NSError(domain: "AppError", code: 500, userInfo: [NSLocalizedDescriptionKey: "Snapshot was nil."]))
+                        return
+                    }
+                    
+                    let rooms = snapshot.documents.compactMap { try? $0.data(as: RoomDomain.self) }
+                    continuation.yield(rooms)
+                }
+            
+            let sendableListener = UnsafeSendableBox(listener)
+            
+            continuation.onTermination = { @Sendable _ in
+                sendableListener.value.remove()
+            }
+        }
+    }
+}
+
+final class UnsafeSendableBox<T>: @unchecked Sendable {
+    let value: T
+
+    init(_ value: T) {
+        self.value = value
+    }
 }

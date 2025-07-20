@@ -2,40 +2,51 @@
 import SwiftUI
 
 struct RoomDetailsView: View {
-    @State private var roomDetailsVM = RoomDetailsViewModel()
+    @State private var roomDetailsVM: RoomDetailsViewModel
     var navigationVM: NavigationViewModel
-    var room: RoomUI
     var user: UserUI
     init(room: RoomUI, user: UserUI, service: FirestoreService, navigation: NavigationViewModel) {
-        self.room = room
         self.user = user
         self.navigationVM = navigation
-        _roomDetailsVM = State(wrappedValue: RoomDetailsViewModel(service: service))
+        _roomDetailsVM = State(wrappedValue: RoomDetailsViewModel(service: service, currentRoom: room))
     }
     
     var body: some View {
         VStack(alignment: .leading) {
+            
             TextHeading600(text: "Restaurants")
                 .padding(.leading, 12)
             ScrollView(.vertical, showsIndicators: false) {
-                ForEach(room.restaurants) { restaurant in
-                    RoomDetailCell(
-                        restaurant: restaurant
-                    ) {
-                        Task {
-                           try await roomDetailsVM.vote(
+                ForEach(self.roomDetailsVM.currentRoom.restaurants) { restaurant in
+                    HStack {
+                        VStack(alignment: .leading, spacing: 8) {
+                            TextHeading200(text: restaurant.name)
+                            let restaurantVotes = self.roomDetailsVM.getVoteCount(withRestaurantID: restaurant.id)
+                            Text("^[\(restaurantVotes) vote](inflect: true)")
+                                .font(.bodyMedium)
+                                .foregroundStyle(.kmKaki)
+                        }
+                        Spacer()
+                        Button {
+                            Task {
+                                try await roomDetailsVM.vote(
                                     forRestaurant: restaurant,
-                                    inRoom: self.room,
+                                    inRoom: self.roomDetailsVM.currentRoom,
                                     user: self.user
                                 )
+                            }
+                        } label: {
+                            Image(.thumbFill)
+                                .resizable()
+                                .frame(maxWidth: 24, maxHeight: 24)
                         }
                     }
                 }
                 .padding(.horizontal, 12)
             }
-            TextHeading600(text: "\(room.code)")
+            TextHeading600(text: "\(self.roomDetailsVM.currentRoom.code)")
                 .padding(.leading, 12)
-            TextHeading400(text: "\(room.members.count)")
+            TextHeading400(text: "\(self.roomDetailsVM.currentRoom.members.count)")
                 .padding(.vertical, 12)
         }
         .toolbar(content: {
@@ -52,14 +63,17 @@ struct RoomDetailsView: View {
             }
         })
         .onAppear {
-            print("self.room.votes: \(self.room.votes)")
+            self.roomDetailsVM.beginListening(forUserID: user.id)
         }
+        .onDisappear(perform: {
+            self.roomDetailsVM.endListening()
+        })
         .background(
             Color.kmBeige
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .edgesIgnoringSafeArea(.all)
         )
-        .navigationTitle(room.name ?? "")
+        .navigationTitle(self.roomDetailsVM.currentRoom.name ?? "")
         .navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -87,23 +101,21 @@ struct RoomDetailsView: View {
                         name: "Central Perk",
                         phoneNumber: "+49 612-345-678",
                         address: "90 Bedford Street, New-York",
-                        url: "https://centralparktoursnyc.com/central-perk-coffee-shop/",
-                        vote: 0),
+                        url: "https://centralparktoursnyc.com/central-perk-coffee-shop/"),
                     RestaurantUI(
                         id: "0df48hf134hf0",
                         name: "Central Perk",
                         phoneNumber: "+49 612-345-678",
                         address: "90 Bedford Street, New-York",
-                        url: "https://centralparktoursnyc.com/central-perk-coffee-shop/",
-                        vote: 0),
+                        url: "https://centralparktoursnyc.com/central-perk-coffee-shop/"),
                     RestaurantUI(
                         id: "0df48hf134hf0",
                         name: "Central Perk",
                         phoneNumber: "+49 612-345-678",
                         address: "90 Bedford Street, New-York",
-                        url: "https://centralparktoursnyc.com/central-perk-coffee-shop/",
-                        vote: 0),
-                ]
+                        url: "https://centralparktoursnyc.com/central-perk-coffee-shop/",),
+                ],
+                votes: ["": ["", ""]]
             ),
             user: UserUI(id: "f480808hd8", name: "Gustave"),
             service: FirestoreService(), navigation: NavigationViewModel()

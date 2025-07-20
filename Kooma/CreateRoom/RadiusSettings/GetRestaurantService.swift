@@ -32,29 +32,27 @@ final class GetRestaurantService: GetRestaurantInterface {
 
 		let search = MKLocalSearch(request: request)
 		let response = try await search.start()
-		let restaurants: [RestaurantDTO]? = try response.mapItems.map { try self.toDTO(from: $0) ?? RestaurantDTO.emptyElement }
+		let restaurants: [RestaurantDTO]? = try response.mapItems.compactMap { try self.toDTO(from: $0) }
 		return restaurants
 	}
 }
 
 extension GetRestaurantService: DTORestaurantServiceConvertible {
 	func toDTO(from item: MKMapItem?) throws -> RestaurantDTO? {
-		guard
+		if
 			let item,
 			let identifier = item.identifier?.rawValue,
 			let name = item.name,
 			let phoneNumber = item.phoneNumber,
-			let url = item.url?.absoluteString
-		else {
-			return nil
-		}
-		return RestaurantDTO(
-			id: identifier,
-			name: name,
-			phoneNumber: phoneNumber,
-			placemark: .init(from: item.placemark),
-            url: url,
-            vote: 0
-		)
+            let url = item.url?.absoluteString {
+            return RestaurantDTO(
+                id: identifier,
+                name: name,
+                phoneNumber: phoneNumber,
+                placemark: .init(from: item.placemark),
+                url: url,
+            )
+        }
+        return nil
 	}
 }

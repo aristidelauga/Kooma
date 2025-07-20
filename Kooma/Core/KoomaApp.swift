@@ -42,13 +42,14 @@ struct KoomaApp: App {
                     case AppRoute.roomsList:
                         RoomsListView(service: self.service)
                     case AppRoute.roomDetails(let roomID):
-                        if let user = self.userManager.currentUser, let room = self.service.getRoomByID(roomID, userID: user.id) {
-                            RoomDetailsView(
-                                room: room.toUI(),
+                        if let user = self.userManager.currentUser {
+                            RoomDetailsLoaderView(
+                                roomID: roomID,
                                 user: user,
-                                service: service,
-                                navigation: navigationVM
+                                service: self.service,
+                                navigationVM: self.navigationVM
                             )
+                            .navigationBarBackButtonHidden()
                         }
                     case .addressSearch(let room):
                         SearchAddressView(room: room, service: service, navigationVM: self.navigationVM)
@@ -68,12 +69,14 @@ struct KoomaApp: App {
             .onAppear {
                 Task {
                     if let currentUserID = self.userManager.currentUser?.id {
-                        try await self.service.fetchMyRooms(withUserID: currentUserID)
-                        try await self.service.fetchJoinedRooms(withUserID: currentUserID)
+                        self.service.startListening(forUserID: currentUserID)
                     }
                     try await Task.sleep(for: .seconds(3))
                     self.isLoading = false
                 }
+            }
+            .onDisappear {
+                self.service.stopListening()
             }
         }
         .environment(self.service)

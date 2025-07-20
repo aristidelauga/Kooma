@@ -2,7 +2,7 @@
 import SwiftUI
 
 struct RoomsListView: View {
-    @State private var roomsListVM = RoomsListViewModel(firestoreService: FirestoreService())
+    @State private var roomsListVM: RoomsListViewModel
     @Environment(NavigationViewModel.self) private var navigationVM
     @Environment(UserManager.self) private var userManager
     @State private var room: RoomUI?
@@ -64,8 +64,12 @@ struct RoomsListView: View {
                 if let userID = self.userManager.currentUser?.id {
                     try await self.roomsListVM.getMyRoomsConverted(userID: userID)
                     try await self.roomsListVM.getJoinedRoomsConverted(userID: userID)
+                    self.roomsListVM.beginListening(forUserID: userID)
                 }
             }
+        }
+        .onDisappear {
+            self.roomsListVM.endListening()
         }
         .background(
             Color.kmBeige
