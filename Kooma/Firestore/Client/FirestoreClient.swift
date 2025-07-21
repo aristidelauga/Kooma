@@ -17,6 +17,7 @@ protocol FirestoreClientInterface {
 
     func saveRoom(_ room: RoomDomain) async throws
     func joinRoom(withCode code: String, user: UserDomain) async throws
+    func leaveRoom(roomID: String, user: UserDomain) async throws
 
     func getMyRooms(forUserID userID: String) async throws -> [RoomDomain]
     func getJoinedRooms(forUserID userID: String) async throws -> [RoomDomain]
@@ -70,6 +71,54 @@ final class FirestoreClient: FirestoreClientInterface {
             ])
         } catch {
             throw NSError(domain: "AppError", code: 310, userInfo: [NSLocalizedDescriptionKey: "Error joining the room: \(error)"])
+        }
+    }
+    
+    func leaveRoom(roomID: String, user: UserDomain) async throws {
+        let ref = roomsCollection.document(roomID)
+        let snapshot = try await ref.getDocument()
+        
+        var room = try snapshot.data(as: RoomDomain.self)
+        
+        let isAdmin = room.administrator.id == user.id
+        let updatedMembers = room.members.filter { $0.id != user.id }
+        
+        var updatedVotes = room.votes
+        for (restaurantID, voterIDs) in updatedVotes {
+            updatedVotes[restaurantID] = voterIDs.filter { $0 != user.id }
+        }
+        
+        if updatedMembers.isEmpty {
+            try await ref.delete()
+            print("Room \(roomID) deleted because user \(user.id) was the only member.")
+            return
+        }
+        
+        if isAdmin {
+            guard let newAdmin = updatedMembers.first else {
+                try await ref.delete()
+                print("Room \(roomID) deleted after admin left and no other member existed.")
+                return
+            }
+            
+            // We change the admin here
+            room.administrator = newAdmin
+            
+            // We move the room from "joinedRooms" to "myRooms" here
+            room.regularMembersID.removeAll { $0 == newAdmin.id }
+        }
+        
+        
+        room.members = updatedMembers
+        room.regularMembersID.removeAll { $0 == user.id }
+        room.votes = updatedVotes
+        
+        do {
+            try ref.setData(from: room)
+            print("User \(user.id) removed from room \(roomID). Admin transferred if needed.")
+        } catch {
+            print("Error updating room \(roomID) after user \(user.id) left: \(error)")
+            throw NSError(domain: "AppError", code: 500, userInfo: [NSLocalizedDescriptionKey: "Failed to update room after user left."])
         }
     }
     
@@ -202,6 +251,8 @@ final class FirestoreClient: FirestoreClientInterface {
             }
         }
     }
+    
+    
 }
 
 final class UnsafeSendableBox<T>: @unchecked Sendable {

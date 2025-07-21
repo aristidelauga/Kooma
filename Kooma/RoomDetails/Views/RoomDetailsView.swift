@@ -67,6 +67,13 @@ struct RoomDetailsView: View {
                         }
                     }
                 }
+                MainButton(text: "Leave Room", maxWidth: 130) {
+                    Task {
+                        try await self.roomDetailsVM.leaveRoom(user: self.user)
+                        self.navigationVM.goToRoomsListViewFromRoomDetails()
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .center)
             }
         }
         .padding(.horizontal, 12)
@@ -74,7 +81,7 @@ struct RoomDetailsView: View {
         .toolbar(content: {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
-                    self.navigationVM.showRoomsListView()
+                    self.navigationVM.goToRoomsListViewFromRoomDetails()
                 } label: {
                     Image(systemName: "arrow.left")
                         .resizable()

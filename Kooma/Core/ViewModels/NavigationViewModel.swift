@@ -10,6 +10,10 @@ final class NavigationViewModel {
         self.path = NavigationPath()
     }
     
+    func goToRoomsListViewFromRoomDetails() {
+        self.path.removeLast()
+    }
+    
     func goToOnboardingStepTwoView() {
         self.path.append(AppRoute.onboardingStepTwo)
     }

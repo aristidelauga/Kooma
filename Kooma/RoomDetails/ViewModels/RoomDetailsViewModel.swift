@@ -19,7 +19,7 @@ final class RoomDetailsViewModel {
             setupCurrentRoomObservation(roomID: id)
         }
     }
-
+    
     private func setupCurrentRoomObservation(roomID: String) {
         currentRoomObservationTask?.cancel()
         
@@ -75,6 +75,13 @@ final class RoomDetailsViewModel {
         }
         
         try await service.removeVote(forRoomID: roomID, restaurantID: restaurant.id, userID: user.id)
+    }
+    
+    func leaveRoom(user: UserUI) async throws {
+        guard let id = self.currentRoom.id else {
+            return
+        }
+        try await self.service.leaveRoom(roomID: id, user: user)
     }
     
     func startListening(forUserID userID: String) {

@@ -11,6 +11,7 @@ protocol FirestoreServiceInterface {
     
     func createRoom(_ room: RoomUI) async throws
     func joinRoom(withCode code: String, user: UserUI) async throws
+    func leaveRoom(roomID: String, user: UserUI) async throws
     
     func fetchMyRooms(withUserID userID: String) async throws
     func fetchJoinedRooms(withUserID userID: String) async throws
@@ -45,7 +46,6 @@ final class FirestoreService: FirestoreServiceInterface {
 	init(client: FirestoreClientInterface = FirestoreClient()) {
 		self.client = client
 	}
-
     
     func createRoom(_ room: RoomUI) async throws {
         guard let address = room.address else {
@@ -83,6 +83,11 @@ final class FirestoreService: FirestoreServiceInterface {
                 throw NSError(domain: "RoomUI", code: 141, userInfo: [NSLocalizedDescriptionKey: "Failure in the Service during an attempt of joining a room"])
             }
 
+    }
+    
+    func leaveRoom(roomID: String, user: UserUI) async throws {
+        let userDomain = UserDomain(id: user.id, name: user.name)
+        try await self.client.leaveRoom(roomID: roomID, user: userDomain)
     }
     
     /// Used to get real-time update of user's created rooms
