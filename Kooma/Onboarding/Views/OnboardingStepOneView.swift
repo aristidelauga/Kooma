@@ -2,6 +2,7 @@
 import SwiftUI
 
 struct OnboardingStepOneView: View {
+    var navigationVM: NavigationViewModel
     var body: some View {
 		VStack(spacing: 0) {
 			Image(.onboarding1)
@@ -15,9 +16,11 @@ struct OnboardingStepOneView: View {
 			TextBodyLarge(text: "Quickly and easily decide where to have lunch")
 			Spacer()
 
-			NavigationLink(destination: OnboardingStepTwoView(), label: {
-				NavigationButton(text: "Continue")
-			})
+            Button {
+                self.navigationVM.goToOnboardingStepTwoView()
+            } label: {
+                NavigationButton(text: "Continue")
+            }
         }
 		.background(
 			Color.kmBeige
@@ -28,5 +31,5 @@ struct OnboardingStepOneView: View {
 }
 
 #Preview {
-    OnboardingStepOneView()
+    OnboardingStepOneView(navigationVM: NavigationViewModel())
 }

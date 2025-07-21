@@ -55,6 +55,7 @@ final class RoomDetailsViewModel {
         
         voters.append(user.id)
         votes[restaurant.id] = voters
+        // This one
         self.currentRoom.votes = votes
         guard let roomID = currentRoom.id else {
             return

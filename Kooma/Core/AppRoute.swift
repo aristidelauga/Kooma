@@ -2,6 +2,8 @@
 import Foundation
 
 enum AppRoute: Hashable, Equatable {
+    case onboardingStepTwo
+    case createUserView
     case yourNextRoom(hasRooms: Bool? = false)
     case roomsList
     case roomDetails(roomID: String)

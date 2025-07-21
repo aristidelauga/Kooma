@@ -13,10 +13,35 @@ struct RoomDetailsView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            
-            TextHeading600(text: "Restaurants")
-                .padding(.leading, 12)
             ScrollView(.vertical, showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 12) {
+                    TextHeading600(text: "Room info")
+                    HStack(spacing: 0) {
+                        TextHeading200(text: "Room code: ")
+                        Text(.init("**\(self.roomDetailsVM.currentRoom.code)**"))
+                            .font(.bodyLarge)
+                            .foregroundColor(.KMYellow)
+                    }
+                    
+                    if let address = self.roomDetailsVM.currentRoom.address {
+                        Text(.init("**Room address:** ")) + Text(address)
+                    }
+                    
+                    TextHeading200(text: "Room members:")
+                    ForEach(self.roomDetailsVM.currentRoom.members) { member in
+                        if member.id == self.roomDetailsVM.currentRoom.hostID {
+                            Text(.init("\(member.name) **(admin)**"))
+                                .font(.bodyMedium)
+                        } else {
+                            TextBodyMedium(text: member.name)
+                        }
+                    }
+                }
+                .padding(.bottom, 12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                TextHeading600(text: "Restaurants")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
                 ForEach(self.roomDetailsVM.currentRoom.restaurants) { restaurant in
                     HStack {
                         VStack(alignment: .leading, spacing: 8) {
@@ -42,13 +67,10 @@ struct RoomDetailsView: View {
                         }
                     }
                 }
-                .padding(.horizontal, 12)
             }
-            TextHeading600(text: "\(self.roomDetailsVM.currentRoom.code)")
-                .padding(.leading, 12)
-            TextHeading400(text: "\(self.roomDetailsVM.currentRoom.members.count)")
-                .padding(.vertical, 12)
         }
+        .padding(.horizontal, 12)
+        
         .toolbar(content: {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
@@ -115,7 +137,7 @@ struct RoomDetailsView: View {
                         address: "90 Bedford Street, New-York",
                         url: "https://centralparktoursnyc.com/central-perk-coffee-shop/",),
                 ],
-                votes: ["": ["", ""]]
+                votes: ["": ["", ""]], image: ""
             ),
             user: UserUI(id: "f480808hd8", name: "Gustave"),
             service: FirestoreService(), navigation: NavigationViewModel()

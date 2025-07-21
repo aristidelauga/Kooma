@@ -3,25 +3,26 @@ import SwiftUI
 
 struct CreateUserView: View {
 	@State private var createUserVM = CreateUserViewModel()
-    @State private var hasCompletedOnboarding: Bool = false
 	@Environment(UserManager.self) private var userManager
-    @Environment(FirestoreService.self) private var service
+    var navigationVM: NavigationViewModel
     var body: some View {
 		VStack(alignment: .leading) {
         	TextHeading600(text: "Your name")
 			KMTextfield(text: $createUserVM.name)
-			MainButton(text: "Submit") { @MainActor in
-				self.createUserVM.createUser()
-				if let user = self.createUserVM.user {
-					self.userManager.setUser(user)
-				}
-				self.hasCompletedOnboarding = true
-			}
-			.padding(.top, 18)
-			.frame(maxWidth: .infinity, alignment: .trailing)
-			.navigationDestination(isPresented: $hasCompletedOnboarding, destination: {
-                YourNextRoomView(userManager: self.userManager)
-			})
+
+            Button {
+                self.createUserVM.createUser()
+                if let user = self.createUserVM.user {
+                    self.userManager.setUser(user)
+                }
+                self.navigationVM.goToYourNextRoomViewFromUserCreation()
+                print("Path: \(self.navigationVM.path)")
+            } label: {
+                NavigationButton(text: "Submit")
+                    .padding(.top, 18)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+
+            }
         }
 		.padding(.horizontal, 16)
 		.navigationBarBackButtonHidden()
@@ -29,5 +30,7 @@ struct CreateUserView: View {
 }
 
 #Preview {
-    CreateUserView()
+    CreateUserView(navigationVM: NavigationViewModel())
+        .environment(FirestoreService())
+        .environment(UserManager())
 }

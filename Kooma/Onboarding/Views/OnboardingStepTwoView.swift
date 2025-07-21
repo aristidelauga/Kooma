@@ -2,6 +2,7 @@
 import SwiftUI
 
 struct OnboardingStepTwoView: View {
+    var navigationVM: NavigationViewModel
 	var body: some View {
 		VStack(spacing: 0) {
 			Image(.onboarding2)
@@ -19,16 +20,11 @@ struct OnboardingStepTwoView: View {
 			.padding(.horizontal, 16)
 			Spacer()
 
-            NavigationLink(destination: CreateUserView(), label: {
-				TextHeading200(text: "Get Started")
-					.padding(.vertical, 20)
-					.padding(.horizontal, 12)
-					.frame(maxWidth: 130, maxHeight: 48)
-					.background(
-						RoundedRectangle(cornerRadius: 48)
-							.foregroundStyle(.kmYellow)
-					)
-			})
+            Button {
+                self.navigationVM.goToCreateUserView()
+            } label: {
+                NavigationButton(text: "Get Started")
+            }
 		}
 		.background(
 			Color.kmBeige
@@ -40,5 +36,5 @@ struct OnboardingStepTwoView: View {
 }
 
 #Preview {
-    OnboardingStepTwoView()
+    OnboardingStepTwoView(navigationVM: NavigationViewModel())
 }

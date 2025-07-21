@@ -5,11 +5,13 @@ struct RoomCell: View {
 	var room: RoomUI
     var body: some View {
 		VStack(alignment: .leading) {
-			Image(room.image)
-				.resizable()
-				.frame(maxWidth: .infinity, maxHeight: 140)
-                .cornerRadius(12, corners: [.topLeft, .topRight])
-            
+            if let image = room.image {
+                Image(image)
+                    .resizable()
+                    .frame(maxWidth: .infinity, maxHeight: 140)
+                    .cornerRadius(12, corners: [.topLeft, .topRight])
+                
+            }
 
 			VStack(alignment: .leading, spacing: 6){
 				TextHeading600(text: room.name ?? "Work Lunch Room")

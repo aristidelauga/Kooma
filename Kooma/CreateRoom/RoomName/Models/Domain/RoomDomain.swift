@@ -29,7 +29,8 @@ extension RoomDomain {
             address: self.address,
             members: self.members.map { $0.toUI() },
             restaurants: self.restaurants.map { $0.toUI() },
-            votes: self.votes
+            votes: self.votes,
+            image: self.image
         )
     }
 }

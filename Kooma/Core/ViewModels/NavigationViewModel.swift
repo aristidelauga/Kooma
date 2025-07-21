@@ -6,13 +6,25 @@ final class NavigationViewModel {
 	var path = NavigationPath()
     var showRoomsList = false
 
-    func cleanPath() {
+    private func cleanPath() {
         self.path = NavigationPath()
+    }
+    
+    func goToOnboardingStepTwoView() {
+        self.path.append(AppRoute.onboardingStepTwo)
+    }
+    
+    func goToCreateUserView() {
+        self.path.append(AppRoute.createUserView)
     }
     
 	func showRoomsListView() {
         self.cleanPath()
         self.path.append(AppRoute.roomsList)
+    }
+    
+    func goToYourNextRoomViewFromUserCreation(hasRooms: Bool? = false) {
+        self.path.append(AppRoute.yourNextRoom(hasRooms: hasRooms))
     }
 
     func goToYourNextRoomView(hasRooms: Bool? = false) {

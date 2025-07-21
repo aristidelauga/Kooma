@@ -2,24 +2,14 @@
 import Foundation
 
 @Observable @MainActor
-final class RoomsListViewModel {
+final class LaunchAppViewModel {
     var myRooms: [RoomUI] = []
     var joinedRooms: [RoomUI] = []
     
     private let service: any FirestoreServiceInterface
     
-    init(firestoreService: any FirestoreServiceInterface = FirestoreService(), myRooms: [RoomUI], joinedRooms: [RoomUI]) {
-        self.service = firestoreService
-        self.myRooms = myRooms
-        self.joinedRooms = joinedRooms
-    }
-    
-    func addNewRoom(_ room: RoomUI) async {
-        do {
-            try await service.createRoom(room)
-        } catch {
-            print("Error preparing room for saving: \(error.localizedDescription)")
-        }
+    init(service: any FirestoreServiceInterface = FirestoreService()) {
+        self.service = service
     }
     
     func getMyRoomsConverted(userID: String) async throws {
@@ -32,7 +22,7 @@ final class RoomsListViewModel {
         self.joinedRooms = self.service.joinedRooms.map { $0.toUI() }
     }
     
-    func beginListening(forUserID userID: String) {
+    func startListening(forUserID userID: String) {
         service.startListening(forUserID: userID)
     }
     

@@ -10,6 +10,7 @@ struct KoomaApp: App {
     @State private var userManager = UserManager()
     @State private var navigationVM = NavigationViewModel()
     @State private var service = FirestoreService()
+    @State private var launchAppVM = LaunchAppViewModel()
     @State private var isLoading = true
     init() {
         FirebaseApp.configure()
@@ -20,27 +21,31 @@ struct KoomaApp: App {
             NavigationStack(path: $navigationVM.path) {
                 VStack {
                     if self.isLoading {
-                       LaunchScreenView()
+                        LaunchScreenView()
                             .onAppear {
-                                print("self.service.rooms.isEmpty: \(self.service.myRooms.isEmpty)")
+                                self.launchAppVM = LaunchAppViewModel(service: self.service)
                             }
                     } else if self.userManager.currentUser != nil {
                         switch !self.service.myRooms.isEmpty || !self.service.joinedRooms.isEmpty {
-                            case true:
-                            RoomsListView(service: self.service)
-                            case false:
+                        case true:
+                            RoomsListView(service: self.service, myRooms: self.launchAppVM.myRooms, joinedRooms: self.launchAppVM.joinedRooms)
+                        case false:
                             YourNextRoomView(userManager: self.userManager)
-                            }
-                        } else {
-                            OnboardingStepOneView()
+                        }
+                    } else {
+                        OnboardingStepOneView(navigationVM: NavigationViewModel())
                     }
                 }
                 .navigationDestination(for: AppRoute.self) { route in
                     switch route {
+                    case AppRoute.onboardingStepTwo:
+                        OnboardingStepTwoView(navigationVM: self.navigationVM)
+                    case AppRoute.createUserView:
+                        CreateUserView(navigationVM: self.navigationVM)
                     case AppRoute.yourNextRoom(let hasRooms):
                         YourNextRoomView(userManager: userManager, hasRooms: hasRooms)
                     case AppRoute.roomsList:
-                        RoomsListView(service: self.service)
+                        RoomsListView(service: self.service, myRooms: self.launchAppVM.myRooms, joinedRooms: self.launchAppVM.joinedRooms)
                     case AppRoute.roomDetails(let roomID):
                         if let user = self.userManager.currentUser {
                             RoomDetailsLoaderView(
@@ -69,7 +74,9 @@ struct KoomaApp: App {
             .onAppear {
                 Task {
                     if let currentUserID = self.userManager.currentUser?.id {
-                        self.service.startListening(forUserID: currentUserID)
+                        self.launchAppVM.startListening(forUserID: currentUserID)
+                        try await self.launchAppVM.getMyRoomsConverted(userID: currentUserID)
+                        try await self.launchAppVM.getJoinedRoomsConverted(userID: currentUserID)
                     }
                     try await Task.sleep(for: .seconds(3))
                     self.isLoading = false

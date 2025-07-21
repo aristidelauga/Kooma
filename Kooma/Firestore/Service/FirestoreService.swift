@@ -42,6 +42,10 @@ final class FirestoreService: FirestoreServiceInterface {
             return
         }
         print("room.votes \(room.votes)")
+        guard let image = room.image else {
+            return
+        }
+        
             let newRoom = RoomDomain(
                 id: room.id,
                 code: room.code,
@@ -52,7 +56,7 @@ final class FirestoreService: FirestoreServiceInterface {
                 regularMembersID: room.regularMembersID,
                 restaurants: try room.restaurants.map { try $0.toDomain() },
                 votes: room.votes,
-                image: room.image
+                image: image
             )
 
         do {

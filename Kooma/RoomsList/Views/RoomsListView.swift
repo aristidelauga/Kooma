@@ -7,9 +7,9 @@ struct RoomsListView: View {
     @Environment(UserManager.self) private var userManager
     @State private var room: RoomUI?
     var service: FirestoreService
-    init(service: FirestoreService) {
+    init(service: FirestoreService, myRooms: [RoomUI], joinedRooms: [RoomUI]) {
         self.service = service
-        _roomsListVM = State(wrappedValue: RoomsListViewModel(firestoreService: service))
+        _roomsListVM = State(wrappedValue: RoomsListViewModel(firestoreService: service, myRooms: myRooms, joinedRooms: joinedRooms))
     }
     
     var body: some View {
@@ -17,39 +17,69 @@ struct RoomsListView: View {
             TextHeading600(text: "Your Rooms")
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.leading, 12)
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 16) {
-                    ForEach(self.roomsListVM.myRooms) { room in
+            if self.roomsListVM.myRooms.isEmpty {
+                VStack(alignment: .center) {
+                    Image(.emptyRoomsState)
+                        .resizable()
+                        .clipShape(Circle())
+                        .scaledToFit()
+                        .frame(maxWidth: 250)
+                    TextBodyMedium(text: "You have created no rooms yet.")
+                        .padding(.top, 6)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .multilineTextAlignment(.center)
+                }
+                .padding(.vertical, 18)
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 16) {
+                        ForEach(self.roomsListVM.myRooms) { room in
                             Button {
                                 self.navigationVM.path.append(AppRoute.roomDetails(roomID: room.id ?? ""))
                             } label: {
                                 RoomCell(room: room)
                             }
+                        }
+                        .padding(.bottom, 12)
                     }
-                    .padding(.bottom, 12)
                 }
+                .padding(12)
             }
-            .padding(12)
             
             
             TextHeading600(text: "Rooms you are invited")
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.leading, 12)
             
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 16) {
-                    ForEach(self.roomsListVM.joinedRooms) { room in
-                        Button {
-                            //TODO: Add to NavigationVM
-                            self.navigationVM.path.append(AppRoute.roomDetails(roomID: room.id ?? ""))
-                        } label: {
-                            RoomCell(room: room)
+            if self.roomsListVM.joinedRooms.isEmpty {
+                VStack(alignment: .center) {
+                    Image(.emptyRoomsState)
+                        .resizable()
+                        .clipShape(Circle())
+                        .scaledToFit()
+                        .frame(maxWidth: 250)
+                        .padding(.top, 18)
+                    TextBodyMedium(text: "You have joined no rooms yet.")
+                        .padding(.horizontal, 66)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .multilineTextAlignment(.center)
+                }
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 16) {
+                        ForEach(self.roomsListVM.joinedRooms) { room in
+                            Button {
+                                //TODO: Add to NavigationVM
+                                self.navigationVM.path.append(AppRoute.roomDetails(roomID: room.id ?? ""))
+                            } label: {
+                                RoomCell(room: room)
+                            }
                         }
                     }
+                    .padding(.bottom, 12)
                 }
-                .padding(.bottom, 12)
+                .padding(12)
             }
-            .padding(12)
             Spacer()
             
             MainButton(text: "New Room", maxWidth: 142) {
@@ -83,8 +113,8 @@ struct RoomsListView: View {
 }
 
 #Preview {
-    RoomsListView(service: FirestoreService())
-        .environment(RoomsListViewModel(firestoreService: FirestoreService()))
-		.environment(UserManager())
+    RoomsListView(service: FirestoreService(), myRooms: [], joinedRooms: [])
+        .environment(RoomsListViewModel(firestoreService: FirestoreService(), myRooms: [], joinedRooms: []))
+        .environment(UserManager())
         .environment(NavigationViewModel())
 }
