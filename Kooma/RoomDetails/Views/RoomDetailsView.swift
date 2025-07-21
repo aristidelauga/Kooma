@@ -14,7 +14,7 @@ struct RoomDetailsView: View {
     var body: some View {
         VStack(alignment: .leading) {
             ScrollView(.vertical, showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 16) {
                     TextHeading600(text: "Room info")
                     HStack(spacing: 0) {
                         TextHeading200(text: "Room code: ")
@@ -24,7 +24,7 @@ struct RoomDetailsView: View {
                     }
                     
                     if let address = self.roomDetailsVM.currentRoom.address {
-                        Text(.init("**Room address:** ")) + Text(address)
+                        Text(.init("**Room address:** ")).font(.bodyLarge) + Text(address).font(.bodyLarge)
                     }
                     
                     TextHeading200(text: "Room members:")

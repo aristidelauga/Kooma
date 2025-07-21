@@ -27,11 +27,10 @@ struct CreateUserView: View {
 		.padding(.horizontal, 16)
 		.navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)
-        .background(
-            Color.kmBeige
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .edgesIgnoringSafeArea(.all)
-        )
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.kmBeige)
+        .edgesIgnoringSafeArea(.all)
+
     }
 }
 
