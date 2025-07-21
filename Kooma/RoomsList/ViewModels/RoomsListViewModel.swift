@@ -7,11 +7,12 @@ final class RoomsListViewModel {
     var joinedRooms: [RoomUI] = []
     
     private let service: any FirestoreServiceInterface
+    private var myRoomsTask: Task<Void, Never>?
+    private var joinedRoomsTask: Task<Void, Never>?
     
-    init(firestoreService: any FirestoreServiceInterface = FirestoreService(), myRooms: [RoomUI], joinedRooms: [RoomUI]) {
+    
+    init(firestoreService: any FirestoreServiceInterface = FirestoreService()) {
         self.service = firestoreService
-        self.myRooms = myRooms
-        self.joinedRooms = joinedRooms
     }
     
     func addNewRoom(_ room: RoomUI) async {
@@ -21,23 +22,36 @@ final class RoomsListViewModel {
             print("Error preparing room for saving: \(error.localizedDescription)")
         }
     }
-    
-    func getMyRoomsConverted(userID: String) async throws {
-        try await self.service.fetchMyRooms(withUserID: userID)
-        self.myRooms = self.service.myRooms.map { $0.toUI() }
-    }
-    
-    func getJoinedRoomsConverted(userID: String) async throws {
-        try await self.service.fetchJoinedRooms(withUserID: userID)
-        self.joinedRooms = self.service.joinedRooms.map { $0.toUI() }
-    }
-    
-    func beginListening(forUserID userID: String) {
-        service.startListening(forUserID: userID)
+
+    func startListening(forUserID userID: String) {
+        endListening()
+        
+        myRoomsTask = Task {
+            do {
+                for try await domainRooms in service.myRoomsStream(forUserID: userID) {
+                    self.myRooms = domainRooms.map { $0.toUI() }
+                }
+            } catch {
+                print("listenToMyRooms failed: \(error)")
+            }
+        }
+        
+        joinedRoomsTask = Task {
+            do {
+                for try await domainRooms in service.joinedRoomsStream(forUserID: userID) {
+                    self.joinedRooms = domainRooms.map { $0.toUI() }
+                }
+            } catch {
+                print("listenToJoinedRooms failed: \(error)")
+            }
+        }
     }
     
     func endListening() {
-        service.stopListening()
+        myRoomsTask?.cancel()
+        joinedRoomsTask?.cancel()
+        myRoomsTask = nil
+        joinedRoomsTask = nil
     }
-
+    
 }

@@ -54,11 +54,11 @@ struct RoomDetailsView: View {
                         Spacer()
                         Button {
                             Task {
-                                try await roomDetailsVM.vote(
-                                    forRestaurant: restaurant,
-                                    inRoom: self.roomDetailsVM.currentRoom,
-                                    user: self.user
-                                )
+                                if !self.roomDetailsVM.hasVoted(forRestaurant: restaurant, user: self.user) {
+                                    try await roomDetailsVM.vote(forRestaurant: restaurant, user: self.user)
+                                } else {
+                                    try await self.roomDetailsVM.removeVote(forRestaurant: restaurant, user: self.user)
+                                }
                             }
                         } label: {
                             Image(self.roomDetailsVM.hasVoted(forRestaurant: restaurant, user: self.user) ? "thumbFill" : "thumbEmpty")
@@ -85,7 +85,7 @@ struct RoomDetailsView: View {
             }
         })
         .onAppear {
-            self.roomDetailsVM.beginListening(forUserID: user.id)
+            self.roomDetailsVM.startListening(forUserID: user.id)
         }
         .onDisappear(perform: {
             self.roomDetailsVM.endListening()

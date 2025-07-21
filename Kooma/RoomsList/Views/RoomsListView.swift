@@ -7,9 +7,9 @@ struct RoomsListView: View {
     @Environment(UserManager.self) private var userManager
     @State private var room: RoomUI?
     var service: FirestoreService
-    init(service: FirestoreService, myRooms: [RoomUI], joinedRooms: [RoomUI]) {
+    init(service: FirestoreService) {
         self.service = service
-        _roomsListVM = State(wrappedValue: RoomsListViewModel(firestoreService: service, myRooms: myRooms, joinedRooms: joinedRooms))
+        _roomsListVM = State(wrappedValue: RoomsListViewModel(firestoreService: service))
     }
     
     var body: some View {
@@ -35,7 +35,7 @@ struct RoomsListView: View {
                     HStack(spacing: 16) {
                         ForEach(self.roomsListVM.myRooms) { room in
                             Button {
-                                self.navigationVM.path.append(AppRoute.roomDetails(roomID: room.id ?? ""))
+                                self.navigationVM.path.append(AppRoute.roomDetails(room: room))
                             } label: {
                                 RoomCell(room: room)
                             }
@@ -70,7 +70,7 @@ struct RoomsListView: View {
                         ForEach(self.roomsListVM.joinedRooms) { room in
                             Button {
                                 //TODO: Add to NavigationVM
-                                self.navigationVM.path.append(AppRoute.roomDetails(roomID: room.id ?? ""))
+                                self.navigationVM.path.append(AppRoute.roomDetails(room: room))
                             } label: {
                                 RoomCell(room: room)
                             }
@@ -89,32 +89,32 @@ struct RoomsListView: View {
             .frame(maxWidth: .infinity, alignment: .trailing)
             .padding(.trailing, 38)
         }
+        .navigationTitle("Rooms")
+        .navigationBarBackButtonHidden()
+        .navigationBarTitleDisplayMode(.inline)
+        .background(
+            Color.kmBeige
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .edgesIgnoringSafeArea(.all)
+        )
+        
         .onAppear {
             Task {
                 if let userID = self.userManager.currentUser?.id {
-                    try await self.roomsListVM.getMyRoomsConverted(userID: userID)
-                    try await self.roomsListVM.getJoinedRoomsConverted(userID: userID)
-                    self.roomsListVM.beginListening(forUserID: userID)
+                    self.roomsListVM.startListening(forUserID: userID)
                 }
             }
         }
         .onDisappear {
             self.roomsListVM.endListening()
         }
-        .background(
-            Color.kmBeige
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .edgesIgnoringSafeArea(.all)
-        )
-        .navigationTitle("Rooms")
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden()
+
     }
 }
 
 #Preview {
-    RoomsListView(service: FirestoreService(), myRooms: [], joinedRooms: [])
-        .environment(RoomsListViewModel(firestoreService: FirestoreService(), myRooms: [], joinedRooms: []))
+    RoomsListView(service: FirestoreService())
+        .environment(RoomsListViewModel(firestoreService: FirestoreService()))
         .environment(UserManager())
         .environment(NavigationViewModel())
 }

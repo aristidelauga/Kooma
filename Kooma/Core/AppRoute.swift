@@ -6,7 +6,7 @@ enum AppRoute: Hashable, Equatable {
     case createUserView
     case yourNextRoom(hasRooms: Bool? = false)
     case roomsList
-    case roomDetails(roomID: String)
+    case roomDetails(room: RoomUI)
     case addressSearch(room: RoomUI)
     case radiusSettingView(room: RoomUI)
     case RoomSearch(code: String)

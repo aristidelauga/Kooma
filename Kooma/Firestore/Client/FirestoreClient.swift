@@ -8,20 +8,30 @@ private enum FirestoreConstants {
     static let roomsCollectionName = "rooms"
     static let myRoomsKey = "administrator.id"
     static let joinedRoomsKey = "regularMembersID"
+    static let votesKey = "votes"
 }
 
 @MainActor
 protocol FirestoreClientInterface {
     var database: Firestore { get }
+
     func saveRoom(_ room: RoomDomain) async throws
-    func getMyRooms(forUserID userID: String) async throws -> [RoomDomain]
     func joinRoom(withCode code: String, user: UserDomain) async throws
+
+    func getMyRooms(forUserID userID: String) async throws -> [RoomDomain]
     func getJoinedRooms(forUserID userID: String) async throws -> [RoomDomain]
-    func vote(forRoomID roomID: String, votes: [String: [String]]) async throws
+
+    func updateVotes(forRoomID roomID: String, restaurantID: String, userID: String, action: VoteAction) async throws
     
     //Listeners
     func listenToMyRooms(forUserID userID: String) -> AsyncThrowingStream<[RoomDomain], Error>
     func listenToJoinedRooms(forUserID userID: String) -> AsyncThrowingStream<[RoomDomain], Error>
+    func listenToRoom(withID roomID: String) -> AsyncThrowingStream<RoomDomain, Error>
+}
+
+enum VoteAction {
+    case add
+    case remove
 }
 
 final class FirestoreClient: FirestoreClientInterface {
@@ -86,23 +96,33 @@ final class FirestoreClient: FirestoreClientInterface {
             throw error
         }
     }
-    
-    func vote(forRoomID roomID: String, votes: [String: [String]]) async throws {
+
+    func updateVotes(forRoomID roomID: String, restaurantID: String, userID: String, action: VoteAction) async throws {
         let ref = roomsCollection.document(roomID)
-        let snapshot = try await ref.getDocument()
-        var currentVotes = snapshot.data()?["votes"] as? [String: [String]] ?? [:]
-
-        for (restaurantID, newUserIDs) in votes {
-            var existingUserIDs = currentVotes[restaurantID] ?? []
-            for userID in newUserIDs {
-                if !existingUserIDs.contains(userID) {
-                    existingUserIDs.append(userID)
+        
+        do {
+            let snapshot = try await ref.getDocument()
+            var currentVotes = snapshot.data()?[FirestoreConstants.votesKey] as? [String: [String]] ?? [:]
+            
+            var userIDsForRestaurant = currentVotes[restaurantID] ?? []
+            
+            switch action {
+            case .add:
+                if !userIDsForRestaurant.contains(userID) {
+                    userIDsForRestaurant.append(userID)
                 }
+            case .remove:
+                userIDsForRestaurant.removeAll(where: { $0 == userID })
             }
-            currentVotes[restaurantID] = existingUserIDs
+            
+            currentVotes[restaurantID] = userIDsForRestaurant
+            
+            try await ref.updateData([FirestoreConstants.votesKey: currentVotes])
+            print("Votes mis à jour pour la salle \(roomID), restaurant \(restaurantID), utilisateur \(userID), action: \(action)")
+        } catch {
+            print("updateVotes in FirestoreClient encountered an error: \(error)")
+            throw error
         }
-
-        try await ref.updateData(["votes": currentVotes])
     }
     
     func listenToMyRooms(forUserID userID: String) -> AsyncThrowingStream<[RoomDomain], Error> {
@@ -151,6 +171,32 @@ final class FirestoreClient: FirestoreClientInterface {
             
             let sendableListener = UnsafeSendableBox(listener)
             
+            continuation.onTermination = { @Sendable _ in
+                sendableListener.value.remove()
+            }
+        }
+    }
+    
+    func listenToRoom(withID roomID: String) -> AsyncThrowingStream<RoomDomain, Error> {
+        AsyncThrowingStream { continuation in
+            let listener = roomsCollection.document(roomID)
+                .addSnapshotListener { snapshot, error in
+                    if let error = error {
+                        continuation.finish(throwing: error)
+                        return
+                    }
+
+                    guard let snapshot = snapshot, snapshot.exists,
+                          let room = try? snapshot.data(as: RoomDomain.self) else {
+                        print("Room snapshot was nil or invalid.")
+                        return
+                    }
+
+                    continuation.yield(room)
+                }
+
+            let sendableListener = UnsafeSendableBox(listener)
+
             continuation.onTermination = { @Sendable _ in
                 sendableListener.value.remove()
             }

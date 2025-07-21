@@ -22,11 +22,13 @@ struct OnboardingStepOneView: View {
                 NavigationButton(text: "Continue")
             }
         }
-		.background(
-			Color.kmBeige
-				.frame(maxWidth: .infinity, maxHeight: .infinity)
-				.edgesIgnoringSafeArea(.all)
-		)
+        .navigationBarBackButtonHidden()
+        .navigationBarTitleDisplayMode(.inline)
+        .background(
+            Color.kmBeige
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .edgesIgnoringSafeArea(.all)
+        )
     }
 }
 

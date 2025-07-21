@@ -11,12 +11,22 @@ protocol FirestoreServiceInterface {
     
     func createRoom(_ room: RoomUI) async throws
     func joinRoom(withCode code: String, user: UserUI) async throws
+    
     func fetchMyRooms(withUserID userID: String) async throws
     func fetchJoinedRooms(withUserID userID: String) async throws
-    func vote(forRoomID roomID: String, votes: [String: [String]]) async throws
+    
+    func myRoomsStream(forUserID userID: String) -> AsyncThrowingStream<[RoomDomain], Error>
+    func joinedRoomsStream(forUserID userID: String) -> AsyncThrowingStream<[RoomDomain], Error>
+    func roomStream(withID roomID: String) -> AsyncThrowingStream<RoomDomain, Error>
+
+    
     func getRoomByID(_ roomID: String, userID: String) async throws -> RoomDomain?
     
+    func addVote(forRoomID roomID: String, restaurantID: String, userID: String) async throws
+    func removeVote(forRoomID roomID: String, restaurantID: String, userID: String) async throws
+    
     func startListening(forUserID userID: String)
+    
     func stopListening()
 
 }
@@ -75,16 +85,29 @@ final class FirestoreService: FirestoreServiceInterface {
 
     }
     
+    /// Used to get real-time update of user's created rooms
+    func myRoomsStream(forUserID userID: String) -> AsyncThrowingStream<[RoomDomain], Error> {
+        client.listenToMyRooms(forUserID: userID)
+    }
+
+    /// Used to get real-time update of user's joined roomse
+    func joinedRoomsStream(forUserID userID: String) -> AsyncThrowingStream<[RoomDomain], Error> {
+        client.listenToJoinedRooms(forUserID: userID)
+    }
+
+    /// Used to get real-time update of a given room
+    func roomStream(withID roomID: String) -> AsyncThrowingStream<RoomDomain, Error> {
+        client.listenToRoom(withID: roomID)
+    }
+    
+    // Used when the app get launched so we display the right screen to the user
     func fetchMyRooms(withUserID userID: String) async throws {
         self.myRooms = try await self.client.getMyRooms(forUserID: userID)
     }
-    
+
+    // Used when the app get launched so we display the right screen to the user
     func fetchJoinedRooms(withUserID userID: String) async throws {
         self.joinedRooms = try await self.client.getJoinedRooms(forUserID: userID)
-    }
-    
-    func vote(forRoomID roomID: String, votes: [String : [String]]) async throws {
-        try await self.client.vote(forRoomID: roomID, votes: votes)
     }
     
     func getRoomByID(_ roomID: String, userID: String) async throws -> RoomDomain? {
@@ -94,6 +117,14 @@ final class FirestoreService: FirestoreServiceInterface {
             return room
         }
         return nil
+    }
+    
+    func addVote(forRoomID roomID: String, restaurantID: String, userID: String) async throws {
+        try await self.client.updateVotes(forRoomID: roomID, restaurantID: restaurantID, userID: userID, action: .add)
+    }
+    
+    func removeVote(forRoomID roomID: String, restaurantID: String, userID: String) async throws {
+        try await self.client.updateVotes(forRoomID: roomID, restaurantID: restaurantID, userID: userID, action: .remove)
     }
     
     func startListening(forUserID userID: String) {

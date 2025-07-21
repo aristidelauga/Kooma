@@ -23,15 +23,17 @@ struct OnboardingStepTwoView: View {
             Button {
                 self.navigationVM.goToCreateUserView()
             } label: {
-                NavigationButton(text: "Get Started")
+                NavigationButton(text: "Get Started", maxWidth: 130)
+                    .frame(maxWidth: .infinity)
             }
 		}
+        .navigationBarBackButtonHidden()
+        .navigationBarTitleDisplayMode(.inline)
 		.background(
 			Color.kmBeige
 				.frame(maxWidth: .infinity, maxHeight: .infinity)
 				.edgesIgnoringSafeArea(.all)
 		)
-		.navigationBarBackButtonHidden()
 	}
 }
 

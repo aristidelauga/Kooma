@@ -28,8 +28,8 @@ final class ResearchRoomViewModel {
     
     func fetchJoinedRooms(userID: String) async throws {
         Task {
-            try await self.service.fetchJoinedRooms(withUserID: userID)
             getJoinedRoomsConverted()
+            try await self.service.fetchJoinedRooms(withUserID: userID)
         }
     }
 }

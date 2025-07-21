@@ -43,7 +43,6 @@ import Foundation
     
     func addNewRoom(_ room: RoomUI) async throws {
         try await self.service.createRoom(room)
-        try await self.service.fetchMyRooms(withUserID: room.hostID)
     }
     
 }

@@ -26,14 +26,14 @@ struct KoomaApp: App {
                                 self.launchAppVM = LaunchAppViewModel(service: self.service)
                             }
                     } else if self.userManager.currentUser != nil {
-                        switch !self.service.myRooms.isEmpty || !self.service.joinedRooms.isEmpty {
+                        switch !self.launchAppVM.myRooms.isEmpty || !self.launchAppVM.joinedRooms.isEmpty {
                         case true:
-                            RoomsListView(service: self.service, myRooms: self.launchAppVM.myRooms, joinedRooms: self.launchAppVM.joinedRooms)
+                            RoomsListView(service: self.service)
                         case false:
                             YourNextRoomView(userManager: self.userManager)
                         }
                     } else {
-                        OnboardingStepOneView(navigationVM: NavigationViewModel())
+                        OnboardingStepOneView(navigationVM: self.navigationVM)
                     }
                 }
                 .navigationDestination(for: AppRoute.self) { route in
@@ -45,14 +45,14 @@ struct KoomaApp: App {
                     case AppRoute.yourNextRoom(let hasRooms):
                         YourNextRoomView(userManager: userManager, hasRooms: hasRooms)
                     case AppRoute.roomsList:
-                        RoomsListView(service: self.service, myRooms: self.launchAppVM.myRooms, joinedRooms: self.launchAppVM.joinedRooms)
-                    case AppRoute.roomDetails(let roomID):
+                        RoomsListView(service: self.service)
+                    case AppRoute.roomDetails(let room):
                         if let user = self.userManager.currentUser {
-                            RoomDetailsLoaderView(
-                                roomID: roomID,
+                            RoomDetailsView(
+                                room: room,
                                 user: user,
                                 service: self.service,
-                                navigationVM: self.navigationVM
+                                navigation: self.navigationVM
                             )
                             .navigationBarBackButtonHidden()
                         }
@@ -74,16 +74,12 @@ struct KoomaApp: App {
             .onAppear {
                 Task {
                     if let currentUserID = self.userManager.currentUser?.id {
-                        self.launchAppVM.startListening(forUserID: currentUserID)
                         try await self.launchAppVM.getMyRoomsConverted(userID: currentUserID)
                         try await self.launchAppVM.getJoinedRoomsConverted(userID: currentUserID)
                     }
                     try await Task.sleep(for: .seconds(3))
                     self.isLoading = false
                 }
-            }
-            .onDisappear {
-                self.service.stopListening()
             }
         }
         .environment(self.service)
