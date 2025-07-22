@@ -10,4 +10,5 @@ enum AppRoute: Hashable, Equatable {
     case addressSearch(room: RoomUI)
     case radiusSettingView(room: RoomUI)
     case RoomSearch(code: String)
+    case restaurantDetail(names: [String], restaurant: RestaurantUI)
 }

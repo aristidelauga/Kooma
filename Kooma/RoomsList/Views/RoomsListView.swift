@@ -35,7 +35,7 @@ struct RoomsListView: View {
                     HStack(spacing: 16) {
                         ForEach(self.roomsListVM.myRooms) { room in
                             Button {
-                                self.navigationVM.path.append(AppRoute.roomDetails(room: room))
+                                self.navigationVM.goToRoomDetailsView(withRoom: room)
                             } label: {
                                 RoomCell(room: room)
                             }
@@ -69,8 +69,7 @@ struct RoomsListView: View {
                     HStack(spacing: 16) {
                         ForEach(self.roomsListVM.joinedRooms) { room in
                             Button {
-                                //TODO: Add to NavigationVM
-                                self.navigationVM.path.append(AppRoute.roomDetails(room: room))
+                                self.navigationVM.goToRoomDetailsView(withRoom: room)
                             } label: {
                                 RoomCell(room: room)
                             }
@@ -99,6 +98,7 @@ struct RoomsListView: View {
         )
         
         .onAppear {
+            print("path count on RoomsListView: \(self.navigationVM.path.count)")
             Task {
                 if let userID = self.userManager.currentUser?.id {
                     self.roomsListVM.startListening(forUserID: userID)

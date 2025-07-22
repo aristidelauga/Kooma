@@ -4,10 +4,16 @@ import SwiftUI
 @Observable
 final class NavigationViewModel {
 	var path = NavigationPath()
-    var showRoomsList = false
+    var comingFromRestaurantView = false
+//    var showRoomsList = false
 
     private func cleanPath() {
         self.path = NavigationPath()
+    }
+
+    
+    func goToRoomDetailsViewFromRestaurantDetails() {
+        self.path.removeLast(1)
     }
     
     func goToRoomsListViewFromRoomDetails() {
@@ -46,6 +52,15 @@ final class NavigationViewModel {
     
     func goToResearchRoomView(withRoomCode code: String) {
         self.path.append(AppRoute.RoomSearch(code: code))
+    }
+    
+    
+    func goToRoomDetailsView(withRoom room: RoomUI) {
+        self.path.append(AppRoute.roomDetails(room: room))
+    }
+    
+    func goToRestaurantDetailView(withNames names: [String], andRestaurant restaurant: RestaurantUI) {
+        self.path.append(AppRoute.restaurantDetail(names: names, restaurant: restaurant))
     }
 
 }

@@ -95,6 +95,17 @@ final class RoomDetailsViewModel {
         try await self.service.deleteRoom(withID: id, byuserID: user.id)
     }
     
+    func getVotersNames(for restaurantID: String) -> [String] {
+        
+        let votersID = self.currentRoom.votes[restaurantID] ?? []
+        
+        let names = self.currentRoom.members
+            .filter { votersID.contains($0.id) }
+            .map { $0.name }
+        
+        return names
+    }
+    
     func startListening(forUserID userID: String) {
         self.service.startListening(forUserID: userID)
     }

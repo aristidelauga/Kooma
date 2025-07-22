@@ -31,8 +31,10 @@ struct RadiusSettingView: View {
 					Task {
                         try await radiusSettingViewModel.searchRestaurants(within: slider)
                         try await self.radiusSettingViewModel.addNewRoom(self.radiusSettingViewModel.room)
+                        print("path when tapping on `submit` in RadiusSettingView: \(self.navigationVM.path.count)")
                         self.navigationVM.showRoomsListView()
-                        print("path from RadiusSettingsView: \(self.navigationVM.path)")
+                        print("path when tapping on `submit` in RadiusSettingView: \(self.navigationVM.path.count), after calling `showRoomsListView`.")
+                        
 					}
 				}
 				.frame(maxWidth: .infinity, alignment: .center)

@@ -2,10 +2,8 @@
 import SwiftUI
 
 struct RoomDetailCell: View {
-    //    var voteTracker: VoteTracker
     @State var restaurant: RestaurantUI
     @Binding var room: RoomUI
-//    @State var hasVoted: Bool = false
     var voteAction: () -> Void
     var body: some View {
         HStack {
@@ -25,17 +23,4 @@ struct RoomDetailCell: View {
             }
         }
     }
-}
-
-#Preview {
-    RoomDetailCell(
-        restaurant: RestaurantUI(
-            id: "0df48hf134hf0",
-            name: "Central Perk",
-            phoneNumber: "+49 612-345-678",
-            address: "90 Bedford Street, New-York",
-            url: "https://centralparktoursnyc.com/central-perk-coffee-shop/"),
-        room: .constant(RoomUI(administrator: UserUI(id: "", name: ""))),
-        voteAction: {}
-    )
 }

@@ -43,27 +43,32 @@ struct RoomDetailsView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
                 ForEach(self.roomDetailsVM.currentRoom.restaurants) { restaurant in
-                    HStack {
-                        VStack(alignment: .leading, spacing: 8) {
-                            TextHeading200(text: restaurant.name)
-                            let restaurantVotes = self.roomDetailsVM.getVoteCount(withRestaurantID: restaurant.id)
-                            Text("^[\(restaurantVotes) vote](inflect: true)")
-                                .font(.bodyMedium)
-                                .foregroundStyle(.kmKaki)
-                        }
-                        Spacer()
-                        Button {
-                            Task {
-                                if !self.roomDetailsVM.hasVoted(forRestaurant: restaurant, user: self.user) {
-                                    try await roomDetailsVM.vote(forRestaurant: restaurant, user: self.user)
-                                } else {
-                                    try await self.roomDetailsVM.removeVote(forRestaurant: restaurant, user: self.user)
-                                }
+                     Button {
+                         let names = self.roomDetailsVM.getVotersNames(for: restaurant.id)
+                         self.navigationVM.goToRestaurantDetailView(withNames: names, andRestaurant: restaurant)
+                    } label: {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 8) {
+                                TextHeading200(text: restaurant.name)
+                                let restaurantVotes = self.roomDetailsVM.getVoteCount(withRestaurantID: restaurant.id)
+                                Text("^[\(restaurantVotes) vote](inflect: true)")
+                                    .font(.bodyMedium)
+                                    .foregroundStyle(.kmKaki)
                             }
-                        } label: {
-                            Image(self.roomDetailsVM.hasVoted(forRestaurant: restaurant, user: self.user) ? "thumbFill" : "thumbEmpty")
-                                .resizable()
-                                .frame(maxWidth: 24, maxHeight: 24)
+                            Spacer()
+                            Button {
+                                Task {
+                                    if !self.roomDetailsVM.hasVoted(forRestaurant: restaurant, user: self.user) {
+                                        try await roomDetailsVM.vote(forRestaurant: restaurant, user: self.user)
+                                    } else {
+                                        try await self.roomDetailsVM.removeVote(forRestaurant: restaurant, user: self.user)
+                                    }
+                                }
+                            } label: {
+                                Image(self.roomDetailsVM.hasVoted(forRestaurant: restaurant, user: self.user) ? "thumbFill" : "thumbEmpty")
+                                    .resizable()
+                                    .frame(maxWidth: 24, maxHeight: 24)
+                            }
                         }
                     }
                 }
@@ -79,9 +84,8 @@ struct RoomDetailsView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .center)
                     
-                    Spacer()
-                    
                     if self.user.id == self.roomDetailsVM.currentRoom.hostID {
+                        Spacer()
                         MainButton(text: "Delete Room", maxWidth: 130) {
                             Task {
                                 try await self.roomDetailsVM.deleteRoom(user: self.user)
@@ -110,6 +114,7 @@ struct RoomDetailsView: View {
         })
         .onAppear {
             self.roomDetailsVM.startListening(forUserID: user.id)
+            print("path count on RoomDetailView: \(self.navigationVM.path.count)")
         }
         .onDisappear(perform: {
             self.roomDetailsVM.endListening()
@@ -127,49 +132,5 @@ struct RoomDetailsView: View {
         .navigationTitle(self.roomDetailsVM.currentRoom.name ?? "")
         .navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)
-    }
-}
-
-#Preview {
-    NavigationStack {
-        RoomDetailsView(
-            room: RoomUI(
-                id: "1-43432jf49fgjjf",
-                hostID: "1-942hfd3410]fh8]",
-                code: "BBX8TR93",
-                name: "Friends",
-                administrator: UserUI(id: "1-942hfd3410]fh8]", name: "Ross Geller"),
-                address: "90 Bedford Street, New-York",
-                members: [
-                    UserUI(id: "fbn341fu8h13[f4gh", name: "Chandler Bing"),
-                    UserUI(id: "qegertgrtgr[f4gh", name: "Monica Geller"),
-                    UserUI(id: "rtgrtwg[rgtrwtgtrwgrtw", name: "Phoebe Buffay"),
-                    
-                ],
-                restaurants: [
-                    RestaurantUI(
-                        id: "0df48hf134hf0",
-                        name: "Central Perk",
-                        phoneNumber: "+49 612-345-678",
-                        address: "90 Bedford Street, New-York",
-                        url: "https://centralparktoursnyc.com/central-perk-coffee-shop/"),
-                    RestaurantUI(
-                        id: "0df48hf134hf0",
-                        name: "Central Perk",
-                        phoneNumber: "+49 612-345-678",
-                        address: "90 Bedford Street, New-York",
-                        url: "https://centralparktoursnyc.com/central-perk-coffee-shop/"),
-                    RestaurantUI(
-                        id: "0df48hf134hf0",
-                        name: "Central Perk",
-                        phoneNumber: "+49 612-345-678",
-                        address: "90 Bedford Street, New-York",
-                        url: "https://centralparktoursnyc.com/central-perk-coffee-shop/",),
-                ],
-                votes: ["": ["", ""]], image: ""
-            ),
-            user: UserUI(id: "f480808hd8", name: "Gustave"),
-            service: FirestoreService(), navigation: NavigationViewModel()
-        )
     }
 }

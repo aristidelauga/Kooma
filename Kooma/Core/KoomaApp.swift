@@ -44,18 +44,6 @@ struct KoomaApp: App {
                         CreateUserView(navigationVM: self.navigationVM)
                     case AppRoute.yourNextRoom(let hasRooms):
                         YourNextRoomView(userManager: userManager, hasRooms: hasRooms)
-                    case AppRoute.roomsList:
-                        RoomsListView(service: self.service)
-                    case AppRoute.roomDetails(let room):
-                        if let user = self.userManager.currentUser {
-                            RoomDetailsView(
-                                room: room,
-                                user: user,
-                                service: self.service,
-                                navigation: self.navigationVM
-                            )
-                            .navigationBarBackButtonHidden()
-                        }
                     case .addressSearch(let room):
                         SearchAddressView(room: room, service: service, navigationVM: self.navigationVM)
                     case .radiusSettingView(let room):
@@ -67,6 +55,20 @@ struct KoomaApp: App {
                             userManager: self.userManager,
                             navigationVM: self.navigationVM
                         )
+                    case AppRoute.roomsList:
+                        RoomsListView(service: self.service)
+                    case AppRoute.roomDetails(let room):
+                        if let user = self.userManager.currentUser {
+                            RoomDetailsView(
+                                room: room,
+                                user: user,
+                                service: self.service,
+                                navigation: self.navigationVM
+                            )
+//                            .navigationBarBackButtonHidden()
+                        }
+                    case .restaurantDetail(let names, let restaurant):
+                        RestaurantDetailView(navigationVM: self.navigationVM, restaurant: restaurant, names: names)
                     }
                 }
             }
