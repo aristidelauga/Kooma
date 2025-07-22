@@ -18,6 +18,7 @@ protocol FirestoreClientInterface {
     func saveRoom(_ room: RoomDomain) async throws
     func joinRoom(withCode code: String, user: UserDomain) async throws
     func leaveRoom(roomID: String, user: UserDomain) async throws
+    func deleteRoom(withID: String, byuserID userID: String) async throws
 
     func getMyRooms(forUserID userID: String) async throws -> [RoomDomain]
     func getJoinedRooms(forUserID userID: String) async throws -> [RoomDomain]
@@ -120,6 +121,23 @@ final class FirestoreClient: FirestoreClientInterface {
             print("Error updating room \(roomID) after user \(user.id) left: \(error)")
             throw NSError(domain: "AppError", code: 500, userInfo: [NSLocalizedDescriptionKey: "Failed to update room after user left."])
         }
+    }
+    
+    func deleteRoom(withID: String, byuserID userID: String) async throws {
+        let ref = roomsCollection.document(withID)
+        let snapshot = try await ref.getDocument()
+        
+        guard snapshot.exists else {
+            return
+        }
+        
+        let room = try snapshot.data(as: RoomDomain.self)
+        
+        guard room.administrator.id == userID else {
+            throw NSError(domain: "AppError", code: 403, userInfo: [NSLocalizedDescriptionKey: "Only the administrator can delete this room."])
+        }
+        
+        try await ref.delete()
     }
     
     func getMyRooms(forUserID userID: String) async throws -> [RoomDomain] {
@@ -234,14 +252,28 @@ final class FirestoreClient: FirestoreClientInterface {
                         continuation.finish(throwing: error)
                         return
                     }
-
-                    guard let snapshot = snapshot, snapshot.exists,
-                          let room = try? snapshot.data(as: RoomDomain.self) else {
-                        print("Room snapshot was nil or invalid.")
+                    
+                    guard let snapshot = snapshot else {
+                        continuation.finish(throwing: NSError(
+                            domain: "AppError",
+                            code: 500,
+                            userInfo: [NSLocalizedDescriptionKey: "Snapshot was nil."]
+                        ))
+                        return
+                    }
+                    
+                    if !snapshot.exists {
+                        continuation.finish()
                         return
                     }
 
-                    continuation.yield(room)
+                    do {
+                        let room = try snapshot.data(as: RoomDomain.self)
+                        continuation.yield(room)
+                    } catch {
+                        print("Decoding failed: \(error)")
+                        continuation.finish(throwing: error)
+                    }
                 }
 
             let sendableListener = UnsafeSendableBox(listener)

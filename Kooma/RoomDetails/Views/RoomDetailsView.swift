@@ -67,13 +67,30 @@ struct RoomDetailsView: View {
                         }
                     }
                 }
-                MainButton(text: "Leave Room", maxWidth: 130) {
-                    Task {
-                        try await self.roomDetailsVM.leaveRoom(user: self.user)
-                        self.navigationVM.goToRoomsListViewFromRoomDetails()
+                
+                HStack {
+                    Spacer()
+                    
+                    MainButton(text: "Leave Room", maxWidth: 130) {
+                        Task {
+                            try await self.roomDetailsVM.leaveRoom(user: self.user)
+                            self.navigationVM.goToRoomsListViewFromRoomDetails()
+                        }
                     }
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    
+                    Spacer()
+                    
+                    if self.user.id == self.roomDetailsVM.currentRoom.hostID {
+                        MainButton(text: "Delete Room", maxWidth: 130) {
+                            Task {
+                                try await self.roomDetailsVM.deleteRoom(user: self.user)
+                            }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .center)
+                    }
+                    Spacer()
                 }
-                .frame(maxWidth: .infinity, alignment: .center)
             }
         }
         .padding(.horizontal, 12)
@@ -96,6 +113,11 @@ struct RoomDetailsView: View {
         }
         .onDisappear(perform: {
             self.roomDetailsVM.endListening()
+        })
+        .onChange(of: roomDetailsVM.roomWasDeleted, perform: { wasDeleted in
+            if wasDeleted {
+                self.navigationVM.goToRoomsListViewFromRoomDetails()
+            }
         })
         .background(
             Color.kmBeige

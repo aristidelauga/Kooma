@@ -12,6 +12,7 @@ protocol FirestoreServiceInterface {
     func createRoom(_ room: RoomUI) async throws
     func joinRoom(withCode code: String, user: UserUI) async throws
     func leaveRoom(roomID: String, user: UserUI) async throws
+    func deleteRoom(withID: String, byuserID userID: String) async throws
     
     func fetchMyRooms(withUserID userID: String) async throws
     func fetchJoinedRooms(withUserID userID: String) async throws
@@ -88,6 +89,10 @@ final class FirestoreService: FirestoreServiceInterface {
     func leaveRoom(roomID: String, user: UserUI) async throws {
         let userDomain = UserDomain(id: user.id, name: user.name)
         try await self.client.leaveRoom(roomID: roomID, user: userDomain)
+    }
+    
+    func deleteRoom(withID: String, byuserID userID: String) async throws {
+        try await self.client.deleteRoom(withID: withID, byuserID: userID)
     }
     
     /// Used to get real-time update of user's created rooms

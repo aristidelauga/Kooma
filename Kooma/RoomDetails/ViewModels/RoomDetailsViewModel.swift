@@ -8,6 +8,7 @@ final class RoomDetailsViewModel {
     var myRooms: [RoomUI] = []
     var joinedRooms: [RoomUI] = []
     var currentRoom: RoomUI
+    var roomWasDeleted = false
     
     private var currentRoomObservationTask: Task<Void, Never>?
     
@@ -25,11 +26,14 @@ final class RoomDetailsViewModel {
         
         currentRoomObservationTask = Task {
             do {
-                for try await room in service.roomStream(withID: roomID) {
-                    self.currentRoom = room.toUI()
+                for try await result in service.roomStream(withID: roomID) {
+                    self.currentRoom = result.toUI()
                 }
+                
+                self.roomWasDeleted = true
             } catch {
                 print("Error listening to room \(roomID): \(error)")
+                self.roomWasDeleted = true
             }
         }
     }
@@ -82,6 +86,13 @@ final class RoomDetailsViewModel {
             return
         }
         try await self.service.leaveRoom(roomID: id, user: user)
+    }
+    
+    func deleteRoom(user: UserUI) async throws {
+        guard let id = self.currentRoom.id else {
+            return
+        }
+        try await self.service.deleteRoom(withID: id, byuserID: user.id)
     }
     
     func startListening(forUserID userID: String) {
