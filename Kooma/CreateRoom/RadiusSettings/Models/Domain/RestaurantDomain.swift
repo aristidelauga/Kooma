@@ -6,6 +6,8 @@ struct RestaurantDomain: Identifiable, Sendable, Codable {
     let name: String
     let phoneNumber: String
     let address: String
+    let latitude: Double
+    let longitude: Double
     let url: String
 }
 
@@ -16,6 +18,8 @@ extension RestaurantDomain {
             name: self.name,
             phoneNumber: self.phoneNumber,
             address: self.address,
+            latitude: self.latitude,
+            longitude: self.longitude,
             url: self.url
         )
     }

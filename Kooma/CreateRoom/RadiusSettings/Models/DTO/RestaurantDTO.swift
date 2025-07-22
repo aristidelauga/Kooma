@@ -27,11 +27,15 @@ extension RestaurantDTO: UIModelConvertible {
 	}
 
 	func toUI() throws -> RestaurantUI {
+        let coordinate = CLLocationCoordinate2D(latitude: self.placemark.latitude, longitude: self.placemark.longitude)
+        
 		RestaurantUI(
 			id: self.id,
 			name: self.name,
 			phoneNumber: self.phoneNumber,
 			address: self.createAddress(),
+            latitude: coordinate.latitude,
+            longitude: coordinate.longitude,
 			url: self.url,
 		)
 	}

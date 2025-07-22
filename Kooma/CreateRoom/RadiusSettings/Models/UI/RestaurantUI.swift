@@ -19,13 +19,17 @@ struct RestaurantUI: Identifiable, Equatable, Hashable  {
 	let name: String
 	let phoneNumber: String
 	let address: String
+    let latitude: Double
+    let longitude: Double
 	let url: String
     
-    init(id: String, name: String, phoneNumber: String, address: String, url: String) {
+    init(id: String, name: String, phoneNumber: String, address: String, latitude: Double, longitude: Double, url: String) {
         self.id = id
         self.name = name
         self.phoneNumber = phoneNumber
         self.address = address
+        self.latitude = latitude
+        self.longitude = longitude
         self.url = url
     }
     
@@ -39,7 +43,9 @@ extension RestaurantUI: DomainModelConvertible {
             name: self.name,
             phoneNumber: self.phoneNumber,
             address: self.address,
-            url: self.url,
+            latitude: self.latitude,
+            longitude: self.longitude,
+            url: self.url
         )
     }
 }
