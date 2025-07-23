@@ -37,7 +37,7 @@ struct RoomDetailsView: View {
                         }
                     }
                 }
-                .padding(.bottom, 12)
+                .padding(.bottom, 16)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 TextHeading600(text: "Restaurants")
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -88,6 +88,7 @@ struct RoomDetailsView: View {
                         Spacer()
                         MainButton(text: "Delete Room", maxWidth: 130) {
                             Task {
+                                self.navigationVM.roomDeletionInitiatedFromRoomDetails = true
                                 try await self.roomDetailsVM.deleteRoom(user: self.user)
                             }
                         }
@@ -102,7 +103,7 @@ struct RoomDetailsView: View {
         .toolbar(content: {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
-                    self.navigationVM.goToRoomsListViewFromRoomDetails()
+                    self.navigationVM.showRoomsListView()
                 } label: {
                     Image(systemName: "arrow.left")
                         .resizable()
@@ -121,7 +122,7 @@ struct RoomDetailsView: View {
         })
         .onChange(of: roomDetailsVM.roomWasDeleted, perform: { wasDeleted in
             if wasDeleted {
-                self.navigationVM.goToRoomsListViewFromRoomDetails()
+                self.navigationVM.showRoomsListView()
             }
         })
         .background(

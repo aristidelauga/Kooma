@@ -5,6 +5,7 @@ import SwiftUI
 final class NavigationViewModel {
 	var path = NavigationPath()
     var comingFromRestaurantView = false
+    var roomDeletionInitiatedFromRoomDetails = false
 //    var showRoomsList = false
 
     private func cleanPath() {

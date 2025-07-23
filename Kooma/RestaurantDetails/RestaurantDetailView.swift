@@ -13,12 +13,23 @@ struct RestaurantDetailView: View {
         VStack(alignment: .leading) {
             VStack(alignment: .leading, spacing: 8) {
                 TextHeading600(text: restaurant.name)
-                    .frame(maxWidth: .infinity, alignment: .center)
                 TextBodyLarge(text: restaurant.address)
+                
+                MainButton(text: "Open website", maxWidth: 150) {
+                    self.showWebView = true
+                }
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.vertical, 16)
             }
             
-            TextBodyLarge(text: "Phone Number: \(restaurant.phoneNumber)")
-                .padding(.top, 6)
+            HStack {
+                TextBodyLarge(text: "Phone Number: \(restaurant.phoneNumber)")
+                
+                MainButtonIconOnly(symbol: "phone.fill") {
+                    self.restaurantDetailVM.makeACall(restaurant.phoneNumber)
+                }
+            }
+            .padding(.vertical, 10)
             
             if !names.isEmpty {
                 TextHeading200(text: "Room members who voted for this restaurant:")
@@ -42,8 +53,6 @@ struct RestaurantDetailView: View {
             
             Spacer()
             
-            HStack {
-                Spacer()
                 MainButton(text: "Open in Apple Maps", maxWidth: 200) {
                     Task {
                         do {
@@ -54,14 +63,6 @@ struct RestaurantDetailView: View {
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .center)
-                
-                Spacer()
-                
-                MainButton(text: "Open website", maxWidth: 150) {
-                    self.showWebView = true
-                }
-                Spacer()
-            }
         }
         .padding(.horizontal, 12)
         .frame(maxWidth: .infinity, alignment: .leading)

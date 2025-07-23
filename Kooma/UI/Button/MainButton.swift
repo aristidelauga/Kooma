@@ -23,15 +23,24 @@ struct MainButton: View {
 }
 
 struct MainButtonIconOnly: View {
-    @Binding var image: ImageResource
+    var image: ImageResource?
+    var symbol: String?
     var action: () -> Void
     var body: some View {
         Button {
             action()
         } label: {
-            Image(image)
-                .resizable()
-                .frame(maxWidth: 24, maxHeight: 24)
+            if let image {
+                Image(image)
+                    .resizable()
+                    .frame(maxWidth: 24, maxHeight: 24)
+            } else {
+                Image(systemName: symbol ?? "")
+                    .resizable()
+                    .foregroundStyle(.kmYellow)
+                    .rotationEffect(.degrees(260))
+                    .frame(maxWidth: 24, maxHeight: 24)
+            }
         }
     }
 }
@@ -39,6 +48,6 @@ struct MainButtonIconOnly: View {
 #Preview {
 	VStack {
         MainButton(text: "Continue", maxWidth: 112, action: {})
-        MainButtonIconOnly(image: .constant(.thumbFill), action: {})
+        MainButtonIconOnly(symbol: "phone.fill", action: {})
     }
 }
