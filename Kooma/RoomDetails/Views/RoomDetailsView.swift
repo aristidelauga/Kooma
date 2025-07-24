@@ -50,6 +50,7 @@ struct RoomDetailsView: View {
                         HStack {
                             VStack(alignment: .leading, spacing: 8) {
                                 TextHeading200(text: restaurant.name)
+                                    .multilineTextAlignment(.leading)
                                 let restaurantVotes = self.roomDetailsVM.getVoteCount(withRestaurantID: restaurant.id)
                                 Text("^[\(restaurantVotes) vote](inflect: true)")
                                     .font(.bodyMedium)
@@ -68,7 +69,16 @@ struct RoomDetailsView: View {
                                 Image(self.roomDetailsVM.hasVoted(forRestaurant: restaurant, user: self.user) ? "thumbFill" : "thumbEmpty")
                                     .resizable()
                                     .frame(maxWidth: 24, maxHeight: 24)
+                                    .padding(.trailing, 8)
                             }
+                            
+                            Image(systemName: "chevron.forward")
+                                .resizable()
+                                .bold()
+                                .foregroundStyle(.kmYellow)
+                            
+                                .frame(maxWidth: 14, maxHeight: 18)
+
                         }
                     }
                 }
@@ -88,7 +98,6 @@ struct RoomDetailsView: View {
                         Spacer()
                         MainButton(text: "Delete Room", maxWidth: 130) {
                             Task {
-                                self.navigationVM.roomDeletionInitiatedFromRoomDetails = true
                                 try await self.roomDetailsVM.deleteRoom(user: self.user)
                             }
                         }

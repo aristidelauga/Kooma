@@ -13,7 +13,6 @@ private enum FirestoreConstants {
 
 @MainActor
 protocol FirestoreClientInterface {
-    var database: Firestore { get }
 
     func saveRoom(_ room: RoomDomain) async throws
     func joinRoom(withCode code: String, user: UserDomain) async throws

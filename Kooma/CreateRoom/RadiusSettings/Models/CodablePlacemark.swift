@@ -22,6 +22,26 @@ struct CodablePlacemark: Codable, Sendable {
 		self.thoroughfare = placemark.thoroughfare
 		self.subThoroughfare = placemark.subThoroughfare
 	}
+    
+    init(
+        latitude: CLLocationDegrees,
+        longitude: CLLocationDegrees,
+        name: String,
+        country: String,
+        postalCode: String,
+        locality: String,
+        thoroughfare: String,
+        subThoroughfare: String
+    ) {
+        self.latitude = latitude
+        self.longitude = longitude
+        self.name = name
+        self.country = country
+        self.postalCode = postalCode
+        self.locality = locality
+        self.thoroughfare = thoroughfare
+        self.subThoroughfare = subThoroughfare
+    }
 
 	func toMKPlacemark() -> MKPlacemark {
 		let coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)

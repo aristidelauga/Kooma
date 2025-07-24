@@ -41,7 +41,7 @@ struct YourNextRoomView: View {
             TextHeading600(text: "Join a Room")
                 .padding(.top, 92)
             
-            KMTextfield(text: $roomCode, placeholder: "Enter Room Code")
+            KMTextfield(text: $roomCode, placeholder: "Enter Room Code", joiningTextfield: true)
                 .padding(.vertical, 16)
             
             Button {

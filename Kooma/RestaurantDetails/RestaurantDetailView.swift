@@ -77,7 +77,6 @@ struct RestaurantDetailView: View {
         .toolbar(content: {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
-                    self.navigationVM.comingFromRestaurantView = true
                     self.navigationVM.goToRoomDetailsViewFromRestaurantDetails()
                 } label: {
                     Image(systemName: "arrow.left")

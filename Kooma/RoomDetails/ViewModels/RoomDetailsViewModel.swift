@@ -28,9 +28,7 @@ final class RoomDetailsViewModel {
             do {
                 for try await result in service.roomStream(withID: roomID) {
                     self.currentRoom = result.toUI()
-                }
-                
-                self.roomWasDeleted = true
+                }                
             } catch {
                 print("Error listening to room \(roomID): \(error)")
                 self.roomWasDeleted = true
@@ -93,6 +91,7 @@ final class RoomDetailsViewModel {
             return
         }
         try await self.service.deleteRoom(withID: id, byuserID: user.id)
+        self.roomWasDeleted = true
     }
     
     func getVotersNames(for restaurantID: String) -> [String] {

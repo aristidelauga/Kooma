@@ -1,9 +1,3 @@
-//
-//  KoomaTests.swift
-//  KoomaTests
-//
-//  Created by Aristide LAUGA on 08/06/2025.
-//
 
 import XCTest
 @testable import Kooma

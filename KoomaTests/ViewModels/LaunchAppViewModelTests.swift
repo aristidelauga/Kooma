@@ -1,0 +1,130 @@
+import XCTest
+@testable import Kooma
+
+@MainActor
+final class LaunchAppViewModelTests: XCTestCase {
+    var fakeClient: FakeFirestoreClient!
+    var service: FirestoreService!
+    var viewModel: LaunchAppViewModel!
+
+    override func setUp() {
+        super.setUp()
+        fakeClient = FakeFirestoreClient()
+        service = FirestoreService(client: fakeClient)
+        viewModel = LaunchAppViewModel(service: service)
+    }
+
+    override func tearDown() {
+        service.stopListening()
+        fakeClient.reset()
+        viewModel = nil
+        service = nil
+        fakeClient = nil
+        super.tearDown()
+    }
+
+    func testGetMyRoomsConverted_success() async throws {
+
+        let room1 = FixturesConstants.createSampleRoom(id: "room1", administrator: FixturesConstants.sampleUser1)
+        let room2 = FixturesConstants.createSampleRoom(id: "room2", administrator: FixturesConstants.sampleUser2)
+        fakeClient.addRoom(room1)
+        fakeClient.addRoom(room2)
+        
+        try await viewModel.getMyRoomsConverted(userID: FixturesConstants.sampleUser1.id)
+
+        XCTAssertEqual(viewModel.myRooms.count, 1)
+        let expectedRoom = room1.toUI()
+        XCTAssertEqual(viewModel.myRooms.first?.id, expectedRoom.id)
+        XCTAssertEqual(viewModel.myRooms.first?.administrator.id, expectedRoom.administrator.id)
+    }
+
+    func testGetMyRoomsConverted_empty() async throws {
+
+        try await viewModel.getMyRoomsConverted(userID: FixturesConstants.sampleUser1.id)
+
+        XCTAssertEqual(viewModel.myRooms.count, 0)
+    }
+
+    func testGetMyRoomsConverted_error() async {
+
+        fakeClient.shouldThrowErrorOnGetMyRooms = true
+
+        do {
+            try await viewModel.getMyRoomsConverted(userID: FixturesConstants.sampleUser1.id)
+            XCTFail("Should have thrown an error")
+        } catch {
+            XCTAssertNotNil(error)
+        }
+    }
+
+    func testGetJoinedRoomsConverted_success() async throws {
+
+        let room = FixturesConstants.createSampleRoom()
+        fakeClient.addRoom(room)
+
+        try await viewModel.getJoinedRoomsConverted(userID: FixturesConstants.sampleUser2.id)
+
+        XCTAssertEqual(viewModel.joinedRooms.count, 1)
+        let expectedRoom = room.toUI()
+        XCTAssertEqual(viewModel.joinedRooms.first?.id, expectedRoom.id)
+        XCTAssertEqual(viewModel.joinedRooms.first?.administrator.id, expectedRoom.administrator.id)
+    }
+
+    func testGetJoinedRoomsConverted_empty() async throws {
+
+        try await viewModel.getJoinedRoomsConverted(userID: FixturesConstants.sampleUser1.id)
+
+        XCTAssertEqual(viewModel.joinedRooms.count, 0)
+    }
+
+    func testGetJoinedRoomsConverted_error() async {
+
+        fakeClient.shouldThrowErrorOnGetJoinedRooms = true
+
+        do {
+            try await viewModel.getJoinedRoomsConverted(userID: FixturesConstants.sampleUser1.id)
+            XCTFail("Should have thrown an error")
+        } catch {
+            XCTAssertNotNil(error)
+        }
+    }
+
+    func testStartListening_andEndListening() async throws {
+         let expectation = XCTestExpectation(description: "ViewModel myRooms property updates via listening")
+        viewModel.startListening(forUserID: FixturesConstants.sampleUser1.id)
+        try await Task.sleep(nanoseconds: 100_000_000) // 0.1s
+        XCTAssertEqual(service.myRooms.count, 0)
+        XCTAssertEqual(service.joinedRooms.count, 0)
+        
+        let room = FixturesConstants.createSampleRoom()
+        try await fakeClient.saveRoom(room)
+        try await Task.sleep(nanoseconds: 200_000_000) // 0.2s
+
+        XCTAssertEqual(service.myRooms.count, 1)
+        
+        viewModel.endListening()
+        
+        
+        let room2 = FixturesConstants.createSampleRoom(id: "room2", administrator: FixturesConstants.sampleUser1)
+        try await fakeClient.saveRoom(room2)
+        try await Task.sleep(nanoseconds: 200_000_000)
+        
+        XCTAssertEqual(service.myRooms.count, 1)
+        expectation.fulfill()
+        await fulfillment(of: [expectation], timeout: 1.0)
+    }
+
+    func testStartListening_cancelsPreviousListeners() async throws {
+        
+        viewModel.startListening(forUserID: FixturesConstants.sampleUser1.id)
+        try await Task.sleep(nanoseconds: 100_000_000)
+        
+        viewModel.startListening(forUserID: FixturesConstants.sampleUser1.id)
+        
+        let room = FixturesConstants.createSampleRoom()
+        try await fakeClient.saveRoom(room)
+        try await Task.sleep(nanoseconds: 200_000_000)
+        
+        XCTAssertEqual(service.myRooms.count, 1)
+    }
+}

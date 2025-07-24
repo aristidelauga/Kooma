@@ -47,6 +47,6 @@ extension SearchAddressViewModel: MKLocalSearchCompleterDelegate {
 	}
 
 	nonisolated func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
-//		print(error)
+		print(error)
 	}
 }
