@@ -28,7 +28,8 @@ final class RoomDetailsViewModel {
             do {
                 for try await result in service.roomStream(withID: roomID) {
                     self.currentRoom = result.toUI()
-                }                
+                }
+                self.roomWasDeleted = false
             } catch {
                 print("Error listening to room \(roomID): \(error)")
                 self.roomWasDeleted = true

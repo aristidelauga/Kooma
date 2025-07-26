@@ -57,7 +57,6 @@ struct SearchAddressView: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                 }
             }
-
             .background(Color.kmBeige.edgesIgnoringSafeArea([.bottom, .top]))
 		}
         .navigationBarBackButtonHidden()

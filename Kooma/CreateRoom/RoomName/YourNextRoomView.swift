@@ -72,6 +72,11 @@ struct YourNextRoomView: View {
                 }
             }
         }
+        .background(
+            Color.kmBeige
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .edgesIgnoringSafeArea(.all)
+        )
     }
 }
 

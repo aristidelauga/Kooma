@@ -19,6 +19,7 @@ struct RoomCell: View {
                 Text(.init("**\(self.room.administrator.name)** is the administrator"))
                     .font(.bodyLarge)
                     .foregroundStyle(.kmBlack)
+                    .multilineTextAlignment(.leading)
                     .fixedSize(horizontal: false, vertical: true)
                 
                 Text("^[\(self.room.members.count) member](inflect: true)")

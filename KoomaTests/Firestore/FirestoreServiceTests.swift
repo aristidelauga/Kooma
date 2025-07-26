@@ -32,7 +32,7 @@ final class FirestoreServiceTests: XCTestCase {
         try await service.createRoom(roomUI)
         
         // Then
-        let myRooms = try await fakeClient.getMyRooms(forUserID: FixturesConstants.sampleUser1.id)
+        let myRooms = try await fakeClient.getMyRooms(forUserID: FixturesConstants.sampleUser1Domain.id)
         XCTAssertEqual(myRooms.count, 1)
         XCTAssertEqual(myRooms.first?.name, roomUI.name)
         XCTAssertEqual(myRooms.first?.administrator.id, roomUI.administrator.id)
@@ -47,7 +47,7 @@ final class FirestoreServiceTests: XCTestCase {
         try await service.createRoom(roomUI)
         
         // Then - Should not create room without address
-        let myRooms = try await fakeClient.getMyRooms(forUserID: FixturesConstants.sampleUser1.id)
+        let myRooms = try await fakeClient.getMyRooms(forUserID: FixturesConstants.sampleUser1Domain.id)
         XCTAssertEqual(myRooms.count, 0)
     }
     
@@ -60,7 +60,7 @@ final class FirestoreServiceTests: XCTestCase {
         try await service.createRoom(roomUI)
         
         // Then - Should not create room without image
-        let myRooms = try await fakeClient.getMyRooms(forUserID: FixturesConstants.sampleUser1.id)
+        let myRooms = try await fakeClient.getMyRooms(forUserID: FixturesConstants.sampleUser1Domain.id)
         XCTAssertEqual(myRooms.count, 0)
     }
     
@@ -138,18 +138,18 @@ final class FirestoreServiceTests: XCTestCase {
         try await service.leaveRoom(roomID: room.id!, user: user)
         
         // Then
-        let myRooms = try await fakeClient.getMyRooms(forUserID: FixturesConstants.sampleUser1.id)
+        let myRooms = try await fakeClient.getMyRooms(forUserID: FixturesConstants.sampleUser1Domain.id)
         let updatedRoom = myRooms.first!
         XCTAssertFalse(updatedRoom.members.contains { $0.id == user.id })
     }
     
     func testLeaveRoom_ClientFailure() async {
-        // Given
+
         let room = FixturesConstants.createSampleRoom()
         fakeClient.addRoom(room)
         fakeClient.shouldThrowErrorOnLeaveRoom = true
         
-        // When/Then
+
         do {
             try await service.leaveRoom(roomID: room.id!, user: FixturesConstants.sampleUserUI2)
             XCTFail("Should have thrown an error")
@@ -158,18 +158,17 @@ final class FirestoreServiceTests: XCTestCase {
         }
     }
     
-    // MARK: - deleteRoom Tests
     
     func testDeleteRoom_Success() async throws {
-        // Given
+
         let room = FixturesConstants.createSampleRoom()
         fakeClient.addRoom(room)
         
         // When
-        try await service.deleteRoom(withID: room.id!, byuserID: FixturesConstants.sampleUser1.id)
+        try await service.deleteRoom(withID: room.id!, byuserID: FixturesConstants.sampleUser1Domain.id)
         
         // Then
-        let myRooms = try await fakeClient.getMyRooms(forUserID: FixturesConstants.sampleUser1.id)
+        let myRooms = try await fakeClient.getMyRooms(forUserID: FixturesConstants.sampleUser1Domain.id)
         XCTAssertEqual(myRooms.count, 0)
     }
     
@@ -180,7 +179,7 @@ final class FirestoreServiceTests: XCTestCase {
         
         // When/Then
         do {
-            try await service.deleteRoom(withID: room.id!, byuserID: FixturesConstants.sampleUser2.id)
+            try await service.deleteRoom(withID: room.id!, byuserID: FixturesConstants.sampleUser2Domain.id)
             XCTFail("Should have thrown an error")
         } catch let error as NSError {
             XCTAssertEqual(error.code, 403)
@@ -191,13 +190,13 @@ final class FirestoreServiceTests: XCTestCase {
     
     func testFetchMyRooms_Success() async throws {
         // Given
-        let room1 = FixturesConstants.createSampleRoom(id: "room1", administrator: FixturesConstants.sampleUser1)
-        let room2 = FixturesConstants.createSampleRoom(id: "room2", administrator: FixturesConstants.sampleUser2)
+        let room1 = FixturesConstants.createSampleRoom(id: "room1", administrator: FixturesConstants.sampleUser1Domain)
+        let room2 = FixturesConstants.createSampleRoom(id: "room2", administrator: FixturesConstants.sampleUser2Domain)
         fakeClient.addRoom(room1)
         fakeClient.addRoom(room2)
         
         // When
-        try await service.fetchMyRooms(withUserID: FixturesConstants.sampleUser1.id)
+        try await service.fetchMyRooms(withUserID: FixturesConstants.sampleUser1Domain.id)
         
         // Then
         XCTAssertEqual(service.myRooms.count, 1)
@@ -206,7 +205,7 @@ final class FirestoreServiceTests: XCTestCase {
     
     func testFetchMyRooms_Empty() async throws {
         // When
-        try await service.fetchMyRooms(withUserID: FixturesConstants.sampleUser1.id)
+        try await service.fetchMyRooms(withUserID: FixturesConstants.sampleUser1Domain.id)
         
         // Then
         XCTAssertEqual(service.myRooms.count, 0)
@@ -218,7 +217,7 @@ final class FirestoreServiceTests: XCTestCase {
         
         // When/Then
         do {
-            try await service.fetchMyRooms(withUserID: FixturesConstants.sampleUser1.id)
+            try await service.fetchMyRooms(withUserID: FixturesConstants.sampleUser1Domain.id)
             XCTFail("Should have thrown an error")
         } catch {
             XCTAssertNotNil(error)
@@ -233,7 +232,7 @@ final class FirestoreServiceTests: XCTestCase {
         fakeClient.addRoom(room)
         
         // When
-        try await service.fetchJoinedRooms(withUserID: FixturesConstants.sampleUser2.id)
+        try await service.fetchJoinedRooms(withUserID: FixturesConstants.sampleUser2Domain.id)
         
         // Then
         XCTAssertEqual(service.joinedRooms.count, 1)
@@ -242,7 +241,7 @@ final class FirestoreServiceTests: XCTestCase {
     
     func testFetchJoinedRooms_Empty() async throws {
         // When
-        try await service.fetchJoinedRooms(withUserID: FixturesConstants.sampleUser1.id)
+        try await service.fetchJoinedRooms(withUserID: FixturesConstants.sampleUser1Domain.id)
         
         // Then
         XCTAssertEqual(service.joinedRooms.count, 0)
@@ -254,10 +253,10 @@ final class FirestoreServiceTests: XCTestCase {
         // Given
         let room = FixturesConstants.createSampleRoom()
         fakeClient.addRoom(room)
-        try await service.fetchMyRooms(withUserID: FixturesConstants.sampleUser1.id)
+        try await service.fetchMyRooms(withUserID: FixturesConstants.sampleUser1Domain.id)
         
         // When
-        let foundRoom = try await service.getRoomByID(room.id!, userID: FixturesConstants.sampleUser1.id)
+        let foundRoom = try await service.getRoomByID(room.id!, userID: FixturesConstants.sampleUser1Domain.id)
         
         // Then
         XCTAssertNotNil(foundRoom)
@@ -268,10 +267,10 @@ final class FirestoreServiceTests: XCTestCase {
         // Given
         let room = FixturesConstants.createSampleRoom()
         fakeClient.addRoom(room)
-        try await service.fetchJoinedRooms(withUserID: FixturesConstants.sampleUser2.id)
+        try await service.fetchJoinedRooms(withUserID: FixturesConstants.sampleUser2Domain.id)
         
         // When
-        let foundRoom = try await service.getRoomByID(room.id!, userID: FixturesConstants.sampleUser2.id)
+        let foundRoom = try await service.getRoomByID(room.id!, userID: FixturesConstants.sampleUser2Domain.id)
         
         // Then
         XCTAssertNotNil(foundRoom)
@@ -280,7 +279,7 @@ final class FirestoreServiceTests: XCTestCase {
     
     func testGetRoomByID_NotFound() async throws {
         // When
-        let foundRoom = try await service.getRoomByID("nonexistent", userID: FixturesConstants.sampleUser1.id)
+        let foundRoom = try await service.getRoomByID("nonexistent", userID: FixturesConstants.sampleUser1Domain.id)
         
         // Then
         XCTAssertNil(foundRoom)
@@ -297,13 +296,13 @@ final class FirestoreServiceTests: XCTestCase {
         try await service.addVote(
             forRoomID: room.id!,
             restaurantID: "restaurant2",
-            userID: FixturesConstants.sampleUser1.id
+            userID: FixturesConstants.sampleUser1Domain.id
         )
         
         // Then
-        let myRooms = try await fakeClient.getMyRooms(forUserID: FixturesConstants.sampleUser1.id)
+        let myRooms = try await fakeClient.getMyRooms(forUserID: FixturesConstants.sampleUser1Domain.id)
         let updatedRoom = myRooms.first!
-        XCTAssertTrue(updatedRoom.votes["restaurant2"]?.contains(FixturesConstants.sampleUser1.id) == true)
+        XCTAssertTrue(updatedRoom.votes["restaurant2"]?.contains(FixturesConstants.sampleUser1Domain.id) == true)
     }
     
     func testRemoveVote_Success() async throws {
@@ -315,13 +314,13 @@ final class FirestoreServiceTests: XCTestCase {
         try await service.removeVote(
             forRoomID: room.id!,
             restaurantID: "restaurant1",
-            userID: FixturesConstants.sampleUser1.id
+            userID: FixturesConstants.sampleUser1Domain.id
         )
         
         // Then
-        let myRooms = try await fakeClient.getMyRooms(forUserID: FixturesConstants.sampleUser1.id)
+        let myRooms = try await fakeClient.getMyRooms(forUserID: FixturesConstants.sampleUser1Domain.id)
         let updatedRoom = myRooms.first!
-        XCTAssertFalse(updatedRoom.votes["restaurant1"]?.contains(FixturesConstants.sampleUser1.id) == true)
+        XCTAssertFalse(updatedRoom.votes["restaurant1"]?.contains(FixturesConstants.sampleUser1Domain.id) == true)
     }
     
     func testAddVote_ClientFailure() async {
@@ -336,7 +335,7 @@ final class FirestoreServiceTests: XCTestCase {
                 forRoomID: room.id ?? ""
 ,
                 restaurantID: "restaurant1",
-                userID: FixturesConstants.sampleUser1.id
+                userID: FixturesConstants.sampleUser1Domain.id
             )
             XCTFail("Should have thrown an error")
         } catch {
@@ -352,7 +351,7 @@ final class FirestoreServiceTests: XCTestCase {
         var receivedRooms: [[RoomDomain]] = []
         
         // When
-        let stream = service.myRoomsStream(forUserID: FixturesConstants.sampleUser1.id)
+        let stream = service.myRoomsStream(forUserID: FixturesConstants.sampleUser1Domain.id)
         
         Task {
             do {
@@ -390,7 +389,7 @@ final class FirestoreServiceTests: XCTestCase {
         var receivedRooms: [[RoomDomain]] = []
         
         // When
-        let stream = service.joinedRoomsStream(forUserID: FixturesConstants.sampleUser2.id)
+        let stream = service.joinedRoomsStream(forUserID: FixturesConstants.sampleUser2Domain.id)
         
         Task {
             do {
@@ -411,7 +410,7 @@ final class FirestoreServiceTests: XCTestCase {
             Task {
                 let room = FixturesConstants.createSampleRoom()
                 self.fakeClient.addRoom(room)
-                self.fakeClient.notifyJoinedRoomsListeners(for: FixturesConstants.sampleUser2.id)
+                self.fakeClient.notifyJoinedRoomsListeners(for: FixturesConstants.sampleUser2Domain.id)
             }
         }
         
@@ -454,7 +453,7 @@ final class FirestoreServiceTests: XCTestCase {
                 try await self.service.addVote(
                     forRoomID: room.id!,
                     restaurantID: "restaurant2",
-                    userID: FixturesConstants.sampleUser1.id
+                    userID: FixturesConstants.sampleUser2Domain.id
                 )
             }
         }
@@ -474,7 +473,7 @@ final class FirestoreServiceTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Service myRooms property updates")
         
         // When
-        service.startListening(forUserID: FixturesConstants.sampleUser1.id)
+        service.startListening(forUserID: FixturesConstants.sampleUser1Domain.id)
         
         // Wait a bit for the initial empty state
         try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
@@ -495,35 +494,9 @@ final class FirestoreServiceTests: XCTestCase {
         await fulfillment(of: [expectation], timeout: 1.0)
     }
     
-//    func testStartListening_UpdatesJoinedRooms() async throws {
-//        // Given
-//        let expectation = XCTestExpectation(description: "Service joinedRooms property updates")
-//        
-//        // When
-//        service.startListening(forUserID: FixturesConstants.sampleUser2.id)
-//        
-//        // Wait a bit for the initial empty state
-//        try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
-//        XCTAssertEqual(service.joinedRooms.count, 0)
-//        
-//        // Add a room where user2 is a regular member
-//        let room = FixturesConstants.createSampleRoom()
-//        fakeClient.addRoom(room)
-//        
-//        // Wait for the update
-//        try await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds
-//        
-//        // Then
-//        XCTAssertEqual(service.joinedRooms.count, 1)
-//        XCTAssertEqual(service.joinedRooms.first?.id, room.id)
-//        
-//        expectation.fulfill()
-//        await fulfillment(of: [expectation], timeout: 1.0)
-//    }
-    
     func testStopListening() async throws {
         // Given
-        service.startListening(forUserID: FixturesConstants.sampleUser1.id)
+        service.startListening(forUserID: FixturesConstants.sampleUser2Domain.id)
         try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
         
         // When
@@ -541,11 +514,11 @@ final class FirestoreServiceTests: XCTestCase {
     
     func testStartListening_CancelsPreviousListeners() async throws {
         // Given
-        service.startListening(forUserID: FixturesConstants.sampleUser1.id)
+        service.startListening(forUserID: FixturesConstants.sampleUser1Domain.id)
         try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
         
         // When - Start listening again (should cancel previous)
-        service.startListening(forUserID: FixturesConstants.sampleUser1.id)
+        service.startListening(forUserID: FixturesConstants.sampleUser1Domain.id)
         
         // Add a room
         let room = FixturesConstants.createSampleRoom()

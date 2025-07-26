@@ -22,6 +22,7 @@ struct KoomaApp: App {
                 VStack {
                     if self.isLoading {
                         LaunchScreenView()
+                            
                             .onAppear {
                                 self.launchAppVM = LaunchAppViewModel(service: self.service)
                             }
@@ -65,7 +66,6 @@ struct KoomaApp: App {
                                 service: self.service,
                                 navigation: self.navigationVM
                             )
-//                            .navigationBarBackButtonHidden()
                         }
                     case .restaurantDetail(let names, let restaurant):
                         RestaurantDetailView(navigationVM: self.navigationVM, restaurant: restaurant, names: names)

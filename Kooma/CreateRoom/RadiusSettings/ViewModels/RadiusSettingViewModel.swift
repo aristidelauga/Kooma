@@ -33,7 +33,9 @@ import Foundation
 		do {
 			let coordinate = try await self.restaurantAPI.getCoordinate(from: address)
 			region.center = coordinate
-			guard let items = try await self.restaurantAPI.searchNearbyRestaurants(at: coordinate, radiusInMeters: radius * 1000) else { return }
+			guard let items = try await self.restaurantAPI.searchNearbyRestaurants(at: coordinate, radiusInMeters: radius * 1000) else {
+                return
+            }
 			let itemsUI = try items.compactMap { try $0.toUI() }
 			self.room.restaurants = itemsUI
 		} catch {

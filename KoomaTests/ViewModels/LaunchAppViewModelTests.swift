@@ -25,12 +25,12 @@ final class LaunchAppViewModelTests: XCTestCase {
 
     func testGetMyRoomsConverted_success() async throws {
 
-        let room1 = FixturesConstants.createSampleRoom(id: "room1", administrator: FixturesConstants.sampleUser1)
-        let room2 = FixturesConstants.createSampleRoom(id: "room2", administrator: FixturesConstants.sampleUser2)
+        let room1 = FixturesConstants.createSampleRoom(id: "room1", administrator: FixturesConstants.sampleUser1Domain)
+        let room2 = FixturesConstants.createSampleRoom(id: "room2", administrator: FixturesConstants.sampleUser2Domain)
         fakeClient.addRoom(room1)
         fakeClient.addRoom(room2)
         
-        try await viewModel.getMyRoomsConverted(userID: FixturesConstants.sampleUser1.id)
+        try await viewModel.getMyRoomsConverted(userID: FixturesConstants.sampleUser1Domain.id)
 
         XCTAssertEqual(viewModel.myRooms.count, 1)
         let expectedRoom = room1.toUI()
@@ -40,7 +40,7 @@ final class LaunchAppViewModelTests: XCTestCase {
 
     func testGetMyRoomsConverted_empty() async throws {
 
-        try await viewModel.getMyRoomsConverted(userID: FixturesConstants.sampleUser1.id)
+        try await viewModel.getMyRoomsConverted(userID: FixturesConstants.sampleUser1Domain.id)
 
         XCTAssertEqual(viewModel.myRooms.count, 0)
     }
@@ -50,7 +50,7 @@ final class LaunchAppViewModelTests: XCTestCase {
         fakeClient.shouldThrowErrorOnGetMyRooms = true
 
         do {
-            try await viewModel.getMyRoomsConverted(userID: FixturesConstants.sampleUser1.id)
+            try await viewModel.getMyRoomsConverted(userID: FixturesConstants.sampleUser1Domain.id)
             XCTFail("Should have thrown an error")
         } catch {
             XCTAssertNotNil(error)
@@ -62,7 +62,7 @@ final class LaunchAppViewModelTests: XCTestCase {
         let room = FixturesConstants.createSampleRoom()
         fakeClient.addRoom(room)
 
-        try await viewModel.getJoinedRoomsConverted(userID: FixturesConstants.sampleUser2.id)
+        try await viewModel.getJoinedRoomsConverted(userID: FixturesConstants.sampleUser2Domain.id)
 
         XCTAssertEqual(viewModel.joinedRooms.count, 1)
         let expectedRoom = room.toUI()
@@ -72,7 +72,7 @@ final class LaunchAppViewModelTests: XCTestCase {
 
     func testGetJoinedRoomsConverted_empty() async throws {
 
-        try await viewModel.getJoinedRoomsConverted(userID: FixturesConstants.sampleUser1.id)
+        try await viewModel.getJoinedRoomsConverted(userID: FixturesConstants.sampleUser1Domain.id)
 
         XCTAssertEqual(viewModel.joinedRooms.count, 0)
     }
@@ -82,7 +82,7 @@ final class LaunchAppViewModelTests: XCTestCase {
         fakeClient.shouldThrowErrorOnGetJoinedRooms = true
 
         do {
-            try await viewModel.getJoinedRoomsConverted(userID: FixturesConstants.sampleUser1.id)
+            try await viewModel.getJoinedRoomsConverted(userID: FixturesConstants.sampleUser1Domain.id)
             XCTFail("Should have thrown an error")
         } catch {
             XCTAssertNotNil(error)
@@ -91,7 +91,7 @@ final class LaunchAppViewModelTests: XCTestCase {
 
     func testStartListening_andEndListening() async throws {
          let expectation = XCTestExpectation(description: "ViewModel myRooms property updates via listening")
-        viewModel.startListening(forUserID: FixturesConstants.sampleUser1.id)
+        viewModel.startListening(forUserID: FixturesConstants.sampleUser1Domain.id)
         try await Task.sleep(nanoseconds: 100_000_000) // 0.1s
         XCTAssertEqual(service.myRooms.count, 0)
         XCTAssertEqual(service.joinedRooms.count, 0)
@@ -105,7 +105,7 @@ final class LaunchAppViewModelTests: XCTestCase {
         viewModel.endListening()
         
         
-        let room2 = FixturesConstants.createSampleRoom(id: "room2", administrator: FixturesConstants.sampleUser1)
+        let room2 = FixturesConstants.createSampleRoom(id: "room2", administrator: FixturesConstants.sampleUser1Domain)
         try await fakeClient.saveRoom(room2)
         try await Task.sleep(nanoseconds: 200_000_000)
         
@@ -116,10 +116,10 @@ final class LaunchAppViewModelTests: XCTestCase {
 
     func testStartListening_cancelsPreviousListeners() async throws {
         
-        viewModel.startListening(forUserID: FixturesConstants.sampleUser1.id)
+        viewModel.startListening(forUserID: FixturesConstants.sampleUser1Domain.id)
         try await Task.sleep(nanoseconds: 100_000_000)
         
-        viewModel.startListening(forUserID: FixturesConstants.sampleUser1.id)
+        viewModel.startListening(forUserID: FixturesConstants.sampleUser1Domain.id)
         
         let room = FixturesConstants.createSampleRoom()
         try await fakeClient.saveRoom(room)

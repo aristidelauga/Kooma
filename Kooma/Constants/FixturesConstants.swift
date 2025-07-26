@@ -3,9 +3,23 @@ import SwiftUI
 import MapKit
 
 final class FixturesConstants {
-    static let sampleUser1 = UserDomain(id: "user1", name: "Alice")
-    static let sampleUser2 = UserDomain(id: "user2", name: "Bob")
-    static let sampleUser3 = UserDomain(id: "user3", name: "Charlie")
+    static let sampleUser1Domain = UserDomain(id: "user1", name: "Alice")
+    static let sampleUser2Domain = UserDomain(id: "user2", name: "Bob")
+    static let sampleUser3Domain = UserDomain(id: "user3", name: "Charlie")
+    
+    static let parisPlacemark: CodablePlacemark = {
+        let coordinate = CLLocationCoordinate2D(latitude: 48.8584, longitude: 2.2945) // Eiffel Tower
+        let address: [String: Any] = [
+            "Name": "Tour Eiffel",
+            "Country": "France",
+            "ZIP": "75007",
+            "City": "Paris",
+            "Street": "Champ de Mars",
+            "SubThoroughfare": "5"
+        ]
+        let mkPlacemark = MKPlacemark(coordinate: coordinate, addressDictionary: address)
+        return CodablePlacemark(from: mkPlacemark)
+    }()
     
     static let samplePlacemark = CodablePlacemark(
         latitude: 48.8566,
@@ -40,9 +54,9 @@ final class FixturesConstants {
         id: String = "room1",
         code: String = "ABC123",
         name: String? = "Test Room",
-        administrator: UserDomain = sampleUser1,
+        administrator: UserDomain = sampleUser1Domain,
         address: String = "Paris, France",
-        members: [UserDomain] = [sampleUser1, sampleUser2],
+        members: [UserDomain] = [sampleUser1Domain, sampleUser2Domain],
         regularMembersID: [String] = ["user2"],
         restaurants: [RestaurantDomain] = [sampleRestaurant1],
         votes: [String: [String]] = ["restaurant1": ["user1", "user2"]],
@@ -67,9 +81,9 @@ final class FixturesConstants {
         id: String? = nil,
         code: String = "ABC123",
         name: String? = "Test Room",
-        administrator: UserDomain = sampleUser1,
+        administrator: UserDomain = sampleUser1Domain,
         address: String = "Paris, France",
-        members: [UserDomain] = [sampleUser1, sampleUser2],
+        members: [UserDomain] = [sampleUser1Domain, sampleUser1Domain],
         regularMembersID: [String] = ["user2"],
         restaurants: [RestaurantDomain] = [sampleRestaurant1],
         votes: [String: [String]] = ["restaurant1": ["user1", "user2"]],
@@ -95,6 +109,7 @@ extension FixturesConstants {
     static let sampleUserUI1 = UserUI(id: "user1", name: "Alice")
     static let sampleUserUI2 = UserUI(id: "user2", name: "Bob")
     static let sampleUserUI3 = UserUI(id: "user3", name: "Charlie")
+    static let sampleAddress = "20 Avenue des Champs, 75008 Paris, France"
     
     static let sampleRestaurantUI1 = RestaurantUI(
         id: "restaurant1",
@@ -163,4 +178,12 @@ extension FixturesConstants {
             image: image ?? "RoomOne"
         )
     }
+    
+    static func createSampleRoomUIWithNoRestaurants(
+        id: String? = nil,
+        name: String? = nil,
+        administrator: UserUI = sampleUserUI1,
+    ) -> RoomUI {
+            RoomUI(administrator: administrator)
+        }
 }

@@ -8,7 +8,6 @@ import CoreLocation
 protocol GetRestaurantInterface {
     func getCoordinate(from address: String) async throws -> CLLocationCoordinate2D
     func searchNearbyRestaurants(at coordinate: CLLocationCoordinate2D, radiusInMeters: Double) async throws -> [RestaurantDTO]?
-    func searchMapItem(for restaurant: RestaurantUI) async -> MKMapItem?
 }
 
 final class GetRestaurantService: GetRestaurantInterface {
@@ -24,31 +23,6 @@ final class GetRestaurantService: GetRestaurantInterface {
 			}
 		}
 	}
-    
-    func searchMapItem(for restaurant: RestaurantUI) async -> MKMapItem? {
-        let request = MKLocalSearch.Request()
-        request.naturalLanguageQuery = restaurant.name
-        request.region = MKCoordinateRegion(
-            center: CLLocationCoordinate2D(latitude: restaurant.placemark.latitude,
-                                           longitude: restaurant.placemark.longitude),
-            latitudinalMeters: 500,
-            longitudinalMeters: 500
-        )
-
-        let search = MKLocalSearch(request: request)
-
-        do {
-            let response = try await search.start()
-            if let mapItem = response.mapItems.first {
-               
-                return mapItem
-            }
-        } catch {
-            print("Error searching map item: \(error)")
-        }
-
-        return nil
-    }
 
 	func searchNearbyRestaurants(
 		at coordinate: CLLocationCoordinate2D,

@@ -8,7 +8,7 @@ import MapKit
 	var searchableText = ""
 	var room: RoomUI?
 
-	private var localSearchCompleter: MKLocalSearchCompleter
+	var localSearchCompleter: MKLocalSearchCompleter
 
 	override init() {
 		self.localSearchCompleter = MKLocalSearchCompleter()
@@ -16,11 +16,16 @@ import MapKit
 		self.localSearchCompleter.delegate = self
 	}
 
-	init(room: RoomUI) {
+	init(room: RoomUI, localSearchCompleter: MKLocalSearchCompleter = MKLocalSearchCompleter()) {
 		self.room = room
-		self.localSearchCompleter = MKLocalSearchCompleter()
+		self.localSearchCompleter = localSearchCompleter
 		super.init()
 		self.localSearchCompleter.delegate = self
+	}
+
+	convenience init(localSearchCompleter: MKLocalSearchCompleter) {
+		self.init(room: RoomUI(id: nil, name: nil, administrator: UserUI(id: "", name: "")), localSearchCompleter: localSearchCompleter)
+		self.room = nil
 	}
 
 	func searchAddress(_ searchableText: String) {

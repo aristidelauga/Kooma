@@ -15,7 +15,28 @@ final class RestaurantDetailViewModel {
     }
     
     func searchMapItem(for restaurant: RestaurantUI) async -> MKMapItem? {
-        await restaurantService.searchMapItem(for: restaurant)
+        let request = MKLocalSearch.Request()
+        request.naturalLanguageQuery = restaurant.name
+        request.region = MKCoordinateRegion(
+            center: CLLocationCoordinate2D(latitude: restaurant.placemark.latitude,
+                                           longitude: restaurant.placemark.longitude),
+            latitudinalMeters: 500,
+            longitudinalMeters: 500
+        )
+
+        let search = MKLocalSearch(request: request)
+
+        do {
+            let response = try await search.start()
+            if let mapItem = response.mapItems.first {
+               
+                return mapItem
+            }
+        } catch {
+            print("Error searching map item: \(error)")
+        }
+
+        return nil
     }
     
     func makeACall(_ string: String) {
