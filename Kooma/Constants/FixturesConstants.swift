@@ -129,6 +129,24 @@ extension FixturesConstants {
         url: "https://example.com/restaurant2"
     )
     
+    static let invalidRestaurant = RestaurantUI(
+        id: "invalid",
+        name: "Invalid Restaurant Name That Should Not Exist",
+        phoneNumber: "+33123456789",
+        address: "Invalid Address",
+        placemark: CodablePlacemark(
+            latitude: 0.0,
+            longitude: 0.0,
+            name: "Invalid",
+            country: "Invalid",
+            postalCode: "00000",
+            locality: "Invalid",
+            thoroughfare: "Invalid",
+            subThoroughfare: "0"
+        ),
+        url: "https://invalid.com"
+    )
+    
     static func createSampleRoomUI(
         id: String? = "id1",
         name: String? = "Test Room",
