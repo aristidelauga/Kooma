@@ -49,12 +49,13 @@ struct KoomaApp: App {
                         SearchAddressView(room: room, service: service, navigationVM: self.navigationVM)
                     case .radiusSettingView(let room):
                         RadiusSettingView(room: room, service: self.service, navigationVM: self.navigationVM)
-                    case .RoomSearch(code: let code):
+                    case .RoomSearch(code: let code, hasRooms: let hasRooms):
                         ResearchRoomView(
                             service: self.service,
                             code: code,
                             userManager: self.userManager,
-                            navigationVM: self.navigationVM
+                            navigationVM: self.navigationVM,
+                            hasRooms: hasRooms
                         )
                     case AppRoute.roomsList:
                         RoomsListView(service: self.service)

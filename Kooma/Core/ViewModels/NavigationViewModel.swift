@@ -47,8 +47,8 @@ final class NavigationViewModel {
         self.path.append(AppRoute.radiusSettingView(room: room))
     }
     
-    func goToResearchRoomView(withRoomCode code: String) {
-        self.path.append(AppRoute.RoomSearch(code: code))
+    func goToResearchRoomView(withRoomCode code: String, and hasRooms: Bool) {
+        self.path.append(AppRoute.RoomSearch(code: code, hasRooms: hasRooms))
     }
     
     func goToRoomDetailsView(withRoom room: RoomUI) {

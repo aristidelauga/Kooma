@@ -4,28 +4,22 @@ import SwiftUI
 struct ResearchRoomView: View {
 	@State private var isLoading: Bool = false
     @State private var viewModel: ResearchRoomViewModel
+    @State private var popupError: Error?
     var service: FirestoreService
     var userManager: UserManager
-    var navigatioNVM: NavigationViewModel
+    var navigationVM: NavigationViewModel
     var code: String
-    @State private var popupError: Error?
-    init(service: FirestoreService, code: String, userManager: UserManager, navigationVM: NavigationViewModel) {
+    var hasRooms: Bool
+    init(service: FirestoreService, code: String, userManager: UserManager, navigationVM: NavigationViewModel, hasRooms: Bool) {
         self.service = service
         self.code = code
         self.userManager = userManager
-        self.navigatioNVM = navigationVM
+        self.navigationVM = navigationVM
+        self.hasRooms = hasRooms
         _viewModel = State(wrappedValue: ResearchRoomViewModel(service: service))
     }
     var body: some View {
 		ZStack {
-            if let error = self.popupError {
-                Color.black
-                    .edgesIgnoringSafeArea(.all)
-                PopupError(error: error as! JoinRoomError) {
-                    popupError = nil
-                    self.navigatioNVM.showRoomsListView()
-                }
-            }
             VStack {
                 Spacer()
                 HStack {
@@ -36,7 +30,7 @@ struct ResearchRoomView: View {
                 Spacer()
 
                 MainButton(text: "Cancel") {
-                    self.navigatioNVM.showRoomsListView()
+                    self.navigationVM.goToYourNextRoomView(hasRooms: hasRooms)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -51,19 +45,21 @@ struct ResearchRoomView: View {
                         try await self.viewModel.fetchJoinedRooms(userID: user.id)
                         do {
                             try await self.viewModel.joinRoom(code: self.code, user: user)
+                            navigationVM.showRoomsListView()
                         } catch {
                             self.popupError = error
                         }
-                        navigatioNVM.showRoomsListView()
                     }
+                }
+            }
+            if let error = self.popupError {
+                Color.black.opacity(0.3)
+                    .edgesIgnoringSafeArea(.all)
+                PopupError(error: error as! JoinRoomError) {
+                    popupError = nil
+                    self.navigationVM.goToYourNextRoomView(hasRooms: hasRooms)
                 }
             }
         }
     }
 }
-
-//#Preview {
-//    ResearchRoomView(service: FirestoreService(), code: "EXPD33", userManager: UserManager())
-//}
-
-

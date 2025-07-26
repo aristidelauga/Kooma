@@ -45,7 +45,9 @@ struct YourNextRoomView: View {
                 .padding(.vertical, 16)
             
             Button {
-                self.navigationVM.goToResearchRoomView(withRoomCode: self.roomCode)
+                if let hasRooms = hasRooms {
+                    self.navigationVM.goToResearchRoomView(withRoomCode: self.roomCode, and: hasRooms)
+                }
             } label: {
                 NavigationButton(text: "Join Room")
                     .frame(maxWidth: .infinity, alignment: .trailing)
@@ -77,6 +79,9 @@ struct YourNextRoomView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .edgesIgnoringSafeArea(.all)
         )
+        .onAppear {
+            print("self.navigationVM.path.count: \(self.navigationVM.path.count)")
+        }
     }
 }
 

@@ -16,20 +16,18 @@ final class ResearchRoomViewModel {
     }
     
     func joinRoom(code: String, user: UserUI) async throws {
-        guard joinedRooms.contains(where: { $0.code == code }) == false else {
+        guard !joinedRooms.contains(where: { $0.code == code }) else {
             throw JoinRoomError.alreadyJoined
         }
-         do {
+        do {
             try await self.service.joinRoom(withCode: code, user: user)
-         } catch {
-             throw JoinRoomError.unableToFindRoom
-         }
+        } catch {
+            throw JoinRoomError.unableToFindRoom
+        }
     }
     
     func fetchJoinedRooms(userID: String) async throws {
-        Task {
-            getJoinedRoomsConverted()
-            try await self.service.fetchJoinedRooms(withUserID: userID)
-        }
+        try await self.service.fetchJoinedRooms(withUserID: userID)
+        self.getJoinedRoomsConverted()
     }
 }
