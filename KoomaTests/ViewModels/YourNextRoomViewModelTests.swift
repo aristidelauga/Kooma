@@ -27,6 +27,7 @@ final class YourNextRoomViewModelTests: XCTestCase {
     
     func test_createRoomWithName_success() {
         let owner = FixturesConstants.sampleUserUI1
+        viewModel.name = "Tester"
         viewModel.createRoomWithName(with: owner)
         
         guard let room = viewModel.room else {
@@ -36,7 +37,13 @@ final class YourNextRoomViewModelTests: XCTestCase {
         
         XCTAssertEqual(room.administrator, owner)
         XCTAssertEqual(room.members.first, owner)
-        
+    }
+    
+    func test_createRoomWithName_whenNameIsEmpty_doesNotCreateRoom() {
+        viewModel.name = ""
+        let owner = FixturesConstants.sampleUserUI1
+        viewModel.createRoomWithName(with: owner)
+        XCTAssertNil(viewModel.room)
     }
     
 }

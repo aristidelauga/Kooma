@@ -12,6 +12,9 @@ import Foundation
 	}
 
 	func createRoomWithName(with owner: UserUI)  {
+        guard !self.name.isEmpty else {
+            return
+        }
 		self.room = RoomUI(name: self.name, administrator: owner)
 	}
 }

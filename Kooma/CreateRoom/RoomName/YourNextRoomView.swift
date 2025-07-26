@@ -3,7 +3,8 @@ import SwiftUI
 
 struct YourNextRoomView: View {
     @State private var roomCode = ""
-    
+    @State private var createRoomPlaceholder =  "Name your room"
+    @State private var joinRoomPlaceholder =  "Enter a room code"
     // MARK: ViewModels
     @State private var yourNextRoomVM: YourNextRoomViewModel
     @Environment(NavigationViewModel.self) private var navigationVM
@@ -23,36 +24,42 @@ struct YourNextRoomView: View {
             // MARK: - Create a Room
             TextHeading600(text: "Create a Room")
                 .padding(.top, 25)
-            KMTextfield(text: $yourNextRoomVM.name, placeholder: "Name your room")
+            KMTextfield(text: $yourNextRoomVM.name, placeholder: createRoomPlaceholder)
                 .padding(.vertical, 16)
             
             VStack {
                 MainButton(text: "Create Room", maxWidth: 140) {
+                    if self.yourNextRoomVM.name.isEmpty {
+                        createRoomPlaceholder = "You must enter a name for your room"
+                    }
                     self.yourNextRoomVM.createRoomWithName(with: self.yourNextRoomVM.user)
                     if let room = self.yourNextRoomVM.room {
                         self.navigationVM.goToSearchAddressView(withRoom: room)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .trailing)
-                .disabled(yourNextRoomVM.name.isEmpty)
             }
             
             // MARK: - Join a Room
             TextHeading600(text: "Join a Room")
                 .padding(.top, 92)
             
-            KMTextfield(text: $roomCode, placeholder: "Enter Room Code", joiningTextfield: true)
+            KMTextfield(text: $roomCode, placeholder: joinRoomPlaceholder, joiningTextfield: true)
                 .padding(.vertical, 16)
             
             Button {
-                if let hasRooms = hasRooms {
-                    self.navigationVM.goToResearchRoomView(withRoomCode: self.roomCode, and: hasRooms)
+                if !self.roomCode.isEmpty {
+                    if let hasRooms = hasRooms {
+                        self.navigationVM.goToResearchRoomView(withRoomCode: self.roomCode, and: hasRooms)
+                    }
+                } else {
+                    self.joinRoomPlaceholder = "You must enter a room code"
                 }
+                
             } label: {
                 NavigationButton(text: "Join Room")
                     .frame(maxWidth: .infinity, alignment: .trailing)
             }
-            .disabled(self.roomCode.isEmpty)
             Spacer()
         }
         .padding(.horizontal, 16)
