@@ -42,8 +42,9 @@ struct ResearchRoomView: View {
             .onAppear {
                 Task {
                     if let user = self.userManager.currentUser {
-                        try await self.viewModel.fetchJoinedRooms(userID: user.id)
                         do {
+                            try await self.viewModel.fetchJoinedRooms(userID: user.id)
+                            try await self.viewModel.fetchMyRooms(userID: user.id)
                             try await self.viewModel.joinRoom(code: self.code, user: user)
                             navigationVM.showRoomsListView()
                         } catch {

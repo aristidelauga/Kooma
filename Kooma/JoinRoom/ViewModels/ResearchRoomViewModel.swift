@@ -6,6 +6,7 @@ final class ResearchRoomViewModel {
     private let service: any FirestoreServiceInterface
     
     var joinedRooms = [RoomUI]()
+    var myRooms = [RoomUI]()
     
     init(service: any FirestoreServiceInterface = FirestoreService()) {
         self.service = service
@@ -15,8 +16,12 @@ final class ResearchRoomViewModel {
         self.joinedRooms = self.service.joinedRooms.map { $0.toUI() }
     }
     
+    private func getMyRoomsConverted() {
+        self.myRooms = self.service.myRooms.map { $0.toUI() }
+    }
+    
     func joinRoom(code: String, user: UserUI) async throws {
-        guard !joinedRooms.contains(where: { $0.code == code }) else {
+        guard !joinedRooms.contains(where: { $0.code == code }), !myRooms.contains(where: {$0.hostID == user.id }) else {
             throw JoinRoomError.alreadyJoined
         }
         do {
@@ -29,5 +34,10 @@ final class ResearchRoomViewModel {
     func fetchJoinedRooms(userID: String) async throws {
         try await self.service.fetchJoinedRooms(withUserID: userID)
         self.getJoinedRoomsConverted()
+    }
+    
+    func fetchMyRooms(userID: String) async throws {
+        try await self.service.fetchMyRooms(withUserID: userID)
+        self.getMyRoomsConverted()
     }
 }

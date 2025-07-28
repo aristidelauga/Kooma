@@ -49,14 +49,9 @@ final class FirestoreService: FirestoreServiceInterface {
 	}
     
     func createRoom(_ room: RoomUI) async throws {
-        guard let address = room.address else {
+        guard let address = room.address, let image = room.image else {
             return
         }
-        print("room.votes \(room.votes)")
-        guard let image = room.image else {
-            return
-        }
-        
             let newRoom = RoomDomain(
                 id: room.id,
                 code: room.code,

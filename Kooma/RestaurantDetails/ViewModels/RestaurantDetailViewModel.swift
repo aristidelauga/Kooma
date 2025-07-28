@@ -8,11 +8,6 @@ final class RestaurantDetailViewModel {
     
     var lookAroundScene: MKLookAroundScene?
     var mkMapItem: MKMapItem?
-    private let restaurantService: any GetRestaurantInterface
-    
-    init(restaurantService: any GetRestaurantInterface = GetRestaurantService()) {
-        self.restaurantService = restaurantService
-    }
     
     func searchMapItem(for restaurant: RestaurantUI) async -> MKMapItem? {
         let request = MKLocalSearch.Request()
@@ -35,23 +30,23 @@ final class RestaurantDetailViewModel {
         } catch {
             print("Error searching map item: \(error)")
         }
-
         return nil
+    }
+    
+    func sendAnalyticsForWebView() {
+        ActionEvent.sendAnalytics(event: .openWebView)
     }
     
     func makeACall(_ string: String) {
         guard let url = URL(string: "tel://\(string)"), UIApplication.shared.canOpenURL(url) else {
             return
         }
-        
         UIApplication.shared.open(url)
+        ActionEvent.sendAnalytics(event: .callRestaurant)
     }
     
-
-        
     func fetchLookAroundPreview() {
         guard let mkMapItem = self.mkMapItem else { return }
-        
         self.lookAroundScene = nil
         Task {
             let request = MKLookAroundSceneRequest(mapItem: mkMapItem)
@@ -63,6 +58,7 @@ final class RestaurantDetailViewModel {
         if let item = self.mkMapItem {
             item.name = restaurant.name
             item.openInMaps()
+            ActionEvent.sendAnalytics(event: .openAppleMaps)
         }
     }
 }

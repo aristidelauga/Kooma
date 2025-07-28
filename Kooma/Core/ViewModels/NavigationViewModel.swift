@@ -9,6 +9,7 @@ final class NavigationViewModel {
         self.path = NavigationPath()
     }
 
+    /// Goes back to 
     func goToRoomDetailsViewFromRestaurantDetails() {
         self.path.removeLast(1)
     }

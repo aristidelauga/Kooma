@@ -12,22 +12,15 @@ final class LaunchAppViewModel {
         self.service = service
     }
     
+    /// Gets all the rooms the user created. This is a punctual call to Firestore
     func getMyRoomsConverted(userID: String) async throws {
         try await self.service.fetchMyRooms(withUserID: userID)
         self.myRooms = self.service.myRooms.map { $0.toUI() }
     }
     
+    /// Gets all the rooms the user joined. This is a punctual call to Firestore
     func getJoinedRoomsConverted(userID: String) async throws {
         try await self.service.fetchJoinedRooms(withUserID: userID)
         self.joinedRooms = self.service.joinedRooms.map { $0.toUI() }
     }
-    
-    func startListening(forUserID userID: String) {
-        service.startListening(forUserID: userID)
-    }
-    
-    func endListening() {
-        service.stopListening()
-    }
-
 }

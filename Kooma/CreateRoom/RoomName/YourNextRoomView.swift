@@ -51,6 +51,7 @@ struct YourNextRoomView: View {
                 if !self.roomCode.isEmpty {
                     if let hasRooms = hasRooms {
                         self.navigationVM.goToResearchRoomView(withRoomCode: self.roomCode, and: hasRooms)
+                        self.yourNextRoomVM.sendAnalyticsForJoiningRoom()
                     }
                 } else {
                     self.joinRoomPlaceholder = "You must enter a room code"

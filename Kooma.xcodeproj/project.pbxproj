@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		923D3AF72E0C45A300914EE0 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 923D3AF62E0C45A300914EE0 /* FirebaseCore */; };
 		923D3AF92E0C45A300914EE0 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 923D3AF82E0C45A300914EE0 /* FirebaseFirestore */; };
+		929660B72E37A0620092E112 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 929660B62E37A0620092E112 /* FirebaseAnalytics */; };
+		929660B92E37A0620092E112 /* FirebaseAnalyticsCore in Frameworks */ = {isa = PBXBuildFile; productRef = 929660B82E37A0620092E112 /* FirebaseAnalyticsCore */; };
+		929660BB2E37A0620092E112 /* FirebaseAnalyticsOnDeviceConversion in Frameworks */ = {isa = PBXBuildFile; productRef = 929660BA2E37A0620092E112 /* FirebaseAnalyticsOnDeviceConversion */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -24,6 +27,7 @@
 /* Begin PBXFileReference section */
 		9212234E2DF5B5BE0065BF77 /* Kooma.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kooma.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9212235B2DF5B5C00065BF77 /* KoomaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KoomaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		92E029C12E36E6B3004F002D /* KoomaTestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = KoomaTestPlan.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -72,6 +76,9 @@
 			files = (
 				923D3AF72E0C45A300914EE0 /* FirebaseCore in Frameworks */,
 				923D3AF92E0C45A300914EE0 /* FirebaseFirestore in Frameworks */,
+				929660BB2E37A0620092E112 /* FirebaseAnalyticsOnDeviceConversion in Frameworks */,
+				929660B72E37A0620092E112 /* FirebaseAnalytics in Frameworks */,
+				929660B92E37A0620092E112 /* FirebaseAnalyticsCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,6 +95,7 @@
 		921223452DF5B5BE0065BF77 = {
 			isa = PBXGroup;
 			children = (
+				92E029C12E36E6B3004F002D /* KoomaTestPlan.xctestplan */,
 				921223502DF5B5BE0065BF77 /* Kooma */,
 				9212235E2DF5B5C00065BF77 /* KoomaTests */,
 				921223682DF5B5C00065BF77 /* KoomaUITests */,
@@ -126,6 +134,9 @@
 			packageProductDependencies = (
 				923D3AF62E0C45A300914EE0 /* FirebaseCore */,
 				923D3AF82E0C45A300914EE0 /* FirebaseFirestore */,
+				929660B62E37A0620092E112 /* FirebaseAnalytics */,
+				929660B82E37A0620092E112 /* FirebaseAnalyticsCore */,
+				929660BA2E37A0620092E112 /* FirebaseAnalyticsOnDeviceConversion */,
 			);
 			productName = Kooma;
 			productReference = 9212234E2DF5B5BE0065BF77 /* Kooma.app */;
@@ -527,6 +538,18 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 923D3AF52E0C45A300914EE0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFirestore;
+		};
+		929660B62E37A0620092E112 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FirebaseAnalytics;
+		};
+		929660B82E37A0620092E112 /* FirebaseAnalyticsCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FirebaseAnalyticsCore;
+		};
+		929660BA2E37A0620092E112 /* FirebaseAnalyticsOnDeviceConversion */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FirebaseAnalyticsOnDeviceConversion;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

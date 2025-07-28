@@ -22,7 +22,7 @@ final class RoomsListViewModel {
             print("Error preparing room for saving: \(error.localizedDescription)")
         }
     }
-
+    
     func startListening(forUserID userID: String) {
         endListening()
         
@@ -54,4 +54,9 @@ final class RoomsListViewModel {
         joinedRoomsTask = nil
     }
     
+    // MARK: - Testing Support
+    
+    func isListening() -> Bool {
+        return myRoomsTask != nil || joinedRoomsTask != nil
+    }
 }

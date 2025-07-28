@@ -93,13 +93,14 @@ final class NavigationViewModelTests: XCTestCase {
     }
     
     func testGoToResearchRoomView_appendsRoomSearch() {
-        navigationVM.goToResearchRoomView(withRoomCode: "CODE123")
+        navigationVM.goToResearchRoomView(withRoomCode: "CODE123", and: false)
         
         let elements: [NavigationPath] = [navigationVM.path]
         
         XCTAssertEqual(elements.count, 1)
         XCTAssertTrue(elements.first.debugDescription.contains("RoomSearch"))
         XCTAssertTrue(elements.first.debugDescription.contains("CODE123"))
+        XCTAssertTrue(elements.first.debugDescription.contains("hasRooms: false"))
     }
     
     func testGoToRoomDetailsView_appendsRoomDetails() {

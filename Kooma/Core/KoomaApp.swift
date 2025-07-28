@@ -3,6 +3,7 @@ import SwiftUI
 import FirebaseCore
 import Firebase
 import FirebaseFirestore
+import FirebaseAnalytics
 
 
 @main

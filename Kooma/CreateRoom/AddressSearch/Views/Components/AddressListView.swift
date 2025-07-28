@@ -9,7 +9,8 @@ struct AddressListView: View {
 				Text(address.title)
 				Text(address.subtitle)
 					.font(.caption)
-			}
+            }
+            .foregroundStyle(.kmBlack)
 			.background(Color.kmBeige)
 			.listRowBackground(Color.kmBeige)
 			.onTapGesture {

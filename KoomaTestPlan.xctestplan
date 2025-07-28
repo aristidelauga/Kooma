@@ -1,0 +1,29 @@
+{
+  "configurations" : [
+    {
+      "id" : "E0A18A58-6780-4364-8EE6-F1965BCA122C",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:Kooma.xcodeproj",
+      "identifier" : "9212234D2DF5B5BE0065BF77",
+      "name" : "Kooma"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:Kooma.xcodeproj",
+        "identifier" : "9212235A2DF5B5C00065BF77",
+        "name" : "KoomaTests"
+      }
+    }
+  ],
+  "version" : 1
+}

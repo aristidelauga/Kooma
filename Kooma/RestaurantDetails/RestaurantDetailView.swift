@@ -17,6 +17,7 @@ struct RestaurantDetailView: View {
                 
                 MainButton(text: "Open website", maxWidth: 150) {
                     self.showWebView = true
+                    restaurantDetailVM.sendAnalyticsForWebView()
                 }
                 .frame(maxWidth: .infinity, alignment: .center)
                 .padding(.vertical, 16)

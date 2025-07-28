@@ -1,5 +1,4 @@
 
-
 import Foundation
 
 @MainActor
@@ -8,9 +7,14 @@ import Foundation
 	var name: String = ""
 
 	func createUser() {
-        guard !self.name.isEmpty else {
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty else {
             return
         }
-        self.user = UserUI(id: UUID().uuidString, name: name.trimmingCharacters(in: .whitespacesAndNewlines))
+        self.user = UserUI(id: UUID().uuidString, name: trimmedName)
+        guard let id = self.user?.id else {
+            return
+        }
+        ActionEvent.sendAnalytics(event:  .createNewUser(userID: id))
 	}
 }
