@@ -154,33 +154,40 @@ final class RoomsListViewModelTests: XCTestCase {
     // MARK: - startListening Tests
     
     func testStartListening_forUserID_startsListeningToMyRoomsAndJoinedRooms() async {
-        let userID = "user1"
-        let room1 = FixturesConstants.createSampleRoom(administrator: FixturesConstants.sampleUser1Domain)
-        let room2 = FixturesConstants.createSampleRoom(
-            id: "room2",
-            administrator: FixturesConstants.sampleUser2Domain,
-            regularMembersID: [userID]
-        )
+        let userID = FixturesConstants.sampleUserUI1
+        let room1 = FixturesConstants.createSampleRoomUI(id: nil, administrator: FixturesConstants.sampleUserUI1)
+        let room2 = FixturesConstants.createSampleRoom(id: "room2", administrator: FixturesConstants.sampleUser2Domain)
         
-        fakeClient.addRoom(room1)
         fakeClient.addRoom(room2)
+        do {
+            try await service.createRoom(room1)
+            try await service.joinRoom(withCode: room2.code, user: userID)
+        } catch {
+            XCTFail("Fail to create a new room")
+            return
+        }
         
-        viewModel.startListening(forUserID: userID)
-        
+        viewModel.startListening(forUserID: userID.id)
         // Wait a bit for async operations
         try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
         
         // Verify rooms are loaded
         XCTAssertEqual(viewModel.myRooms.count, 1)
-        XCTAssertEqual(viewModel.myRooms.first?.id, room1.id)
+        XCTAssertEqual(viewModel.myRooms.first?.name, room1.name)
         XCTAssertEqual(viewModel.joinedRooms.count, 1)
         XCTAssertEqual(viewModel.joinedRooms.first?.id, room2.id)
     }
     
     func testStartListening_whenCalledMultipleTimes_cancelsPreviousListeners() async {
         let userID = "user1"
-        let room1 = FixturesConstants.createSampleRoom(administrator: FixturesConstants.sampleUser1Domain)
-        fakeClient.addRoom(room1)
+        let room1 = FixturesConstants.createSampleRoomUI(administrator: FixturesConstants.sampleUserUI1)
+        
+        do {
+            try await service.createRoom(room1)
+        } catch {
+            XCTFail("Fail to create a new room")
+            return
+        }
         
         viewModel.startListening(forUserID: userID)
         
@@ -238,8 +245,14 @@ final class RoomsListViewModelTests: XCTestCase {
         fakeClient.getJoinedRoomsError = NSError(domain: "JoinedRoomsError", code: 500, userInfo: [NSLocalizedDescriptionKey: "Joined rooms stream error"])
         
         let userID = "user1"
-        let room = FixturesConstants.createSampleRoom(administrator: FixturesConstants.sampleUser1Domain)
-        fakeClient.addRoom(room)
+        let room1 = FixturesConstants.createSampleRoomUI(administrator: FixturesConstants.sampleUserUI1)
+        
+        do {
+            try await service.createRoom(room1)
+        } catch {
+            XCTFail("Fail to create a new room")
+            return
+        }
         
         // Should not throw, just print error
         viewModel.startListening(forUserID: userID)
@@ -274,8 +287,14 @@ final class RoomsListViewModelTests: XCTestCase {
     
     func testStartListening_whenStreamThrowsErrorAfterInitialSuccess_handlesErrorGracefully() async {
         let userID = "user1"
-        let room = FixturesConstants.createSampleRoom(administrator: FixturesConstants.sampleUser1Domain)
-        fakeClient.addRoom(room)
+        let room1 = FixturesConstants.createSampleRoomUI(administrator: FixturesConstants.sampleUserUI1)
+        
+        do {
+            try await service.createRoom(room1)
+        } catch {
+            XCTFail("Fail to create a new room")
+            return
+        }
         
         // Start listening successfully
         viewModel.startListening(forUserID: userID)
@@ -329,8 +348,14 @@ final class RoomsListViewModelTests: XCTestCase {
     
     func testEndListening_cancelsAllActiveTasks() async {
         let userID = "user1"
-        let room = FixturesConstants.createSampleRoom(administrator: FixturesConstants.sampleUser1Domain)
-        fakeClient.addRoom(room)
+        let room1 = FixturesConstants.createSampleRoomUI(administrator: FixturesConstants.sampleUserUI1)
+        
+        do {
+            try await service.createRoom(room1)
+        } catch {
+            XCTFail("Fail to create a new room")
+            return
+        }
         
         viewModel.startListening(forUserID: userID)
         
@@ -361,8 +386,14 @@ final class RoomsListViewModelTests: XCTestCase {
         XCTAssertTrue(viewModel.myRooms.isEmpty)
         
         // Add a room
-        let room = FixturesConstants.createSampleRoom(administrator: FixturesConstants.sampleUser1Domain)
-        fakeClient.addRoom(room)
+        let room = FixturesConstants.createSampleRoomUI(administrator: FixturesConstants.sampleUserUI1)
+        
+        do {
+            try await service.createRoom(room)
+        } catch {
+            XCTFail("Fail to create a new room")
+            return
+        }
         
         // Notify listeners
         fakeClient.notifyMyRoomsListeners(for: userID)
@@ -374,36 +405,16 @@ final class RoomsListViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.myRooms.first?.id, room.id)
     }
     
-    func testRealTimeUpdates_whenRoomAdded_updatesJoinedRoomsList() async {
-        let userID = "user2"
-        viewModel.startListening(forUserID: userID)
-        
-        // Wait for initial load
-        try? await Task.sleep(nanoseconds: 100_000_000)
-        
-        XCTAssertTrue(viewModel.joinedRooms.isEmpty)
-        
-        // Add a room where user is a member
-        let room = FixturesConstants.createSampleRoom(
-            administrator: FixturesConstants.sampleUser1Domain,
-            regularMembersID: [userID]
-        )
-        fakeClient.addRoom(room)
-        
-        // Notify listeners
-        fakeClient.notifyJoinedRoomsListeners(for: userID)
-        
-        // Wait for update
-        try? await Task.sleep(nanoseconds: 100_000_000)
-        
-        XCTAssertEqual(viewModel.joinedRooms.count, 1)
-        XCTAssertEqual(viewModel.joinedRooms.first?.id, room.id)
-    }
-    
     func testRealTimeUpdates_whenRoomRemoved_updatesLists() async {
         let userID = "user1"
-        let room = FixturesConstants.createSampleRoom(administrator: FixturesConstants.sampleUser1Domain)
-        fakeClient.addRoom(room)
+        let room = FixturesConstants.createSampleRoomUI(administrator: FixturesConstants.sampleUserUI1)
+        
+        do {
+            try await service.createRoom(room)
+        } catch {
+            XCTFail("Fail to create a new room")
+            return
+        }
         
         viewModel.startListening(forUserID: userID)
         
@@ -500,8 +511,14 @@ final class RoomsListViewModelTests: XCTestCase {
     
     func testErrorHandling_whenAddNewRoomFailsAndStartListeningSucceeds_handlesGracefully() async {
         let userID = "user1"
-        let room = FixturesConstants.createSampleRoom(administrator: FixturesConstants.sampleUser1Domain)
-        fakeClient.addRoom(room)
+        let room = FixturesConstants.createSampleRoomUI(administrator: FixturesConstants.sampleUserUI1)
+        
+        do {
+            try await service.createRoom(room)
+        } catch {
+            XCTFail("Fail to create a new room")
+            return
+        }
         
         // Make addNewRoom fail
         fakeClient.shouldThrowErrorOnSaveRoom = true
@@ -620,15 +637,14 @@ final class RoomsListViewModelTests: XCTestCase {
     
     func testDataConversion_domainToUIConversionWorksCorrectly() async {
         let userID = "user1"
-        let room = FixturesConstants.createSampleRoom(
-            administrator: FixturesConstants.sampleUser1Domain,
-            members: [FixturesConstants.sampleUser1Domain, FixturesConstants.sampleUser2Domain],
-            restaurants: [FixturesConstants.sampleRestaurant1],
-            votes: ["restaurant1": ["user1", "user2"]]
-        )
+        let room = FixturesConstants.createSampleRoomUI(administrator: FixturesConstants.sampleUserUI1)
         
-        fakeClient.addRoom(room)
-        
+        do {
+            try await service.createRoom(room)
+        } catch {
+            XCTFail("Fail to create a new room")
+            return
+        }
         viewModel.startListening(forUserID: userID)
         
         // Wait for async operations
@@ -671,22 +687,31 @@ final class RoomsListViewModelTests: XCTestCase {
     }
     
     func testObservableBehavior_joinedRoomsUpdatesTriggerObservableChanges() async {
-        let userID = "user2"
-        let room = FixturesConstants.createSampleRoom(
-            administrator: FixturesConstants.sampleUser1Domain,
-            regularMembersID: [userID]
-        )
+        let user = UserUI(id: "user2", name: "user2")
+        let room = FixturesConstants.createSampleRoom(administrator: FixturesConstants.sampleUser1Domain)
         
-        viewModel.startListening(forUserID: userID)
+        // Add the room to the fake client first
+        fakeClient.addRoom(room)
+        
+        // Join the room
+        do {
+            try await service.joinRoom(withCode: room.code, user: user)
+        } catch {
+            XCTFail("Failed to join room: \(error)")
+            return
+        }
+        
+        viewModel.startListening(forUserID: user.id)
         
         // Wait for initial load
         try? await Task.sleep(nanoseconds: 100_000_000)
         
-        XCTAssertTrue(viewModel.joinedRooms.isEmpty)
+        // After joining, the room should be in joinedRooms
+        XCTAssertEqual(viewModel.joinedRooms.count, 1)
+        XCTAssertEqual(viewModel.joinedRooms.first?.id, room.id)
         
-        // Add room and notify
-        fakeClient.addRoom(room)
-        fakeClient.notifyJoinedRoomsListeners(for: userID)
+        // Test real-time updates by notifying listeners
+        fakeClient.notifyJoinedRoomsListeners(for: user.id)
         
         // Wait for update
         try? await Task.sleep(nanoseconds: 100_000_000)

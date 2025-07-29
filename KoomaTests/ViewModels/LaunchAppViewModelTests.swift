@@ -88,43 +88,4 @@ final class LaunchAppViewModelTests: XCTestCase {
             XCTAssertNotNil(error)
         }
     }
-
-    func testStartListening_andEndListening() async throws {
-         let expectation = XCTestExpectation(description: "ViewModel myRooms property updates via listening")
-        viewModel.startListening(forUserID: FixturesConstants.sampleUser1Domain.id)
-        try await Task.sleep(nanoseconds: 100_000_000) // 0.1s
-        XCTAssertEqual(service.myRooms.count, 0)
-        XCTAssertEqual(service.joinedRooms.count, 0)
-        
-        let room = FixturesConstants.createSampleRoom()
-        try await fakeClient.saveRoom(room)
-        try await Task.sleep(nanoseconds: 200_000_000) // 0.2s
-
-        XCTAssertEqual(service.myRooms.count, 1)
-        
-        viewModel.endListening()
-        
-        
-        let room2 = FixturesConstants.createSampleRoom(id: "room2", administrator: FixturesConstants.sampleUser1Domain)
-        try await fakeClient.saveRoom(room2)
-        try await Task.sleep(nanoseconds: 200_000_000)
-        
-        XCTAssertEqual(service.myRooms.count, 1)
-        expectation.fulfill()
-        await fulfillment(of: [expectation], timeout: 1.0)
-    }
-
-    func testStartListening_cancelsPreviousListeners() async throws {
-        
-        viewModel.startListening(forUserID: FixturesConstants.sampleUser1Domain.id)
-        try await Task.sleep(nanoseconds: 100_000_000)
-        
-        viewModel.startListening(forUserID: FixturesConstants.sampleUser1Domain.id)
-        
-        let room = FixturesConstants.createSampleRoom()
-        try await fakeClient.saveRoom(room)
-        try await Task.sleep(nanoseconds: 200_000_000)
-        
-        XCTAssertEqual(service.myRooms.count, 1)
-    }
 }

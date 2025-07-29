@@ -67,3 +67,21 @@ struct RoomUI: Identifiable, Equatable, Hashable {
         return String((0..<length).compactMap { _ in characters.randomElement() })
     }
 }
+
+extension RoomUI {
+    // Only for test purposes
+    func toDomain() throws -> RoomDomain {
+        RoomDomain(
+            id: self.id,
+            code: self.code,
+            name: self.name,
+            administrator: try self.administrator.toDomain(),
+            address: self.address ?? "Paris, France",
+            members: try self.members.compactMap { try $0.toDomain() },
+            regularMembersID: self.regularMembersID,
+            restaurants: try self.restaurants.compactMap { try $0.toDomain() },
+            votes:  self.votes,
+            image: self.image ?? "RoomOne"
+        )
+    }
+}

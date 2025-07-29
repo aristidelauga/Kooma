@@ -114,4 +114,8 @@ final class RoomDetailsViewModel {
         self.service.stopListening()
         currentRoomObservationTask?.cancel()
     }
+    
+    func isListening() -> Bool {
+        return currentRoomObservationTask != nil
+    }
 }

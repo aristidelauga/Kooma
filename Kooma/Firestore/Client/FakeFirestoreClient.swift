@@ -33,6 +33,12 @@ final class FakeFirestoreClient: FirestoreClientInterface {
     func reset() {
         myRooms.removeAll()
         joinedRooms.removeAll()
+        
+        // Clear all listeners
+        myRoomsListeners.removeAll()
+        joinedRoomsListeners.removeAll()
+        roomListeners.removeAll()
+        
         shouldThrowErrorOnSaveRoom = false
         shouldThrowErrorOnJoinRoom = false
         shouldThrowErrorOnLeaveRoom = false
@@ -51,7 +57,10 @@ final class FakeFirestoreClient: FirestoreClientInterface {
     }
  
     func addRoom(_ room: RoomDomain) {
-        guard let roomId = room.id else { return }
+        guard let roomId = room.id else {
+            print("FakeFirestoreClient: Cannot add room without ID")
+            return
+        }
         myRooms[roomId] = room
         joinedRooms[room.code] = room
     }
@@ -199,7 +208,12 @@ final class FakeFirestoreClient: FirestoreClientInterface {
             userIDsForRestaurant.removeAll { $0 == userID }
         }
         
-        room.votes[restaurantID] = userIDsForRestaurant
+        // Remove the restaurant entry if it has no votes
+        if userIDsForRestaurant.isEmpty {
+            room.votes.removeValue(forKey: restaurantID)
+        } else {
+            room.votes[restaurantID] = userIDsForRestaurant
+        }
         myRooms[roomID] = room
         joinedRooms[room.code] = room
         
@@ -243,17 +257,26 @@ final class FakeFirestoreClient: FirestoreClientInterface {
     
     func listenToRoom(withID roomID: String) -> AsyncThrowingStream<RoomDomain, Error> {
         return AsyncThrowingStream { @MainActor continuation in
+            print("FakeFirestoreClient: listenToRoom called for room \(roomID)")
             roomListeners[roomID] = continuation
+            print("FakeFirestoreClient: Added listener for room \(roomID), total listeners: \(roomListeners.count)")
             
             // Send initial data if room exists
             if let room = myRooms[roomID] {
+                print("FakeFirestoreClient: Sending initial data for room \(roomID) with \(room.votes.count) votes")
                 continuation.yield(room)
             } else {
+                print("FakeFirestoreClient: Room \(roomID) not found, finishing stream")
                 continuation.finish()
+                return
             }
             
-            continuation.onTermination = { @Sendable _ in
+            // The stream will remain open and active until the continuation is finished
+            // Future calls to notifyRoomListeners will yield new values through this continuation
+            
+            continuation.onTermination = { @Sendable reason in
                 Task { @MainActor in
+                    print("FakeFirestoreClient: Stream terminated for room \(roomID) with reason: \(reason)")
                     self.roomListeners.removeValue(forKey: roomID)
                 }
             }
@@ -275,7 +298,11 @@ final class FakeFirestoreClient: FirestoreClientInterface {
     }
     
     func notifyRoomListeners(for roomID: String, room: RoomDomain) {
-        guard let continuation = roomListeners[roomID] else { return }
+        guard let continuation = roomListeners[roomID] else {
+            print("FakeFirestoreClient: No listener found for room \(roomID)")
+            return 
+        }
+        
         continuation.yield(room)
     }
 }
