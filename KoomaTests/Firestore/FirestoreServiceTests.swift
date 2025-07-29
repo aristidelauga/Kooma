@@ -368,12 +368,11 @@ final class FirestoreServiceTests: XCTestCase {
         }
         
         // Add a room after a short delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             Task {
+                try await Task.sleep(for: .milliseconds(1000))
                 let room = FixturesConstants.createSampleRoom()
                 try await self.fakeClient.saveRoom(room)
             }
-        }
         
         await fulfillment(of: [expectation], timeout: 2.0)
         
@@ -406,13 +405,12 @@ final class FirestoreServiceTests: XCTestCase {
         }
         
         // Add a room after a short delay where user2 is a regular member
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             Task {
+                try await Task.sleep(for: .milliseconds(1000))
                 let room = FixturesConstants.createSampleRoom()
                 self.fakeClient.addRoom(room)
                 self.fakeClient.notifyJoinedRoomsListeners(for: FixturesConstants.sampleUser2Domain.id)
             }
-        }
         
         await fulfillment(of: [expectation], timeout: 2.0)
         
@@ -448,15 +446,15 @@ final class FirestoreServiceTests: XCTestCase {
         }
         
         // Update votes after a short delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             Task {
+                try await Task.sleep(for: .milliseconds(1000))
                 try await self.service.addVote(
                     forRoomID: room.id!,
                     restaurantID: "restaurant2",
                     userID: FixturesConstants.sampleUser2Domain.id
                 )
             }
-        }
+
         
         await fulfillment(of: [expectation], timeout: 2.0)
         
