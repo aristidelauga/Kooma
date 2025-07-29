@@ -96,7 +96,7 @@ final class RoomDetailsViewModelTests: XCTestCase {
     func testHasVoted_whenRestaurantHasNoVotes_returnsFalse() {
         let restaurant = FixturesConstants.sampleRestaurantUI1
         let user = FixturesConstants.sampleUserUI1
-
+        
         let result = viewModel.hasVoted(forRestaurant: restaurant, user: user)
         
         XCTAssertFalse(result)
@@ -133,7 +133,6 @@ final class RoomDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(count, 0)
     }
     
-    // MARK: - vote Tests
     
     func testVote_whenUserHasNotVotedAndUnderLimit_addsVoteSuccessfully() async throws {
         let restaurant = FixturesConstants.sampleRestaurantUI1
@@ -201,7 +200,7 @@ final class RoomDetailsViewModelTests: XCTestCase {
         ]
         
         try await service.createRoom(roomWithMaxVotes)
-
+        
         // Then set the viewModel's currentRoom to match
         viewModel.currentRoom = roomWithMaxVotes
         
@@ -258,6 +257,43 @@ final class RoomDetailsViewModelTests: XCTestCase {
         } catch {
             XCTAssertNotNil(error)
         }
+    }
+    
+    func test_removeVote_removesUserVote() async throws {
+        let user = UserUI(id: "user1", name: "Alice")
+        let restaurant = RestaurantUI(
+            id: "rest1",
+            name: "Pizza Place",
+            phoneNumber: "123456789",
+            address: "123 Main St",
+            placemark: FixturesConstants.parisPlacemark,
+            url: "http://pizza.com"
+        )
+        let roomDomain = RoomDomain(
+            id: "room1",
+            code: "CODE1",
+            name: "Test Room",
+            administrator: try user.toDomain(),
+            address: "Paris, France",
+            members: [try user.toDomain()],
+            regularMembersID: [],
+            restaurants: [try restaurant.toDomain()],
+            votes: [restaurant.id: [user.id]],
+            image: "RoomOne"
+        )
+        
+        fakeClient.addRoom(roomDomain)
+        let roomUI = roomDomain.toUI()
+        viewModel = RoomDetailsViewModel(service: service, currentRoom: roomUI)
+
+        // Act
+        try await viewModel.removeVote(forRestaurant: restaurant, user: user)
+
+        // Assert
+        let updatedRooms = try await fakeClient.getMyRooms(forUserID: user.id)
+        let updatedRoom = updatedRooms.first(where: { $0.id == "room1" })
+        let votes = updatedRoom?.votes[restaurant.id] ?? []
+        XCTAssertFalse(votes.contains(user.id), "User's vote should be removed")
     }
     
     func testRemoveVote_whenUserHasNotVoted_doesNotRemoveVote() async throws {
@@ -322,23 +358,6 @@ final class RoomDetailsViewModelTests: XCTestCase {
             XCTAssertNotNil(error)
         }
     }
-    
-//    func testLeaveRoom_withValidRoom_leavesRoomSuccessfully() async throws {
-//        let user = FixturesConstants.sampleUserUI1
-//        
-//        // Add room to fake client
-//        sampleRoom.id = nil
-//        try await service.createRoom(sampleRoom)
-//        
-//        try await viewModel.leaveRoom(user: user)
-//        
-//        // Verify user was removed from room
-//        let updatedRooms = try await fakeClient.getMyRooms(forUserID: user.id)
-//        let updatedRoom = updatedRooms.first
-//        XCTAssertNotNil(updatedRoom)
-//        XCTAssertFalse(updatedRoom?.members.contains { $0.id == user.id } ?? true)
-//        XCTAssertFalse(updatedRoom?.regularMembersID.contains(user.id) ?? true)
-//    }
     
     func testLeaveRoom_whenRoomIDIsNil_handlesErrorGracefully() async {
         let user = FixturesConstants.sampleUserUI1
@@ -474,7 +493,7 @@ final class RoomDetailsViewModelTests: XCTestCase {
         XCTAssertTrue(names.contains(user1.name))
         XCTAssertFalse(names.contains(user2.name))
     }
-
+    
     func testStartListening_startsServiceListening() {
         viewModel.startListening(forUserID: sampleUser.id)
         
@@ -485,41 +504,32 @@ final class RoomDetailsViewModelTests: XCTestCase {
     func testFakeFirestoreClientListenersAreWorking() async throws {
         let restaurant = FixturesConstants.sampleRestaurantUI1
         let user = FixturesConstants.sampleUserUI1
-        
-        // Create a room and add it to fake client
+
         let roomDomain = try sampleRoom.toDomain()
         fakeClient.addRoom(roomDomain)
-        
-        
-        // Set up a listener for the room
+
         let roomStream = fakeClient.listenToRoom(withID: roomDomain.id!)
         var receivedUpdates: [RoomDomain] = []
-        
-        // Start listening in a separate task
+
         let listeningTask = Task {
             for try await room in roomStream {
                 receivedUpdates.append(room)
+            }
         }
-        
+
         // Wait for initial data
         try await Task.sleep(nanoseconds: 100_000_000)
-        
-        
-        // Verify initial state
+
         XCTAssertEqual(receivedUpdates.count, 1, "Should receive initial room data")
         XCTAssertEqual(receivedUpdates.first?.votes.count, 0, "Initial room should have no votes")
-        
-        // Update votes directly in fake client
+
         try await fakeClient.updateVotes(forRoomID: roomDomain.id!, restaurantID: restaurant.id, userID: user.id, action: .add)
-        
-        // Wait for the update to propagate
+
         try await Task.sleep(nanoseconds: 100_000_000)
-        
-        // Verify that the listener received the update
+
         XCTAssertEqual(receivedUpdates.count, 2, "Should receive both initial data and update")
         XCTAssertEqual(receivedUpdates.last?.votes.count, 1, "Updated room should have 1 vote")
-        
-        // Clean up
+
         listeningTask.cancel()
     }
     
@@ -563,7 +573,7 @@ final class RoomDetailsViewModelTests: XCTestCase {
         // Clean up
         listeningTask.cancel()
     }
-
+    
     
     func testFakeFirestoreClientStreamStaysOpen() async throws {
         
@@ -584,7 +594,7 @@ final class RoomDetailsViewModelTests: XCTestCase {
         
         // Wait for initial data
         try await Task.sleep(nanoseconds: 100_000_000)
-                
+        
         // Test manual notification
         var updatedRoom = roomDomain
         updatedRoom.votes["test"] = ["test"]
@@ -592,7 +602,7 @@ final class RoomDetailsViewModelTests: XCTestCase {
         
         // Wait for the update to propagate
         try await Task.sleep(nanoseconds: 100_000_000)
-                
+        
         // Verify we got both initial data and the update
         XCTAssertEqual(receivedUpdates.count, 2, "Should receive both initial data and manual notification")
         
