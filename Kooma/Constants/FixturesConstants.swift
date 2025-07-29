@@ -133,7 +133,7 @@ extension FixturesConstants {
         id: "invalid",
         name: "Invalid Restaurant Name That Should Not Exist",
         phoneNumber: "+33123456789",
-        address: "Invalid Address",
+        address: "",
         placemark: CodablePlacemark(
             latitude: 0.0,
             longitude: 0.0,

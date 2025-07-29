@@ -10,6 +10,10 @@ final class RestaurantDetailViewModel {
     var mkMapItem: MKMapItem?
     
     func searchMapItem(for restaurant: RestaurantUI) async -> MKMapItem? {
+        guard !restaurant.address.isEmpty else {
+            return nil
+        }
+        
         let request = MKLocalSearch.Request()
         request.naturalLanguageQuery = restaurant.name
         request.region = MKCoordinateRegion(

@@ -40,14 +40,11 @@ final class RestaurantDetailViewModelTests: XCTestCase {
     }
     
     func testSearchMapItem_withInvalidRestaurant_handlesGracefully() async {
-        // Create a restaurant with coordinates that are unlikely to have any results
         let invalidRestaurant = FixturesConstants.invalidRestaurant
         
         let mapItem = await viewModel.searchMapItem(for: invalidRestaurant)
-        
-        // The method should handle the search gracefully without crashing
-        // We test that the method completes successfully
-        XCTAssertNotNil(mapItem)
+
+        XCTAssertNil(mapItem)
     }
     
     func testSearchMapItem_handlesSearchErrors() async {
