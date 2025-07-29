@@ -497,35 +497,23 @@ final class RoomDetailsViewModelTests: XCTestCase {
         
         // Start listening in a separate task
         let listeningTask = Task {
-            print("FakeFirestoreClient: Starting listening task")
             for try await room in roomStream {
                 receivedUpdates.append(room)
-                print("FakeFirestoreClient: Received room update with \(room.votes.count) votes")
-            }
-            print("FakeFirestoreClient: Listening task ended")
         }
         
         // Wait for initial data
         try await Task.sleep(nanoseconds: 100_000_000)
         
-        print("FakeFirestoreClient: After initial wait, receivedUpdates count: \(receivedUpdates.count)")
         
         // Verify initial state
         XCTAssertEqual(receivedUpdates.count, 1, "Should receive initial room data")
         XCTAssertEqual(receivedUpdates.first?.votes.count, 0, "Initial room should have no votes")
         
         // Update votes directly in fake client
-        print("FakeFirestoreClient: About to call updateVotes")
         try await fakeClient.updateVotes(forRoomID: roomDomain.id!, restaurantID: restaurant.id, userID: user.id, action: .add)
-        print("FakeFirestoreClient: updateVotes completed")
         
         // Wait for the update to propagate
         try await Task.sleep(nanoseconds: 100_000_000)
-        
-        print("FakeFirestoreClient: After update wait, receivedUpdates count: \(receivedUpdates.count)")
-        if let lastUpdate = receivedUpdates.last {
-            print("FakeFirestoreClient: Last update has \(lastUpdate.votes.count) vote entries")
-        }
         
         // Verify that the listener received the update
         XCTAssertEqual(receivedUpdates.count, 2, "Should receive both initial data and update")
@@ -549,12 +537,9 @@ final class RoomDetailsViewModelTests: XCTestCase {
         
         // Start listening in a separate task
         let listeningTask = Task {
-            print("FakeFirestoreClient: Starting listening task (test 2)")
             for try await room in roomStream {
                 receivedUpdates.append(room)
-                print("FakeFirestoreClient: Received room update with \(room.votes.count) votes")
             }
-            print("FakeFirestoreClient: Listening task ended (test 2)")
         }
         
         // Wait for initial data
@@ -581,7 +566,6 @@ final class RoomDetailsViewModelTests: XCTestCase {
 
     
     func testFakeFirestoreClientStreamStaysOpen() async throws {
-        print("=== Testing if stream stays open ===")
         
         // Create a room and add it to fake client
         let roomDomain = try sampleRoom.toDomain()
@@ -593,19 +577,14 @@ final class RoomDetailsViewModelTests: XCTestCase {
         
         // Start listening in a separate task
         let listeningTask = Task {
-            print("FakeFirestoreClient: Starting stream test")
             for try await room in roomStream {
                 receivedUpdates.append(room)
-                print("FakeFirestoreClient: Stream received update with \(room.votes.count) votes")
             }
-            print("FakeFirestoreClient: Stream test ended")
         }
         
         // Wait for initial data
         try await Task.sleep(nanoseconds: 100_000_000)
-        
-        print("FakeFirestoreClient: After initial wait, receivedUpdates count: \(receivedUpdates.count)")
-        
+                
         // Test manual notification
         var updatedRoom = roomDomain
         updatedRoom.votes["test"] = ["test"]
@@ -613,9 +592,7 @@ final class RoomDetailsViewModelTests: XCTestCase {
         
         // Wait for the update to propagate
         try await Task.sleep(nanoseconds: 100_000_000)
-        
-        print("FakeFirestoreClient: After manual notification, receivedUpdates count: \(receivedUpdates.count)")
-        
+                
         // Verify we got both initial data and the update
         XCTAssertEqual(receivedUpdates.count, 2, "Should receive both initial data and manual notification")
         

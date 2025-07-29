@@ -17,7 +17,6 @@ class MockRestaurantAPI: GetRestaurantInterface {
 
     func searchNearbyRestaurants(at coordinate: CLLocationCoordinate2D, radiusInMeters: Double) async throws -> [RestaurantDTO]? {
         if let error = searchError { throw error }
-        print("searchResults \(searchResults)")
         return searchResults
     }
 }

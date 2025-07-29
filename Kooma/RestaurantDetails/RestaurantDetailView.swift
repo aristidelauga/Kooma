@@ -69,7 +69,6 @@ struct RestaurantDetailView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .navigationBarBackButtonHidden()
         .onAppear {
-            print("path count on RoomDetailView: \(self.navigationVM.path.count)")
             Task(priority: .high, operation: {
                 self.restaurantDetailVM.mkMapItem = await self.restaurantDetailVM.searchMapItem(for: restaurant)
                 self.restaurantDetailVM.fetchLookAroundPreview()

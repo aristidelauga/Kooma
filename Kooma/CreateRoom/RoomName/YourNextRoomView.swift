@@ -87,9 +87,7 @@ struct YourNextRoomView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .edgesIgnoringSafeArea(.all)
         )
-        .onAppear {
-            print("self.navigationVM.path.count: \(self.navigationVM.path.count)")
-        }
+
     }
 }
 

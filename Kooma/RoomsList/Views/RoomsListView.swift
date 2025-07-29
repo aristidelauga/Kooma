@@ -98,7 +98,6 @@ struct RoomsListView: View {
         )
         
         .onAppear {
-            print("path count on RoomsListView: \(self.navigationVM.path.count)")
             Task {
                 if let userID = self.userManager.currentUser?.id {
                     self.roomsListVM.startListening(forUserID: userID)

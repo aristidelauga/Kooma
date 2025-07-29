@@ -124,7 +124,6 @@ struct RoomDetailsView: View {
         })
         .onAppear {
             self.roomDetailsVM.startListening(forUserID: user.id)
-            print("path count on RoomDetailView: \(self.navigationVM.path.count)")
         }
         .onDisappear(perform: {
             self.roomDetailsVM.endListening()

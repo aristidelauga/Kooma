@@ -96,7 +96,6 @@ final class RadiusSettingViewModelTests: XCTestCase {
         mockAPI.coordinateToReturn = CLLocationCoordinate2D(latitude: 1, longitude: 2)
         mockAPI.searchResults = nil
         try await viewModel.searchRestaurants(within: 1)
-        print("viewModel.room.restaurants.count: \(viewModel.room.restaurants)")
         XCTAssertEqual(viewModel.room.restaurants.count, 0)
         XCTAssertFalse(viewModel.isLoading)
     }

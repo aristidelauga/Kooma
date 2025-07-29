@@ -257,16 +257,12 @@ final class FakeFirestoreClient: FirestoreClientInterface {
     
     func listenToRoom(withID roomID: String) -> AsyncThrowingStream<RoomDomain, Error> {
         return AsyncThrowingStream { @MainActor continuation in
-            print("FakeFirestoreClient: listenToRoom called for room \(roomID)")
             roomListeners[roomID] = continuation
-            print("FakeFirestoreClient: Added listener for room \(roomID), total listeners: \(roomListeners.count)")
             
             // Send initial data if room exists
             if let room = myRooms[roomID] {
-                print("FakeFirestoreClient: Sending initial data for room \(roomID) with \(room.votes.count) votes")
                 continuation.yield(room)
             } else {
-                print("FakeFirestoreClient: Room \(roomID) not found, finishing stream")
                 continuation.finish()
                 return
             }
@@ -276,7 +272,6 @@ final class FakeFirestoreClient: FirestoreClientInterface {
             
             continuation.onTermination = { @Sendable reason in
                 Task { @MainActor in
-                    print("FakeFirestoreClient: Stream terminated for room \(roomID) with reason: \(reason)")
                     self.roomListeners.removeValue(forKey: roomID)
                 }
             }

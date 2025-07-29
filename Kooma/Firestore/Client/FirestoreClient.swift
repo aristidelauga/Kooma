@@ -184,7 +184,6 @@ final class FirestoreClient: FirestoreClientInterface {
             currentVotes[restaurantID] = userIDsForRestaurant
             
             try await ref.updateData([FirestoreConstants.votesKey: currentVotes])
-            print("Votes mis à jour pour la salle \(roomID), restaurant \(restaurantID), utilisateur \(userID), action: \(action)")
         } catch {
             print("updateVotes in FirestoreClient encountered an error: \(error)")
             throw error
