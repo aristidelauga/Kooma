@@ -25,7 +25,6 @@ final class RoomDetailsViewModelTests: XCTestCase {
     }
     
     override func tearDown() {
-        viewModel.endListening()
         viewModel = nil
         fakeClient.reset()
         fakeClient = nil
@@ -492,13 +491,6 @@ final class RoomDetailsViewModelTests: XCTestCase {
         XCTAssertEqual(names.count, 1)
         XCTAssertTrue(names.contains(user1.name))
         XCTAssertFalse(names.contains(user2.name))
-    }
-    
-    func testStartListening_startsServiceListening() {
-        viewModel.startListening(forUserID: sampleUser.id)
-        
-        // Verify that the service is listening by checking if the viewModel is listening
-        XCTAssertTrue(viewModel.isListening())
     }
     
     func testFakeFirestoreClientListenersAreWorking() async throws {

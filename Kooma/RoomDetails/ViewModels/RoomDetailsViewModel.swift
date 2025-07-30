@@ -105,17 +105,4 @@ final class RoomDetailsViewModel {
         
         return names
     }
-    
-    func startListening(forUserID userID: String) {
-        self.service.startListening(forUserID: userID)
-    }
-    
-    func endListening() {
-        self.service.stopListening()
-        currentRoomObservationTask?.cancel()
-    }
-    
-    func isListening() -> Bool {
-        return currentRoomObservationTask != nil
-    }
 }

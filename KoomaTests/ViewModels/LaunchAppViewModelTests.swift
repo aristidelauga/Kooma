@@ -15,7 +15,6 @@ final class LaunchAppViewModelTests: XCTestCase {
     }
 
     override func tearDown() {
-        service.stopListening()
         fakeClient.reset()
         viewModel = nil
         service = nil

@@ -1,6 +1,7 @@
 
 import Foundation
 
+/// Any model conforming to this protocol will adopt `toDTO()` method
 @MainActor
 protocol DTORestaurantServiceConvertible {
 	associatedtype DTOType

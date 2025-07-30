@@ -24,7 +24,12 @@ struct RoomDetailsView: View {
                     }
                     
                     if let address = self.roomDetailsVM.currentRoom.address {
-                        Text(.init("**Room address:** ")).font(.bodyLarge) + Text(address).font(.bodyLarge)
+                        Text(.init("**Room address:** "))
+                            .font(.bodyLarge)
+                            .foregroundStyle(.kmBlack)
+                        + Text(address)
+                            .font(.bodyLarge)
+                            .foregroundStyle(.kmBlack)
                     }
                     
                     TextHeading200(text: "Room members:")
@@ -32,6 +37,7 @@ struct RoomDetailsView: View {
                         if member.id == self.roomDetailsVM.currentRoom.hostID {
                             Text(.init("\(member.name) **(admin)**"))
                                 .font(.bodyMedium)
+                                .foregroundStyle(.kmBlack)
                         } else {
                             TextBodyMedium(text: member.name)
                         }
@@ -121,12 +127,6 @@ struct RoomDetailsView: View {
                         .padding(.trailing, 12)
                 }
             }
-        })
-        .onAppear {
-            self.roomDetailsVM.startListening(forUserID: user.id)
-        }
-        .onDisappear(perform: {
-            self.roomDetailsVM.endListening()
         })
         .onChange(of: roomDetailsVM.roomWasDeleted, perform: { wasDeleted in
             if wasDeleted {

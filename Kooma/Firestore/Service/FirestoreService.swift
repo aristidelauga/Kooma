@@ -20,16 +20,9 @@ protocol FirestoreServiceInterface {
     func myRoomsStream(forUserID userID: String) -> AsyncThrowingStream<[RoomDomain], Error>
     func joinedRoomsStream(forUserID userID: String) -> AsyncThrowingStream<[RoomDomain], Error>
     func roomStream(withID roomID: String) -> AsyncThrowingStream<RoomDomain, Error>
-
-    
-    func getRoomByID(_ roomID: String, userID: String) async throws -> RoomDomain?
     
     func addVote(forRoomID roomID: String, restaurantID: String, userID: String) async throws
     func removeVote(forRoomID roomID: String, restaurantID: String, userID: String) async throws
-    
-    func startListening(forUserID userID: String)
-    
-    func stopListening()
 
 }
 
@@ -48,6 +41,7 @@ final class FirestoreService: FirestoreServiceInterface {
 		self.client = client
 	}
     
+    /// Allows a user to create a room
     func createRoom(_ room: RoomUI) async throws {
         guard let address = room.address, let image = room.image else {
             return
@@ -72,6 +66,7 @@ final class FirestoreService: FirestoreServiceInterface {
         }
     }
     
+    /// Allows a user to join a room
     func joinRoom(withCode code: String, user: UserUI) async throws {
             do {
                 try await self.client.joinRoom(withCode: code, user: user.toDomain())
@@ -81,6 +76,7 @@ final class FirestoreService: FirestoreServiceInterface {
 
     }
     
+    /// Allows a user to leave a given room
     func leaveRoom(roomID: String, user: UserUI) async throws {
         let userDomain = UserDomain(id: user.id, name: user.name)
         try await self.client.leaveRoom(roomID: roomID, user: userDomain)
@@ -105,64 +101,24 @@ final class FirestoreService: FirestoreServiceInterface {
         client.listenToRoom(withID: roomID)
     }
     
-    // Used when the app get launched so we display the right screen to the user
+    /// Used when the app get launched so we display the right screen to the user
     func fetchMyRooms(withUserID userID: String) async throws {
         self.myRooms = try await self.client.getMyRooms(forUserID: userID)
     }
 
-    // Used when the app get launched so we display the right screen to the user
+    /// Used when the app get launched so we display the right screen to the user
     func fetchJoinedRooms(withUserID userID: String) async throws {
         self.joinedRooms = try await self.client.getJoinedRooms(forUserID: userID)
     }
     
-    func getRoomByID(_ roomID: String, userID: String) async throws -> RoomDomain? {
-        if let room = self.myRooms.first(where: { $0.id == roomID && $0.administrator.id == userID}) {
-            return room
-        } else if let room = self.joinedRooms.first(where: { $0.id == roomID }) {
-            return room
-        }
-        return nil
-    }
-    
+    /// Allow a user to vote for a given restaurant within a given room
     func addVote(forRoomID roomID: String, restaurantID: String, userID: String) async throws {
         try await self.client.updateVotes(forRoomID: roomID, restaurantID: restaurantID, userID: userID, action: .add)
     }
     
+    /// Allow a user to vote for a given restaurant within a given room
     func removeVote(forRoomID roomID: String, restaurantID: String, userID: String) async throws {
         try await self.client.updateVotes(forRoomID: roomID, restaurantID: restaurantID, userID: userID, action: .remove)
-    }
-    
-    func startListening(forUserID userID: String) {
-        self.stopListening()
-        
-        myRoomsTask = Task {
-            do {
-                let stream = client.listenToMyRooms(forUserID: userID)
-                for try await rooms in stream {
-                    self.myRooms = rooms
-                }
-            } catch {
-                print("Error listening to my rooms in FireStoreService: \(error.localizedDescription)")
-            }
-        }
-        
-        joinedRoomsTask = Task {
-            do {
-                let stream = client.listenToJoinedRooms(forUserID: userID)
-                for try await rooms in stream {
-                    self.joinedRooms = rooms
-                }
-            } catch {
-                print("Error listening to joined rooms in FireStoreService: \(error.localizedDescription)")
-            }
-        }
-    }
-    
-    func stopListening() {
-        self.myRoomsTask?.cancel()
-        self.joinedRoomsTask?.cancel()
-        self.myRoomsTask = nil
-        self.joinedRoomsTask = nil
     }
 
 }

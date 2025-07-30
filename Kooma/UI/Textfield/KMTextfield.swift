@@ -12,6 +12,7 @@ struct KMTextfield: View {
 			.padding(.vertical, 12)
 			.background(Color.kmBeigeSecondary)
 			.textInputAutocapitalization(joiningTextfield ?? false ? .characters :.words)
+            .autocorrectionDisabled()
 			.cornerRadius(12)
     }
 }

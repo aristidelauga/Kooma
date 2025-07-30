@@ -41,6 +41,7 @@ final class FirestoreClient: FirestoreClientInterface {
         database.collection(FirestoreConstants.roomsCollectionName)
     }
     
+    /// Saves a document corresponding to a "RoomDomain" on Firestore
     func saveRoom(_ room: RoomDomain) async throws {
         do {
             try self.roomsCollection.addDocument(from: room)
@@ -50,6 +51,9 @@ final class FirestoreClient: FirestoreClientInterface {
         }
     }
     
+    /// Joins a "RoomDomain" matching the given code on Firestore
+    /// The joining mechanism is made by adding the users to the members' array
+    /// And its ID to the regularMembersID one
     func joinRoom(withCode code: String, user: UserDomain) async throws {
         let query = roomsCollection.whereField("code", isEqualTo: code).limit(to: 1)
         let snapshot: QuerySnapshot
@@ -74,6 +78,12 @@ final class FirestoreClient: FirestoreClientInterface {
         }
     }
     
+    /// Allows the user to leave the room matching the given ID
+    /// Removes also all the user's votes
+    /// If the leaving user is the administrator of the Room
+    /// Name the very user who joined the room after the administrator
+    /// As the new administrator of the room
+    /// If the user is alone in his room, deletes the room
     func leaveRoom(roomID: String, user: UserDomain) async throws {
         let ref = roomsCollection.document(roomID)
         let snapshot = try await ref.getDocument()
@@ -122,6 +132,7 @@ final class FirestoreClient: FirestoreClientInterface {
         }
     }
     
+    /// Delete the room on Firestore
     func deleteRoom(withID: String, byuserID userID: String) async throws {
         let ref = roomsCollection.document(withID)
         let snapshot = try await ref.getDocument()
@@ -139,6 +150,8 @@ final class FirestoreClient: FirestoreClientInterface {
         try await ref.delete()
     }
     
+    /// Punctual call to Firestore that fetches
+    /// all the rooms where the user is the administrator
     func getMyRooms(forUserID userID: String) async throws -> [RoomDomain] {
         do {
             let snapshot = try await roomsCollection.whereField(FirestoreConstants.myRoomsKey, isEqualTo: userID).getDocuments()
@@ -151,6 +164,8 @@ final class FirestoreClient: FirestoreClientInterface {
         }
     }
     
+    /// Punctual call to Firestore that fetches
+    /// all the rooms where the user is a joined member
     func getJoinedRooms(forUserID userID: String) async throws -> [RoomDomain] {
         do {
             let snapshot = try await roomsCollection.whereField(FirestoreConstants.joinedRoomsKey, arrayContains: userID).getDocuments()
@@ -163,6 +178,8 @@ final class FirestoreClient: FirestoreClientInterface {
         }
     }
 
+    /// Allows users to vote and to remove vote for a given restaurant
+    /// Uses the `VoteAction` parameter to wether vote or remote a vote
     func updateVotes(forRoomID roomID: String, restaurantID: String, userID: String, action: VoteAction) async throws {
         let ref = roomsCollection.document(roomID)
         
@@ -190,6 +207,8 @@ final class FirestoreClient: FirestoreClientInterface {
         }
     }
     
+    /// Listener for all the rooms where the user is a joined member
+    /// Allows the user to have real-time updates on these rooms
     func listenToMyRooms(forUserID userID: String) -> AsyncThrowingStream<[RoomDomain], Error> {
         return AsyncThrowingStream { @MainActor continuation in
             let listener = roomsCollection.whereField(FirestoreConstants.myRoomsKey, isEqualTo: userID)
@@ -216,6 +235,8 @@ final class FirestoreClient: FirestoreClientInterface {
         }
     }
     
+    /// Listener for all the rooms where the user is the administrator
+    /// Allows the user to have real-time updates on these rooms
     func listenToJoinedRooms(forUserID userID: String) -> AsyncThrowingStream<[RoomDomain], any Error> {
         return AsyncThrowingStream { @MainActor continuation in
             let listener = roomsCollection.whereField(FirestoreConstants.joinedRoomsKey, arrayContains: userID)
@@ -242,6 +263,8 @@ final class FirestoreClient: FirestoreClientInterface {
         }
     }
     
+    /// Listener for a given room thanks to the ID provided
+    /// Allows the user to have real-time updates on this very room
     func listenToRoom(withID roomID: String) -> AsyncThrowingStream<RoomDomain, Error> {
         AsyncThrowingStream { continuation in
             let listener = roomsCollection.document(roomID)
@@ -281,8 +304,6 @@ final class FirestoreClient: FirestoreClientInterface {
             }
         }
     }
-    
-    
 }
 
 final class UnsafeSendableBox<T>: @unchecked Sendable {

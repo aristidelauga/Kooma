@@ -15,7 +15,6 @@ final class FirestoreServiceTests: XCTestCase {
     }
     
     override func tearDown() {
-        service.stopListening()
         fakeClient.reset()
         service = nil
         fakeClient = nil
@@ -247,45 +246,7 @@ final class FirestoreServiceTests: XCTestCase {
         XCTAssertEqual(service.joinedRooms.count, 0)
     }
     
-    // MARK: - getRoomByID Tests
-    
-    func testGetRoomByID_FromMyRooms() async throws {
-        // Given
-        let room = FixturesConstants.createSampleRoom()
-        fakeClient.addRoom(room)
-        try await service.fetchMyRooms(withUserID: FixturesConstants.sampleUser1Domain.id)
-        
-        // When
-        let foundRoom = try await service.getRoomByID(room.id!, userID: FixturesConstants.sampleUser1Domain.id)
-        
-        // Then
-        XCTAssertNotNil(foundRoom)
-        XCTAssertEqual(foundRoom?.id, room.id)
-    }
-    
-    func testGetRoomByID_FromJoinedRooms() async throws {
-        // Given
-        let room = FixturesConstants.createSampleRoom()
-        fakeClient.addRoom(room)
-        try await service.fetchJoinedRooms(withUserID: FixturesConstants.sampleUser2Domain.id)
-        
-        // When
-        let foundRoom = try await service.getRoomByID(room.id!, userID: FixturesConstants.sampleUser2Domain.id)
-        
-        // Then
-        XCTAssertNotNil(foundRoom)
-        XCTAssertEqual(foundRoom?.id, room.id)
-    }
-    
-    func testGetRoomByID_NotFound() async throws {
-        // When
-        let foundRoom = try await service.getRoomByID("nonexistent", userID: FixturesConstants.sampleUser1Domain.id)
-        
-        // Then
-        XCTAssertNil(foundRoom)
-    }
-    
-    // MARK: - Vote Tests
+        // MARK: - Vote Tests
     
     func testAddVote_Success() async throws {
         // Given
@@ -462,70 +423,6 @@ final class FirestoreServiceTests: XCTestCase {
         XCTAssertEqual(receivedRooms.count, 2)
         XCTAssertEqual(receivedRooms[0].votes["restaurant2"]?.count ?? 0, 0) // Initial state
         XCTAssertEqual(receivedRooms[1].votes["restaurant2"]?.count ?? 0, 1) // After vote update
-    }
-    
-    // MARK: - startListening/stopListening Tests
-    
-    func testStartListening_UpdatesMyRooms() async throws {
-        // Given
-        let expectation = XCTestExpectation(description: "Service myRooms property updates")
-        
-        // When
-        service.startListening(forUserID: FixturesConstants.sampleUser1Domain.id)
-        
-        // Wait a bit for the initial empty state
-        try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
-        XCTAssertEqual(service.myRooms.count, 0)
-        
-        // Add a room
-        let room = FixturesConstants.createSampleRoom()
-        try await fakeClient.saveRoom(room)
-        
-        // Wait for the update
-        try await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds
-        
-        // Then
-        XCTAssertEqual(service.myRooms.count, 1)
-        XCTAssertEqual(service.myRooms.first?.id, room.id)
-        
-        expectation.fulfill()
-        await fulfillment(of: [expectation], timeout: 1.0)
-    }
-    
-    func testStopListening() async throws {
-        // Given
-        service.startListening(forUserID: FixturesConstants.sampleUser2Domain.id)
-        try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
-        
-        // When
-        service.stopListening()
-        
-        // Add a room after stopping - should not update the service properties
-        let room = FixturesConstants.createSampleRoom()
-        try await fakeClient.saveRoom(room)
-        
-        try await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds
-        
-        // Then - myRooms should remain empty since we stopped listening
-        XCTAssertEqual(service.myRooms.count, 0)
-    }
-    
-    func testStartListening_CancelsPreviousListeners() async throws {
-        // Given
-        service.startListening(forUserID: FixturesConstants.sampleUser1Domain.id)
-        try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
-        
-        // When - Start listening again (should cancel previous)
-        service.startListening(forUserID: FixturesConstants.sampleUser1Domain.id)
-        
-        // Add a room
-        let room = FixturesConstants.createSampleRoom()
-        try await fakeClient.saveRoom(room)
-        
-        try await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds
-        
-        // Then - Should still work correctly
-        XCTAssertEqual(service.myRooms.count, 1)
     }
     
     // MARK: - Integration Tests

@@ -67,6 +67,11 @@ struct RestaurantDetailView: View {
         }
         .padding(.horizontal, 12)
         .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            Color.kmBeige
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .edgesIgnoringSafeArea(.all)
+        )
         .navigationBarBackButtonHidden()
         .onAppear {
             Task(priority: .high, operation: {

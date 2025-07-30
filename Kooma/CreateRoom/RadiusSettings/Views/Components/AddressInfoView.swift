@@ -6,6 +6,7 @@ struct AddressInfoView: View {
     var body: some View {
 		HStack {
 			Image(systemName: "mappin.and.ellipse")
+                .foregroundStyle(.kmBlack)
 				.imageScale(.large)
 				.padding(10)
 				.background(
