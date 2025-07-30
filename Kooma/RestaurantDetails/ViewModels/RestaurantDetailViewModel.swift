@@ -9,6 +9,7 @@ final class RestaurantDetailViewModel {
     var lookAroundScene: MKLookAroundScene?
     var mkMapItem: MKMapItem?
     
+    /// Builds a MKMapItem using the data from the given `RestaurantUI`
     func searchMapItem(for restaurant: RestaurantUI) async -> MKMapItem? {
         guard !restaurant.address.isEmpty else {
             return nil
@@ -37,10 +38,13 @@ final class RestaurantDetailViewModel {
         return nil
     }
     
+    
+    /// Sends analytics each time the button opening the webView is triggered
     func sendAnalyticsForWebView() {
         ActionEvent.sendAnalytics(event: .openWebView)
     }
     
+    /// Uses the restaurant `phoneNumber` to make a call
     func makeACall(_ string: String) {
         guard let url = URL(string: "tel://\(string)"), UIApplication.shared.canOpenURL(url) else {
             return
@@ -49,6 +53,7 @@ final class RestaurantDetailViewModel {
         ActionEvent.sendAnalytics(event: .callRestaurant)
     }
     
+    /// Builds a LounkAroundScene using the `mkMapItem` built by `searchMapItem`
     func fetchLookAroundPreview() {
         guard let mkMapItem = self.mkMapItem else { return }
         self.lookAroundScene = nil
@@ -58,6 +63,7 @@ final class RestaurantDetailViewModel {
         }
     }
     
+    /// Opens the POI using the `mkMapItem` built by `searchMapItem`
     func openInMaps(_ restaurant: RestaurantUI) throws {
         if let item = self.mkMapItem {
             item.name = restaurant.name

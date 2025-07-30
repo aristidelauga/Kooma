@@ -24,6 +24,9 @@ import Foundation
         self.room = room
     }
     
+    /// Uses the RestaurantService to find restaurants around the room's address
+    /// using the given radius
+    /// `Radius * 1000` being used to calculate the radius in kilometers
     func searchRestaurants(within radius: Double) async throws {
         guard let address = self.room.address, !address.isEmpty else {
             throw NSError(domain: "RoomUI", code: 4, userInfo: [NSLocalizedDescriptionKey: "Address is missing. Please enter a valid address"])
@@ -45,6 +48,7 @@ import Foundation
         ActionEvent.sendAnalytics(event: .createdNewRoomSuccessfully)
     }
     
+    /// Adds the new created room to Firestore
     func addNewRoom(_ room: RoomUI) async throws {
         try await self.service.createRoom(room)
     }

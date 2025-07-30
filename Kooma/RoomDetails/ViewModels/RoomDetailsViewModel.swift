@@ -21,6 +21,8 @@ final class RoomDetailsViewModel {
         }
     }
     
+    /// Listens to any modifications made in the room matching the `currentRoom`'s ID
+    /// So it updates the `currentRoom` in real-time
     private func setupCurrentRoomObservation(roomID: String) {
         currentRoomObservationTask?.cancel()
         
@@ -37,10 +39,12 @@ final class RoomDetailsViewModel {
         }
     }
     
+    /// Returns a boolean asserting whether a user has voted for a given restaurant
     func hasVoted(forRestaurant restaurant: RestaurantUI, user: UserUI) -> Bool {
         self.currentRoom.votes[restaurant.id]?.contains(user.id) ?? false
     }
     
+    /// Returns the amounf of vote for a given restaurant
     func getVoteCount(withRestaurantID id: String) -> Int {
         guard let restaurantVotes = self.currentRoom.votes[id] else {
             return 0
@@ -48,6 +52,8 @@ final class RoomDetailsViewModel {
         return restaurantVotes.count
     }
     
+    /// Vote for a given restaurant with a given user ID
+    /// Checks if the user has already voted for two restaurants or not
     func vote(forRestaurant restaurant: RestaurantUI, user: UserUI) async throws {
         guard !hasVoted(forRestaurant: restaurant, user: user) else {
             return
@@ -67,6 +73,9 @@ final class RoomDetailsViewModel {
         try await self.service.addVote(forRoomID: roomID, restaurantID: restaurant.id, userID: user.id)
     }
     
+    /// Removes vote of a given user for a given restaurant
+    /// Checks if the user did really voted for this restaurant or not
+    /// If he did, terminates the method
     func removeVote(forRestaurant restaurant: RestaurantUI, user: UserUI) async throws {
         guard hasVoted(forRestaurant: restaurant, user: user) else {
             return
@@ -80,6 +89,7 @@ final class RoomDetailsViewModel {
         try await service.removeVote(forRoomID: roomID, restaurantID: restaurant.id, userID: user.id)
     }
     
+    /// Allows the user to leave a room
     func leaveRoom(user: UserUI) async throws {
         guard let id = self.currentRoom.id else {
             return
@@ -87,6 +97,7 @@ final class RoomDetailsViewModel {
         try await self.service.leaveRoom(roomID: id, user: user)
     }
     
+    /// Allows the administrator of a room to delete it
     func deleteRoom(user: UserUI) async throws {
         guard let id = self.currentRoom.id else {
             return
@@ -95,6 +106,9 @@ final class RoomDetailsViewModel {
         self.roomWasDeleted = true
     }
     
+    
+    /// Fetches all the users' names who voted for a given restaurant
+    /// So we can transfer these names to `RestaurantDetailView`
     func getVotersNames(for restaurantID: String) -> [String] {
         
         let votersID = self.currentRoom.votes[restaurantID] ?? []

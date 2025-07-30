@@ -12,7 +12,7 @@ import FirebaseAnalytics
 		self.user = user
 	}
 
-    /// Create a room with a name and the administrator only.
+    /// Creates a room with a name and the administrator only.
     /// The ID has to be nil as it will be given a value via Firestore
 	func createRoomWithName(with owner: UserUI)  {
         guard !self.name.isEmpty else {

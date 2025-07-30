@@ -28,15 +28,21 @@ import MapKit
 		self.room = nil
 	}
 
+    /// Uses the LocalSearchCompleter to search for the address corresponding
+    /// to the one written in the textfield
 	func searchAddress(_ searchableText: String) {
 		guard !searchableText.isEmpty else { return }
 		localSearchCompleter.queryFragment = searchableText
 	}
 
+    /// Fills the address matching the address written in the texfield
+    /// Triggered when a user taps on any cell of the displayed results
+    /// of the List
 	func fillSearchText(result: String) {
 		searchableText = result
 	}
 
+    /// Assigns the address written in the textfiel to the room
 	func assignAddressToRoom() {
         self.room?.address = self.searchableText
 	}

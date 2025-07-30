@@ -64,6 +64,8 @@ enum ActionEvent: Equatable {
         }
     }
     
+    /// Method used to send the analytics to Firebase
+    /// Uses an `ActionEvent` as an argument
     static func sendAnalytics(event: ActionEvent) {
         Analytics.logEvent(event.name, parameters: event.parameters)
         print(event.printStatement)

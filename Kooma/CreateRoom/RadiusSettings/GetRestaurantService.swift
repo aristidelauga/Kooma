@@ -12,6 +12,7 @@ protocol GetRestaurantInterface {
 
 final class GetRestaurantService: GetRestaurantInterface {
 
+    /// Finds the coordinates corresponding to the given `address`
 	func getCoordinate(from address: String) async throws -> CLLocationCoordinate2D {
 		return try await withCheckedThrowingContinuation { continuation in
 			CLGeocoder().geocodeAddressString(address) { placemarks, error in
@@ -24,6 +25,8 @@ final class GetRestaurantService: GetRestaurantInterface {
 		}
 	}
 
+    /// Look for the restaurants around the given `coordinates` and `radiusInMeters`
+    /// Uses a natural language query to look for nearby `restaurants`
 	func searchNearbyRestaurants(
 		at coordinate: CLLocationCoordinate2D,
 		radiusInMeters: Double
