@@ -3,6 +3,7 @@ import Foundation
 
 enum JoinRoomError: Error {
     case alreadyJoined
+    case administrator
     case unableToFindRoom
     case noInternetConnection
     
@@ -10,6 +11,8 @@ enum JoinRoomError: Error {
         switch self {
         case .alreadyJoined:
             "You already joined this room"
+        case .administrator:
+            "You are the administrator of this room"
         case .unableToFindRoom:
             "Unable to find room matching your code"
         case .noInternetConnection:
@@ -21,6 +24,8 @@ enum JoinRoomError: Error {
         switch self {
         case .alreadyJoined:
             "Feel free to retry with a different code"
+        case .administrator:
+            "You can't join this room as you are the administrator"
         case .unableToFindRoom:
             "Please try again later"
         case .noInternetConnection:

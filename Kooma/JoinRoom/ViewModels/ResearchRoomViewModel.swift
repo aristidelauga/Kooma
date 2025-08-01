@@ -21,9 +21,15 @@ final class ResearchRoomViewModel {
     }
     
     func joinRoom(code: String, user: UserUI) async throws {
-        guard !joinedRooms.contains(where: { $0.code == code }), !myRooms.contains(where: {$0.hostID == user.id }) else {
+        
+        guard !joinedRooms.contains(where: { $0.code == code }) else {
             throw JoinRoomError.alreadyJoined
         }
+        
+        if myRooms.contains(where: { $0.code == code }) {
+            throw JoinRoomError.administrator
+        }
+        
         do {
             try await self.service.joinRoom(withCode: code, user: user)
         } catch {

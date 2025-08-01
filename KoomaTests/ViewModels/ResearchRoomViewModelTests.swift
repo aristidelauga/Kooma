@@ -87,7 +87,41 @@ final class ResearchRoomViewModelTests: XCTestCase {
         }
     }
     
-    func testJoinRoom_whenRoomNotFound_throwsUnableToFindRoomError() async {
+    func testJoinRoom_whenUserIsAdministrator_throwsAdministratorError() async throws {
+        // Given
+        let roomCode = "ADMIN_ROOM"
+        let adminUser = FixturesConstants.sampleUserUI1
+        let room = FixturesConstants.createSampleRoom(code: roomCode, administrator: try adminUser.toDomain())
+        mockClient.addRoom(room)
+
+        // When/Then
+        do {
+            try await viewModel.joinRoom(code: roomCode, user: adminUser)
+            XCTFail("Should have thrown administrator error")
+        } catch let error as JoinRoomError {
+            XCTAssertEqual(error, .administrator)
+        } catch {
+            XCTFail("Should have thrown JoinRoomError.administrator but received \(error) instead")
+        }
+    }
+    
+    func testJoinRoom_whenServiceThrowsError_throwsUnableToFindRoomError() async {
+        // Given
+        let roomCode = "NON_EXISTENT_ROOM"
+        let user = FixturesConstants.sampleUserUI3
+        
+        // When/Then
+        do {
+            try await viewModel.joinRoom(code: roomCode, user: user)
+            XCTFail("Should have thrown unableToFindRoom error")
+        } catch let error as JoinRoomError {
+            XCTAssertEqual(error, .unableToFindRoom)
+        } catch {
+            XCTFail("Should have thrown JoinRoomError.unableToFindRoom, but got \(error)")
+        }
+    }
+    
+    func testJoinRoom_whenRoomNotFound_throwsError() async {
         // Given
         let roomCode = "INVALID"
         let user = FixturesConstants.sampleUserUI3
@@ -95,15 +129,15 @@ final class ResearchRoomViewModelTests: XCTestCase {
         // When/Then
         do {
             try await viewModel.joinRoom(code: roomCode, user: user)
-            XCTFail("Should have thrown unableToFindRoom error")
+            XCTFail("Should have thrown an error")
         } catch let error as JoinRoomError {
             XCTAssertEqual(error, .unableToFindRoom)
         } catch {
-            XCTFail("Should have thrown JoinRoomError.unableToFindRoom, but got \(error)")
+            XCTFail("Should have thrown NSError, but got \(error)")
         }
     }
     
-    func testJoinRoom_withEmptyCode_throwsUnableToFindRoomError() async {
+    func testJoinRoom_withEmptyCode_throwsError() async {
         // Given
         let roomCode = ""
         let user = FixturesConstants.sampleUserUI3
@@ -111,15 +145,15 @@ final class ResearchRoomViewModelTests: XCTestCase {
         // When/Then
         do {
             try await viewModel.joinRoom(code: roomCode, user: user)
-            XCTFail("Should have thrown unableToFindRoom error")
+            XCTFail("Should have thrown an error")
         } catch let error as JoinRoomError {
             XCTAssertEqual(error, .unableToFindRoom)
         } catch {
-            XCTFail("Should have thrown JoinRoomError.unableToFindRoom, but got \(error)")
+            XCTFail("Should have thrown NSError, but got \(error)")
         }
     }
     
-    func testJoinRoom_withWhitespaceCode_throwsUnableToFindRoomError() async {
+    func testJoinRoom_withWhitespaceCode_throwsError() async {
         // Given
         let roomCode = "   "
         let user = FixturesConstants.sampleUserUI3
@@ -127,53 +161,45 @@ final class ResearchRoomViewModelTests: XCTestCase {
         // When/Then
         do {
             try await viewModel.joinRoom(code: roomCode, user: user)
-            XCTFail("Should have thrown unableToFindRoom error")
+            XCTFail("Should have thrown an error")
         } catch let error as JoinRoomError {
             XCTAssertEqual(error, .unableToFindRoom)
         } catch {
-            XCTFail("Should have thrown JoinRoomError.unableToFindRoom, but got \(error)")
+            XCTFail("Should have thrown NSError, but got \(error)")
         }
     }
     
-    func testJoinRoom_whenClientThrowsError_throwsUnableToFindRoomError() async {
+    func testJoinRoom_whenClientThrowsError_throwsError() async {
         // Given
         let roomCode = "ABC123"
         let user = FixturesConstants.sampleUserUI3
         mockClient.shouldThrowErrorOnJoinRoom = true
         
-        // When/Then
         do {
             try await viewModel.joinRoom(code: roomCode, user: user)
-            XCTFail("Should have thrown unableToFindRoom error")
+            XCTFail("Should have thrown an error")
         } catch let error as JoinRoomError {
             XCTAssertEqual(error, .unableToFindRoom)
         } catch {
-            XCTFail("Should have thrown JoinRoomError.unableToFindRoom, but got \(error)")
+            XCTFail("Should have thrown NSError, but got \(error)")
         }
     }
     
-    // MARK: - fetchJoinedRooms Tests
-    
     func testFetchJoinedRooms_withValidUserID_succeeds() async throws {
-        // Given
         let userID = FixturesConstants.sampleUserUI2.id
         let room = FixturesConstants.createSampleRoom()
         mockClient.addRoom(room)
         
-        // When
         try await viewModel.fetchJoinedRooms(userID: userID)
         
-        // Then
         XCTAssertEqual(viewModel.joinedRooms.count, 1)
         XCTAssertEqual(viewModel.joinedRooms.first?.id, room.id)
     }
     
     func testFetchJoinedRooms_whenClientThrowsError_propagatesError() async {
-        // Given
         let userID = FixturesConstants.sampleUserUI2.id
         mockClient.shouldThrowErrorOnGetJoinedRooms = true
         
-        // When/Then
         do {
             try await viewModel.fetchJoinedRooms(userID: userID)
             XCTFail("Should have thrown an error")
@@ -236,26 +262,21 @@ final class ResearchRoomViewModelTests: XCTestCase {
         try await viewModel.fetchJoinedRooms(userID: user.id)
         try await viewModel.joinRoom(code: roomCode, user: user)
         
-        // Then
         let joinedRooms = try await mockClient.getJoinedRooms(forUserID: user.id)
         XCTAssertEqual(joinedRooms.count, 1)
         XCTAssertEqual(joinedRooms.first?.code, roomCode)
     }
     
     func testJoinRoomFlow_whenAlreadyJoined_preventsJoining() async throws {
-        // Given
         let roomCode = "ABC123"
         let user = FixturesConstants.sampleUserUI3
         let room = FixturesConstants.createSampleRoom(code: roomCode)
         mockClient.addRoom(room)
         
-        // Join room first
         try await mockClient.joinRoom(withCode: roomCode, user: user.toDomain())
         
-        // Fetch joined rooms to populate viewModel
         try await viewModel.fetchJoinedRooms(userID: user.id)
         
-        // When/Then
         do {
             try await viewModel.joinRoom(code: roomCode, user: user)
             XCTFail("Should have thrown alreadyJoined error")
@@ -268,19 +289,17 @@ final class ResearchRoomViewModelTests: XCTestCase {
     
     // MARK: - Edge Cases
     
-    func testJoinRoom_withSpecialCharactersInCode_handlesCorrectly() async {
-        // Given
+    func testJoinRoom_withSpecialCharactersInCode_throwsError() async {
         let roomCode = "ABC-123"
         let user = FixturesConstants.sampleUserUI3
         
-        // When/Then
         do {
             try await viewModel.joinRoom(code: roomCode, user: user)
-            XCTFail("Should have thrown unableToFindRoom error")
+            XCTFail("Should have thrown an error")
         } catch let error as JoinRoomError {
             XCTAssertEqual(error, .unableToFindRoom)
         } catch {
-            XCTFail("Should have thrown JoinRoomError.unableToFindRoom, but got \(error)")
+            XCTFail("Should have thrown NSError, but got \(error)")
         }
     }
     
