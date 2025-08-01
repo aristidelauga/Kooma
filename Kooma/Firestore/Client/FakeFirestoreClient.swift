@@ -91,7 +91,11 @@ final class FakeFirestoreClient: FirestoreClientInterface {
         guard var room = joinedRooms[code] else {
             throw NSError(domain: "AppError", code: 404, userInfo: [NSLocalizedDescriptionKey: "Room with code '\(code)' not found."])
         }
-        
+
+		guard !(room.administrator.id == user.id) else {
+			throw JoinRoomError.administrator
+		}
+
         // Add user to room if not already present
         if !room.members.contains(where: { $0.id == user.id }) {
             room.members.append(user)

@@ -87,24 +87,26 @@ final class ResearchRoomViewModelTests: XCTestCase {
         }
     }
     
-    func testJoinRoom_whenUserIsAdministrator_throwsAdministratorError() async throws {
-        // Given
-        let roomCode = "ADMIN_ROOM"
-        let adminUser = FixturesConstants.sampleUserUI1
-        let room = FixturesConstants.createSampleRoom(code: roomCode, administrator: try adminUser.toDomain())
-        mockClient.addRoom(room)
+	func testJoinRoom_whenUserIsAdministrator_throwsAdministratorError() async throws {
+		// Given
+		let roomCode = "ADMIN_ROOM"
+		let adminUser = FixturesConstants.sampleUserUI1
+		let room = FixturesConstants.createSampleRoom(code: roomCode, administrator: try adminUser.toDomain())
+		mockClient.addRoom(room)
 
-        // When/Then
-        do {
-            try await viewModel.joinRoom(code: roomCode, user: adminUser)
-            XCTFail("Should have thrown administrator error")
-        } catch let error as JoinRoomError {
-            XCTAssertEqual(error, .administrator)
-        } catch {
-            XCTFail("Should have thrown JoinRoomError.administrator but received \(error) instead")
-        }
-    }
-    
+		try await viewModel.fetchMyRooms(userID: adminUser.id)
+
+		// When/Then
+		do {
+			try await viewModel.joinRoom(code: roomCode, user: adminUser)
+			XCTFail("Should have thrown administrator error")
+		} catch let error as JoinRoomError {
+			XCTAssertEqual(error, .administrator)
+		} catch {
+			XCTFail("Should have thrown JoinRoomError.administrator but received \(error) instead")
+		}
+	}
+
     func testJoinRoom_whenServiceThrowsError_throwsUnableToFindRoomError() async {
         // Given
         let roomCode = "NON_EXISTENT_ROOM"
